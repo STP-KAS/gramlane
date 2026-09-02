@@ -1,0 +1,30 @@
+{{define "header"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/">GRAMLANE</a>
+    <a class="tiny" href="https://x.com/StppStp">@StppStp</a>
+    <nav>
+      <a href="/" class="{{if eq .Active "home"}}on{{end}}">Home</a>
+      <a href="/desk" class="{{if eq .Active "desk"}}on{{end}}">Desk</a>
+      <a href="/honest" class="{{if eq .Active "honest"}}on{{end}}">Claims</a>
+      <a href="/docs" class="{{if eq .Active "docs"}}on{{end}}">Docs</a>
+      <a href="/wallets" class="{{if eq .Active "wallets"}}on{{end}}">Wallets</a>
+      <a href="/feedback" class="{{if eq .Active "feedback"}}on{{end}}">Feedback</a>
+      <a href="/safety" class="{{if eq .Active "safety"}}on{{end}}">Safety</a>
+    </nav>
+    <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Connect wallet">Connect wallet</button>
+    <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
+    <span class="chip">L1 · grams · no L2</span>
+  </header>
+{{end}}

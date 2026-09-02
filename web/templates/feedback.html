@@ -1,0 +1,20 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">Feedback</div>
+  <h1>Tell us what broke.</h1>
+  <p class="lede">Stored on this PC in <span class="mono">Documents\kaspa\feedback</span>. Not a ticket system. This site never DMs you — even if you leave a handle, we will not message first. Never paste a seed, key, or password.</p>
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Query}}<p class="ok">Saved {{.Query}}</p>{{end}}
+  <form class="row" action="/feedback" method="post" style="flex-direction:column;align-items:stretch;max-width:640px">
+    <div>
+      <label>Message</label>
+      <textarea name="text" rows="8" required placeholder="what you expected, what happened"></textarea>
+    </div>
+    <div>
+      <label>Optional handle (we still will not DM you)</label>
+      <input name="contact" placeholder="x/@ or nothing" />
+    </div>
+    <button class="btn mint" type="submit">Store locally</button>
+  </form>
+</main>
+{{template "footer" .}}

@@ -1,0 +1,17 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">Receipt</div>
+  <h1>Job returned.</h1>
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Run}}
+  <table>
+    <tr><th>job</th><td>{{.Run.Job.Name}}</td></tr>
+    <tr><th>grams billed</th><td class="mono">{{.Run.Quote.Grams}}</td></tr>
+    <tr><th>paid header</th><td class="mono">{{.Run.Paid}}</td></tr>
+    <tr><th>note</th><td>{{.Run.Note}}</td></tr>
+  </table>
+  <pre>{{.Run.Output}}</pre>
+  {{end}}
+  <p><a class="btn ghost" href="/desk">Back to desk</a></p>
+</main>
+{{template "footer" .}}
