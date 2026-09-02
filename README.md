@@ -12,10 +12,19 @@ Sister dApp (no grams; vision of a native Kaspa L1 stable):
 ```powershell
 cd C:\Users\Remco\Documents\kaspa\superapp
 go test ./...
-go run ./cmd/gramlane
+go build -o gramlane.exe ./cmd/gramlane
+.\gramlane.exe
 ```
 
 http://localhost:8081
+
+If the browser says “localhost refused to connect”, the process is dead. Start all three:
+
+```powershell
+powershell -File C:\Users\Remco\Documents\kaspa\start-local.ps1
+```
+
+Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/project-delusional).
 
 | Path | What |
 | --- | --- |
@@ -23,7 +32,9 @@ http://localhost:8081
 | `/job/resolve` | Quote + run a name lookup |
 | `/api/run?job=dag` | HTTP 402 until `X-Work-Credit` |
 | `/honest` | Claims |
-| `/wallets` | All Kaspa wallets. Inject: Kasware + Kastle. Ledger: KasVault. |
+| `/wallets` | All Kaspa wallets. Inject: Kasware + Kastle. Ledger: KasVault. Log out supported. |
+| `/safety` | This site never DMs you. Never paste a seed. |
+| `/feedback` | Stored on this PC under `Documents\kaspa\feedback\gramlane` |
 
 ## Map (this folder)
 
