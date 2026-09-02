@@ -1,0 +1,31 @@
+{{template "header" .}}
+<main>
+  {{if .Job}}
+  <div class="kicker">{{.Job.Lane}} · {{.Job.Kind}}</div>
+  <h1>{{.Job.Name}}</h1>
+  <p class="lede">{{.Job.Blurb}}</p>
+  {{if .Quote}}
+  <table>
+    <tr><th>grams</th><td class="mono">{{.Quote.Grams}}</td></tr>
+    <tr><th>KAS fallback</th><td class="mono">{{.Quote.KAS}} KAS ({{.Quote.Sompi}} sompi)</td></tr>
+    <tr><th>USD</th><td>{{.Quote.USD}}</td></tr>
+    <tr><th>scheme</th><td class="mono">{{.Quote.Scheme}}</td></tr>
+  </table>
+  {{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  <form class="row" action="/run" method="post">
+    <input type="hidden" name="job" value="{{.Job.ID}}" />
+    <div>
+      <label>name or query</label>
+      <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+    </div>
+    <div>
+      <label>receipt id (X-Work-Credit / txid)</label>
+      <input name="payment" placeholder="local voucher or kas txid" />
+    </div>
+    <button class="btn mint" type="submit">Run job</button>
+  </form>
+  <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kns.kas</span> → 402. Retry with header <span class="mono">X-Work-Credit</span>.</p>
+  {{end}}
+</main>
+{{template "footer" .}}

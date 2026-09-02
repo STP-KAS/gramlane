@@ -1,0 +1,18 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">Work desk</div>
+  <h1>Jobs in grams.</h1>
+  <p class="lede">Each run asks for a WorkCredit burn (or KAS fallback at 100 sompi/gram). Receipts are HTTP-layer. The covenant is the ledger; this process does not broadcast Toccata spends.</p>
+  <table>
+    <tr><th>Job</th><th>Lane</th><th>Grams</th><th></th></tr>
+    {{range .Jobs}}
+    <tr>
+      <td><strong>{{.Name}}</strong><div class="lede" style="font-size:14px;margin:0">{{.Blurb}}</div></td>
+      <td class="mono">{{.Lane}}</td>
+      <td class="price">{{.Grams}}</td>
+      <td><a href="/job/{{.ID}}">run</a></td>
+    </tr>
+    {{end}}
+  </table>
+</main>
+{{template "footer" .}}

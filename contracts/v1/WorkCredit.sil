@@ -1,0 +1,45 @@
+pragma silverscript ^0.1.0;
+
+// Gramlane dApp — prepaid L1 grams. Not a dollar. No L2.
+// 1 credit = 1 gram of named-lane mass.
+
+contract WorkCredit(pubkey initIssuer, pubkey initHolder, int initCredits, byte[32] initLane) {
+    pubkey issuer = initIssuer;
+    pubkey holder = initHolder;
+    int credits = initCredits;
+    byte[32] lane = initLane;
+
+    entry consume(sig holderSig, sig issuerSig, int used) {
+        require(checkSig(holderSig, holder));
+        require(checkSig(issuerSig, issuer));
+        require(used > 0);
+        require(used <= credits);
+        validateOutputState(0, State {
+            issuer: issuer,
+            holder: holder,
+            credits: credits - used,
+            lane: lane
+        });
+    }
+
+    entry transfer(sig holderSig, pubkey nextHolder) {
+        require(checkSig(holderSig, holder));
+        validateOutputState(0, State {
+            issuer: issuer,
+            holder: nextHolder,
+            credits: credits,
+            lane: lane
+        });
+    }
+
+    entry mint(sig issuerSig, int added) {
+        require(checkSig(issuerSig, issuer));
+        require(added > 0);
+        validateOutputState(0, State {
+            issuer: issuer,
+            holder: holder,
+            credits: credits + added,
+            lane: lane
+        });
+    }
+}
