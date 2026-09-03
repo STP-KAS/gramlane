@@ -14,3 +14,22 @@ func TestLiveKeys(t *testing.T) {
 		t.Fatal("desk must not equal holder")
 	}
 }
+
+func TestP2SHAddress(t *testing.T) {
+	addr, hash, n, err := P2SH()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n < 100 || len(hash) != 64 {
+		t.Fatalf("n=%d hash=%s", n, hash)
+	}
+	if len(addr) < 20 || addr[:6] != "kaspa:" {
+		t.Fatal(addr)
+	}
+	if addr[6] != 'p' {
+		t.Fatalf("P2SH should start kaspa:p… got %s", addr)
+	}
+	if addr == DeskAddress || addr == HolderAddress {
+		t.Fatal("p2sh collided with p2pk")
+	}
+}

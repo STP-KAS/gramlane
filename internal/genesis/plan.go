@@ -1,6 +1,6 @@
 // Package genesis is the WorkCredit instance tied to the 0.5 KAS L1 sale.
 // Template hash is the code. Constructor state is this issuer/holder/credits/lane.
-// This process does not broadcast the covenant UTXO. Kasware sendKaspa cannot lock a script.
+// Deploy is sendKaspa to the P2SH of the compiled redeem script.
 package genesis
 
 import (
@@ -38,6 +38,11 @@ type Plan struct {
 	VoucherOnChain bool   `json:"voucherOnChain"`
 	Note           string `json:"note"`
 	CtorPath       string `json:"ctorPath"`
+	P2SH           string `json:"p2sh"`
+	ScriptHash     string `json:"scriptHash"`
+	RedeemLen      int    `json:"redeemLen"`
+	FundSompi      uint64 `json:"fundSompi"`
+	FundKAS        string `json:"fundKas"`
 }
 
 func Live() Plan {
@@ -45,7 +50,7 @@ func Live() Plan {
 	if _, err := os.Stat(art); err != nil {
 		art = ""
 	}
-	return Plan{
+	p := Plan{
 		SaleTx:         SaleTx,
 		Explorer:       Explorer,
 		Desk:           DeskAddress,
@@ -60,8 +65,18 @@ func Live() Plan {
 		OnChainSale:    true,
 		VoucherOnChain: false,
 		CtorPath:       "contracts/v1/ctor-WorkCredit-live.json",
-		Note:           "0.5 KAS sale is on L1. WorkCredit.sil compiled with those two x-only pubkeys and 500000 grams on lane SEQ1. Template hash is the code (same for every WorkCredit). Instance state is in the artifact. Broadcasting the covenant UTXO is not sendKaspa — it is a Toccata P2SH deploy. Not done.",
+		FundSompi:      SaleSompi,
+		FundKAS:        "0.5",
+		Note:           "Sale is on L1. Deploy = Kasware sendKaspa of 0.5 KAS to the P2SH of this redeem script. That output is the WorkCredit UTXO. consume() is a later spend of that UTXO.",
 	}
+	if addr, hash, n, err := P2SH(); err == nil {
+		p.P2SH = addr
+		p.ScriptHash = hash
+		p.RedeemLen = n
+	} else {
+		p.Note += " P2SH encode failed: " + err.Error()
+	}
+	return p
 }
 
 func MustHex(h string) []byte {
