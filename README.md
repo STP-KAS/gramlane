@@ -2,11 +2,11 @@
 
 **project delusional** · [@StppStp](https://x.com/StppStp)
 
-A **Kaspa L1** sequenced work desk. Jobs are billed in **grams** (Work Credits). Not a dollar. **No L2.**
+**Stable work price on L1, not a synthetic dollar.**
 
-The stable *alternative is possible for fees only*. This dApp is that alternative.
+A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Vaults still lock KAS; grams pay the action.
 
-Sister dApp (no grams; vision of a native Kaspa L1 stable):  
+Sister dApp (when the invoice really is money):  
 `C:\Users\Remco\Documents\kaspa\superappstablesalternative` — Kaspa Till on `:8082`.
 
 ```powershell
@@ -28,8 +28,9 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | Path | What |
 | --- | --- |
-| `/idea` | What this URL is |
-| `/why` | Beyond the chain: bill the event, not FX |
+| `/vision` | Stable work price on L1, not a synthetic dollar |
+| `/idea` | Short pointer at the three local sites |
+| `/why` | Bill the action, not the exchange rate |
 | `/guide` | Step-by-step: what you do with grams |
 | `/genesis` | WorkCredit instance: 0.5 KAS sale + funded P2SH voucher UTXO |
 | `/desk` | Job catalog in GRAM |
@@ -46,7 +47,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | File | What |
 | --- | --- |
-| [VISION.md](VISION.md) | Why names + predictable work costs |
+| [VISION.md](VISION.md) | Work-credit lane: grams meter work, not USD |
 | [DIFF-MAP.md](DIFF-MAP.md) | Live / local / wrong |
 | [HOW-IT-WORKS.md](HOW-IT-WORKS.md) | Stack |
 | [WORK-CREDITS.md](WORK-CREDITS.md) | Why grams, not USD |
@@ -54,4 +55,4 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 ## Honesty
 
-Covenants lock work. They do not mint USD. This dApp never routes through an L2. A Kaspa L1 dollar is **not live**; that slot is the other dApp.
+Covenants lock work. They do not mint USD. This dApp never routes through an L2. USDT can sit off to the side; it is not the meter. A Kaspa L1 dollar is **not live**; that slot is the other dApp.

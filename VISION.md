@@ -1,65 +1,32 @@
-# Vision
+# Gramlane vision
 
-A name an agent can pay, and a fee a dApp can predict.
+**Stable work price on L1, not a synthetic dollar.**
 
-That is the whole product.
+Kaspa stays issuer-free. Gramlane is not a dollar and does not replace USDT.
 
-## What “superapp” means here
+It is an L1 work-credit lane. dApps invoice jobs in **grams** (KIP-21 mass), not USD. The fee for a named job stays the same in work units: lookup, vault bump, message postage, data pull, agent call. KAS is only the fallback if the user has no prepaid credits.
 
-Not a single corporation. A **stack** that a human, a wallet, an agent, and a sequenced dApp can share:
+Centralized stables can exist on L2. They do not sit in Gramlane’s path. No mint from Tether. No freeze from Circle. No quoting FX as if it were protocol cost.
 
-1. **Name** — `.kas` as the public handle (KNS inscriptions today, covenant names later).
-2. **Talk** — KaChat envelopes addressed to that name (encryption stays in KaChat).
-3. **Secrets** — Kassword vault commitment hanging off the name (ciphertext stays in the browser).
-4. **Rank** — live KAS depth as a local ocean rank (not the KASRANKS NFT).
-5. **Call** — MCP + agent card so a machine can resolve, call, pay.
-6. **Pay fees** — Work Credits: prepaid grams of sequenced work, not a fake dollar.
+## Use it where the scarce thing is work, not rent
 
-The running process is `kns.exe` at `:8080`. It is a resolver, a protocol surface, and a design. It is not the official KNS team, not KaChat, not a deployed registrar, and not a stablecoin issuer.
-
-## Web4.0
-
-Web4.0 here is the agentic internet: **readable, discoverable, callable, payable**. A `.kas` name already pays a human. The stack adds an agent card, MCP tools, and a Kaspa-native HTTP 402 so a machine can do the same.
-
-## The money problem (why work credits exist)
-
-dApps sequenced on Kaspa still have a cost problem:
-
-- Users hate **USD volatility** in fees.
-- Operators hate **KAS volatility** in their own opex if they priced in dollars.
-- Classic stables (USDC, USDT, DAI) need **capital**: fiat reserves, crypto overcollateral, or a bank.
-- Algorithmic “stables” (UST) mint a dollar from a story. That story dies.
-
-Kaspa L1 cannot print dollars. A Toccata covenant cannot see Circle’s reserve. So the honest move is to stop pretending the missing object is a dollar, and ask what dApps actually consume.
-
-They consume **sequenced work**: mass, gas, lane slots, inclusion.
-
-Kaspa already prices that work in **sompi per gram** (policy today: 100 sompi/gram; KIP-21: 50 lanes/block, 1e9 gas/lane). That unit is already more stable *in KAS* than KAS is *in USD*.
-
-**Work Credits** make that unit a prepaid voucher:
-
-- 1 credit = 1 gram of a named lane.
-- A covenant UTXO holds `issuer`, `holder`, `credits`, `lane`.
-- dApps invoice in grams. Settlement is burn-with-sequencer-cosign, or KAS fallback.
-- USD is a different dApp: Kaspa Till, reserved L1 kUSD. No L2. Not live. Still needs capital when it lands.
-
-The user of a sequenced dApp sees a bill that does not move when KAS/USD moves. The operator ate the KAS inventory when they sold the voucher. That is a business, not a mint.
-
-## Four-era identity (so names survive forks)
-
-| Era | Object | Status |
+| Work | What grams pay | What grams are not |
 | --- | --- | --- |
-| 1 | Inscription + indexer | Live |
-| 2 | Toccata Name UTXO / registrar | Consensus ready, app not deployed |
-| 3 | Based ZK name set on a KIP-21 lane | Research + local `/sim` |
-| 4 | vProgs composition + DAGKnight ordering | Socket, not a switch |
+| AI bots / HTTP 402 | The sequenced call | The model’s output, the dollar the bot might later spend |
+| Messaging postage | Inclusion of the envelope | The message, the chat app, encryption |
+| Data transfer | The pull / the write | The dataset’s market price |
+| Vault operations | The bump, the pin, the spend path | The KAS locked in the vault |
 
-`kas://name.kas` and `did:kas:name.kas` are conventions of this repo.
+Vaults still lock KAS. Grams pay the **action**.
 
-## What success looks like
+## What this is not
 
-- An agent resolves `shop.kas`, reads the card, pays in KAS *or* burns grams.
-- Today: Kasware `sendKaspa` of the quoted sompi (KAS fallback) is the L1 receipt. WorkCredit consume waits on a genesis UTXO.
-- A sequenced dApp quotes `50_000 grams`. A shop quotes reserved kUSD and settles KAS. Neither uses an L2.
-- A human still uses KaChat / Kassword / KasRanks as those products exist. This app points; it does not clone them.
-- Nobody ships a UST on Kaspa because “covenants back it”.
+- A unit of account for humans (nobody prices coffee in grams).
+- A savings asset (credits are inventory of work, not a store of value).
+- A claim that “stables are banned.” Liquidity will still touch USDT off to the side. Gramlane just refuses to make that the **meter**.
+
+A Toccata covenant can conserve grams. It cannot peg `$1`. The operator who sold the voucher ate the KAS inventory. That is a business, not a mint.
+
+## Live on this dApp
+
+Prepaid grams from a 0.5 KAS L1 sale, with a funded WorkCredit P2SH. Jobs burn that inventory. `consume()` of the UTXO is a later 2-sig spend — operator accounting until then. USD is never quoted.

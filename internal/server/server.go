@@ -83,11 +83,10 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/safety", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "safety.html", page{Title: "Safety · Gramlane", Active: "safety"})
 	})
+	mux.HandleFunc("/vision", s.visionPage)
+	mux.HandleFunc("/explain", s.visionPage)
 	mux.HandleFunc("/idea", func(w http.ResponseWriter, r *http.Request) {
-		s.render(w, "idea.html", page{Title: "Idea · Gramlane", Active: "idea"})
-	})
-	mux.HandleFunc("/explain", func(w http.ResponseWriter, r *http.Request) {
-		s.render(w, "idea.html", page{Title: "Idea · Gramlane", Active: "idea"})
+		s.render(w, "idea.html", page{Title: "Idea · Gramlane", Active: "vision"})
 	})
 	mux.HandleFunc("/why", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "why.html", page{Title: "Why · Gramlane", Active: "why"})
@@ -113,6 +112,7 @@ func (s *Server) Handler() http.Handler {
 		writeJSON(w, 200, map[string]any{
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
+			"vision":         "stable work price on L1, not a synthetic dollar",
 			"gramsRemaining": led.Remaining, "credits": led.Credits,
 			"voucherOnChain": led.OnChain, "saleTx": led.SaleTx,
 			"voucherTx": led.VoucherTx, "p2sh": led.P2SH,
@@ -165,6 +165,10 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.render(w, "home.html", page{Title: "Gramlane — L1 work desk", Active: "home", Jobs: jobs.Catalog})
+}
+
+func (s *Server) visionPage(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "vision.html", page{Title: "Vision · Gramlane", Active: "vision"})
 }
 
 func (s *Server) desk(w http.ResponseWriter, r *http.Request) {
