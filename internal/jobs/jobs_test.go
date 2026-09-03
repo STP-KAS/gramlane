@@ -22,6 +22,16 @@ func TestCatalogQuoted(t *testing.T) {
 	}
 }
 
+func TestFits(t *testing.T) {
+	f := Fits(8_000)
+	if len(f) < 2 {
+		t.Fatalf("%d", len(f))
+	}
+	if Fits(4_000) != nil && len(Fits(4_000)) != 0 {
+		t.Fatal("under heartbeat")
+	}
+}
+
 func TestPrepaidToken(t *testing.T) {
 	if !prepaidToken("grams") || !prepaidToken("kaspa-work-credit") {
 		t.Fatal("prepaid")

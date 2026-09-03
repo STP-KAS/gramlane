@@ -48,6 +48,8 @@ type page struct {
 	Card    *agent.Card
 	Reply   *agent.Reply
 	HasGrok bool
+	Conv    *quote.Convert
+	Fits    []jobs.Fit
 }
 
 func New(addr string) (*Server, error) {
@@ -67,6 +69,8 @@ func (s *Server) Handler() http.Handler {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	mux.HandleFunc("/", s.home)
 	mux.HandleFunc("/desk", s.desk)
+	mux.HandleFunc("/convert", s.convertPage)
+	mux.HandleFunc("/api/convert", s.apiConvert)
 	mux.HandleFunc("/job/", s.job)
 	mux.HandleFunc("/run", s.runPage)
 	mux.HandleFunc("/honest", s.honest)
@@ -129,7 +133,8 @@ func (s *Server) Handler() http.Handler {
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
 			"vision":         "stable work price on L1, not a synthetic dollar",
-			"products":       []string{"vault", "postage", "agent", "site"},
+			"products":       []string{"vault", "postage", "agent", "site", "convert"},
+			"sompiPerGram":   quote.SompiPerGram,
 			"grok":           agent.HasKey(),
 			"gramsRemaining": led.Remaining, "credits": led.Credits,
 			"voucherOnChain": led.OnChain, "saleTx": led.SaleTx,
@@ -191,6 +196,65 @@ func (s *Server) visionPage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) desk(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "desk.html", page{Title: "Desk · Gramlane", Active: "desk", Jobs: jobs.Catalog})
+}
+
+func convertFromRequest(r *http.Request) (quote.Convert, error) {
+	kind := r.FormValue("unit")
+	amount := strings.TrimSpace(r.FormValue("amount"))
+	if amount == "" {
+		amount = strings.TrimSpace(r.URL.Query().Get("kas"))
+		if amount != "" {
+			kind = "kas"
+		}
+	}
+	if amount == "" {
+		amount = strings.TrimSpace(r.URL.Query().Get("grams"))
+		if amount != "" {
+			kind = "grams"
+		}
+	}
+	if amount == "" {
+		amount = strings.TrimSpace(r.URL.Query().Get("sompi"))
+		if amount != "" {
+			kind = "sompi"
+		}
+	}
+	if r.FormValue("from") == "remaining" || r.URL.Query().Get("from") == "remaining" {
+		return quote.FromGrams(seq.Snap().Remaining)
+	}
+	if amount == "" {
+		return quote.Convert{}, fmt.Errorf("amount")
+	}
+	if kind == "" {
+		kind = "kas"
+	}
+	return quote.Parse(kind, amount)
+}
+
+func (s *Server) convertPage(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "Convert · Gramlane", Active: "convert", Query: r.FormValue("amount")}
+	has := r.FormValue("amount") != "" || r.FormValue("from") == "remaining" ||
+		r.URL.Query().Get("kas") != "" || r.URL.Query().Get("grams") != "" ||
+		r.URL.Query().Get("sompi") != "" || r.URL.Query().Get("from") == "remaining"
+	if has {
+		c, err := convertFromRequest(r)
+		if err != nil {
+			p.Error = err.Error()
+		} else {
+			p.Conv = &c
+			p.Fits = jobs.Fits(c.Grams)
+		}
+	}
+	s.render(w, "convert.html", p)
+}
+
+func (s *Server) apiConvert(w http.ResponseWriter, r *http.Request) {
+	c, err := convertFromRequest(r)
+	if err != nil {
+		writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error(), "hint": "kas=0.5 or grams=8000 or sompi=50000000 or from=remaining"})
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "convert": c, "fits": jobs.Fits(c.Grams), "seq": seq.Snap()})
 }
 
 func (s *Server) job(w http.ResponseWriter, r *http.Request) {
