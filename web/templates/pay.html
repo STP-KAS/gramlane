@@ -3,8 +3,9 @@
   {{if .Invoice}}
   <div class="kicker">{{.Invoice.Place}} · {{.Invoice.Merchant}}</div>
   <h1>{{.Invoice.Item}}</h1>
+  {{if .Invoice.Shelf}}<p class="lede">{{.Invoice.Shelf}}</p>{{end}}
   <p class="till">{{.Invoice.Grams}} GRAM</p>
-  {{if .Seq}}<p class="lede">Your spend pile: <span class="mono">{{.Seq.Remaining}}</span> grams.</p>{{end}}
+  {{if .Seq}}<p class="lede">Stablegram jar: <span class="mono">{{.Seq.Remaining}}</span> grams.</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if eq .Invoice.Status "paid"}}
   <p class="ok">Paid. Sequenced gram burn. Not a dollar. Merchant tab updated on this rail.</p>
@@ -17,7 +18,7 @@
   </form>
   <p class="tiny">Burns prepaid grams. No new KAS send. Stay on this origin.</p>
   {{else}}
-  <p class="lede">Spend pile cannot cover this bill. <a href="/spend">Set aside KAS</a> or pay KAS fallback if the merchant posted an address.</p>
+  <p class="lede">Jar cannot cover this bill. <a href="/stablegram">Fill Stablegram</a> or pay KAS fallback if the merchant posted an address.</p>
   {{if .Invoice.PayTo}}
   <div class="card">
     <p>KAS fallback to merchant (volatile). Desk must not be your login.</p>

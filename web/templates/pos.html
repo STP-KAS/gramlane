@@ -3,7 +3,7 @@
   <div class="kicker">till · online or on the counter</div>
   <h1>One ticket. Two doors.</h1>
   <p class="lede">A URL for the phone. A QR for the shop. Same grams. Customer pays from the jar.</p>
-  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> grams. <a href="/spend">Fill it</a></p>{{end}}
+  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> grams. <a href="/stablegram">Stablegram</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <form action="/pos" method="post">
@@ -13,14 +13,35 @@
         <input name="item" placeholder="coffee" required />
       </div>
       <div>
-        <label>grams</label>
-        <input name="grams" placeholder="50000" />
+        <label>price</label>
+        <input name="fiat" placeholder="3" />
       </div>
       <div>
-        <label>or KAS at policy</label>
-        <input name="kas" placeholder="0.05" />
+        <label>currency</label>
+        <select name="ccy">
+          <option value="EUR" {{if and .Sign (eq .Sign.Ccy "EUR")}}selected{{end}}>EUR</option>
+          <option value="USD" {{if and .Sign (eq .Sign.Ccy "USD")}}selected{{end}}>USD</option>
+        </select>
+      </div>
+      <div>
+        <label>1 KAS = (your sign)</label>
+        <input name="rate" placeholder="0.10" value="{{if .Sign}}{{.Sign.KasInFiat}}{{end}}" />
       </div>
     </div>
+    <p class="tiny">Type 3 EUR for a coffee. The rate is the sign on this counter — not an oracle, not a peg. Grams = price ÷ (EUR per KAS) × 1&nbsp;000&nbsp;000.</p>
+    <details>
+      <summary class="tiny">or enter grams / KAS directly</summary>
+      <div class="row">
+        <div>
+          <label>grams</label>
+          <input name="grams" placeholder="50000" />
+        </div>
+        <div>
+          <label>or KAS at policy</label>
+          <input name="kas" placeholder="0.05" />
+        </div>
+      </div>
+    </details>
     <div class="row">
       <div>
         <label>merchant</label>
@@ -46,6 +67,7 @@
   <div class="card tillbox">
     <div class="kicker">{{.Invoice.Place}} · {{.Invoice.Merchant}} · {{.Invoice.ID}}</div>
     <p class="till">{{.Invoice.Grams}} GRAM</p>
+    {{if .Invoice.Shelf}}<p class="lede">{{.Invoice.Shelf}}</p>{{end}}
     <p>{{.Invoice.Item}}</p>
     <p class="tiny">Scan or open this pay URL</p>
     <p class="mono"><a href="{{.PayURL}}">{{.PayURL}}</a></p>
@@ -76,11 +98,12 @@
   {{if .Invoices}}
   <h2>Tickets</h2>
   <table>
-    <tr><th>id</th><th>item</th><th>grams</th><th>where</th><th>status</th></tr>
+    <tr><th>id</th><th>item</th><th>shelf</th><th>grams</th><th>where</th><th>status</th></tr>
     {{range .Invoices}}
     <tr>
       <td class="mono"><a href="/pay/{{.ID}}">{{.ID}}</a></td>
       <td>{{.Item}}</td>
+      <td>{{.Shelf}}</td>
       <td class="mono">{{.Grams}}</td>
       <td>{{.Place}}</td>
       <td>{{if eq .Status "paid"}}<span class="ok">paid</span>{{else}}open{{end}}</td>

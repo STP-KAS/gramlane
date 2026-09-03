@@ -32,6 +32,15 @@ type Invoice struct {
 	PaidWhen string `json:"paidWhen,omitempty"`
 	Paid     string `json:"paid,omitempty"`
 	Payer    string `json:"payer,omitempty"`
+	Fiat     string `json:"fiat,omitempty"`
+	Ccy      string `json:"ccy,omitempty"`
+	Rate     string `json:"rate,omitempty"`
+	Shelf    string `json:"shelf,omitempty"`
+}
+
+type Sign struct {
+	Ccy       string `json:"ccy"`
+	KasInFiat string `json:"kasInFiat"`
 }
 
 type Merchant struct {
@@ -49,6 +58,29 @@ var (
 	mu   sync.Mutex
 	live *Book
 )
+
+func LoadSign() Sign {
+	b, err := os.ReadFile("data/till-rate.json")
+	if err != nil {
+		return Sign{Ccy: "EUR", KasInFiat: "0.10"}
+	}
+	var s Sign
+	if json.Unmarshal(b, &s) != nil || s.Ccy == "" {
+		return Sign{Ccy: "EUR", KasInFiat: "0.10"}
+	}
+	return s
+}
+
+func SaveSign(s Sign) {
+	s.Ccy = strings.ToUpper(strings.TrimSpace(s.Ccy))
+	s.KasInFiat = strings.TrimSpace(s.KasInFiat)
+	_ = os.MkdirAll("data", 0o755)
+	raw, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		return
+	}
+	_ = os.WriteFile("data/till-rate.json", raw, 0o644)
+}
 
 func Create(item string, grams uint64, merchant, payTo, place string) (*Invoice, error) {
 	item = strings.TrimSpace(item)
@@ -106,6 +138,25 @@ func Get(id string) (*Invoice, bool) {
 		}
 	}
 	return nil, false
+}
+
+func SetShelf(id, fiat, ccy, rate, shelf string) *Invoice {
+	id = strings.TrimSpace(id)
+	mu.Lock()
+	defer mu.Unlock()
+	b := openLocked()
+	for i := range b.Invoices {
+		if b.Invoices[i].ID == id {
+			b.Invoices[i].Fiat = strings.TrimSpace(fiat)
+			b.Invoices[i].Ccy = strings.ToUpper(strings.TrimSpace(ccy))
+			b.Invoices[i].Rate = strings.TrimSpace(rate)
+			b.Invoices[i].Shelf = strings.TrimSpace(shelf)
+			_ = save(b)
+			cp := b.Invoices[i]
+			return &cp
+		}
+	}
+	return nil
 }
 
 func List() []Invoice {

@@ -43,6 +43,23 @@ func TestConvertHalfKASIs500kGrams(t *testing.T) {
 	}
 }
 
+func TestThreeEuroCoffee(t *testing.T) {
+	b, err := FromFiat("3", "EUR", "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.Grams != 3_000_000 || b.Ccy != "EUR" {
+		t.Fatalf("%+v", b)
+	}
+	b, err = FromFiat("3", "eur", "0.5")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.Grams != 6_000_000 {
+		t.Fatalf("half-kas rate %+v", b)
+	}
+}
+
 func TestSetAsideHalf(t *testing.T) {
 	a, err := SetAside("2", 50)
 	if err != nil {

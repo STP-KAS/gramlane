@@ -161,6 +161,100 @@ func SetAside(totalKAS string, pct uint64) (Aside, error) {
 	}, nil
 }
 
+// FiatBill is a merchant shelf price → grams.
+// The EUR/USD rate is the sign on the counter, not an oracle and not a peg.
+type FiatBill struct {
+	Amount    string `json:"amount"`
+	Ccy       string `json:"ccy"`
+	KasInFiat string `json:"kasInFiat"`
+	Grams     uint64 `json:"grams"`
+	KASText   string `json:"kasText"`
+	Sompi     uint64 `json:"sompi"`
+	Label     string `json:"label"`
+	Note      string `json:"note"`
+}
+
+func FromFiat(amount, ccy, kasInFiat string) (FiatBill, error) {
+	ccy = strings.ToUpper(strings.TrimSpace(ccy))
+	if ccy != "EUR" && ccy != "USD" {
+		return FiatBill{}, fmt.Errorf("currency: EUR or USD")
+	}
+	amt, err := parseDec(amount, 6)
+	if err != nil || amt == 0 {
+		return FiatBill{}, fmt.Errorf("price")
+	}
+	rate, err := parseDec(kasInFiat, 6)
+	if err != nil || rate == 0 {
+		return FiatBill{}, fmt.Errorf("rate: 1 KAS in %s", ccy)
+	}
+	if amt > math.MaxUint64/SompiPerKAS {
+		return FiatBill{}, fmt.Errorf("overflow")
+	}
+	sompi := amt * SompiPerKAS / rate
+	c, err := FromSompi(sompi)
+	if err != nil {
+		return FiatBill{}, err
+	}
+	label := strings.TrimSpace(amount) + " " + ccy
+	return FiatBill{
+		Amount:    strings.TrimSpace(amount),
+		Ccy:       ccy,
+		KasInFiat: strings.TrimSpace(kasInFiat),
+		Grams:     c.Grams,
+		KASText:   c.KASText,
+		Sompi:     c.Sompi,
+		Label:     label,
+		Note:      "Merchant sign, not an oracle. 1 KAS = " + strings.TrimSpace(kasInFiat) + " " + ccy + " on this till. Settlement is grams at 100 sompi/gram. Not a dollar peg.",
+	}, nil
+}
+
+func parseDec(s string, scale int) (uint64, error) {
+	s = strings.TrimSpace(s)
+	s = strings.ReplaceAll(s, ",", "")
+	s = strings.ReplaceAll(s, " ", "")
+	if s == "" || strings.HasPrefix(s, "-") {
+		return 0, fmt.Errorf("number")
+	}
+	parts := strings.SplitN(s, ".", 2)
+	whole := parts[0]
+	if whole == "" {
+		whole = "0"
+	}
+	w, err := strconv.ParseUint(whole, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("number")
+	}
+	var frac uint64
+	if len(parts) == 2 {
+		f := parts[1]
+		if len(f) > scale {
+			f = f[:scale]
+		}
+		for len(f) < scale {
+			f += "0"
+		}
+		frac, err = strconv.ParseUint(f, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("number")
+		}
+	}
+	base := uint64(1)
+	for i := 0; i < scale; i++ {
+		if base > math.MaxUint64/10 {
+			return 0, fmt.Errorf("overflow")
+		}
+		base *= 10
+	}
+	if w > math.MaxUint64/base {
+		return 0, fmt.Errorf("overflow")
+	}
+	out := w * base
+	if out+frac < out {
+		return 0, fmt.Errorf("overflow")
+	}
+	return out + frac, nil
+}
+
 func pack(src string, grams, sompi, dust uint64) (Convert, error) {
 	return Convert{
 		Source:       src,

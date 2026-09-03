@@ -37,7 +37,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/why` | Bill the action, not the exchange rate |
 | `/guide` | Step-by-step: what you do with grams |
 | `/genesis` | WorkCredit instance: 0.5 KAS sale + funded P2SH voucher UTXO |
-| `/spend` | Set aside % of KAS into a gram spend pile |
+| `/stablegram` | Set aside % of KAS into the Stablegram jar |
 | `/pos` | Merchant till — digital + on-location QR |
 | `/pay/{id}` | Pay a POS invoice from prepaid grams |
 | `/convert` | KAS ↔ grams at policy 100 sompi/gram. Not a KCC-20 |
