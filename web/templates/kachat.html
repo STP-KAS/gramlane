@@ -1,0 +1,49 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">KaChat · Gramlane app</div>
+  <h1>Message a .kas name.</h1>
+  <p class="lede">KaChat seals E2E on Kaspa (<span class="mono">ciph_msg:1:</span>) in the wallet. Gramlane resolves the name, stamps postage in grams, and can open a Pay ticket to that address. This page does not encrypt.</p>
+  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> GRAM.</p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Run}}<p class="ok">Stamped. Remaining {{.Run.Remaining}} grams.</p>{{end}}
+
+  <form class="row" action="/kachat" method="get">
+    <div>
+      <label>.kas name</label>
+      <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+    </div>
+    <button class="btn mint" type="submit">Resolve</button>
+  </form>
+
+  {{if .Contact}}
+  <div class="card" style="margin:18px 0">
+    <h3>{{.Contact.Name}}</h3>
+    <p class="mono">{{.Contact.Address}}</p>
+    <p>{{.Contact.Note}}</p>
+    <p>
+      {{if .Contact.PayURI}}<button class="btn ghost" type="button" data-copy-text="{{.Contact.PayURI}}">Copy pay URI</button>{{end}}
+      <a class="btn mint" href="/pay?merchant={{.Contact.Name}}&amp;payTo={{.Contact.PayURI}}">Pay them</a>
+      <a class="btn ghost" href="{{if .Contact.Address}}https://www.kachat.org/?to={{.Contact.Address}}{{else}}https://linktr.ee/KaChat_{{end}}">Open KaChat</a>
+    </p>
+  </div>
+  {{if and .Job .Seq (ge .Seq.Remaining .Job.Grams)}}
+  <form action="/kachat" method="post">
+    <input type="hidden" name="q" value="{{.Contact.Name}}" />
+    <label>postage (not E2E — sequenced stamp only)</label>
+    <textarea name="text" rows="3" maxlength="280" placeholder="hello"></textarea>
+    <p style="margin-top:12px"><button class="btn mint" type="submit">Stamp {{.Job.Grams}} grams</button></p>
+  </form>
+  {{end}}
+  {{end}}
+
+  <h2>Envelope shapes</h2>
+  {{range .Envelopes}}
+  <div class="card" style="margin-top:12px">
+    <div class="kicker">{{.Kind}}</div>
+    <pre>{{.Template}}</pre>
+    <p>{{.Fill}}</p>
+  </div>
+  {{end}}
+  <p class="tiny"><a href="https://www.kachat.org/">kachat.org</a> · <a href="https://x.com/KaChat_">@KaChat_</a> · postage board: <a href="/postage">/postage</a></p>
+</main>
+{{template "footer" .}}

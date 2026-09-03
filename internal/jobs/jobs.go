@@ -47,7 +47,7 @@ var Catalog = []Job{
 	{ID: "profile", Name: "Pull KNS profile texts", Blurb: "Avatar, x, website if the indexer has them.", Grams: 22_000, Lane: "KNS1", Kind: "profile"},
 	{ID: "batch", Name: "Batch three resolves", Blurb: "kns.kas + kaspa.kas + kachat.kas. One voucher burn.", Grams: 40_000, Lane: "KNS1", Kind: "batch"},
 	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: 8_000, Lane: "SEQ1", Kind: "vault"},
-	{ID: "postage", Name: "Message postage", Blurb: "Bill grams for a sequenced envelope. Not the chat app. Not USD. Not broadcast.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
+	{ID: "postage", Name: "KaChat postage", Blurb: "Sequenced stamp to a .kas contact. Not E2E — KaChat seals ciph_msg in the wallet.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
 	{ID: "agent", Name: "AI agent call", Blurb: "HTTP 402 for a machine. Grok if XAI_API_KEY is set; otherwise local tools. Grams pay the call.", Grams: 25_000, Lane: "AGENT", Kind: "agent"},
 	{ID: "site", Name: ".kas site builder", Blurb: "Generate a web page from a live KNS name. Link-in-bio from indexer texts, not IPFS.", Grams: 15_000, Lane: "KNS1", Kind: "site"},
 }

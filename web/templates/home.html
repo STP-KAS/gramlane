@@ -1,8 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">the jar · not a coin</div>
+  <div class="kicker">Gramlane · the jar · not a coin</div>
   <h1>Keep a jar of spend.</h1>
-  <p class="lede">Hold KAS. Put a share aside as grams. Pay a till — a link on the phone, a QR on the counter. The jar does not move when the exchange rate does. Not a dollar. Not Tether.</p>
+  <p class="lede">Gramlane is the project. Hold KAS. Put a share aside as Stablegram. Pay — a link or a QR. Chat a .kas name. The jar does not move when the exchange rate does. Not a dollar. Not Tether.</p>
   {{if .Seq}}
   <div class="meter">
     <div class="till">{{.Seq.Remaining}}</div>
@@ -11,24 +11,25 @@
   {{end}}
   <div class="grid doors">
     <article class="card">
-      <h3>Fund</h3>
+      <h3>Stablegram</h3>
       <p>Set 50% aside, or any share. One send fills the jar.</p>
-      <a class="btn mint" href="/stablegram">Stablegram</a>
+      <a class="btn mint" href="/stablegram">Fill</a>
     </article>
     <article class="card">
       <h3>Pay</h3>
-      <p>Someone handed you a ticket. Paste the id. Burn grams.</p>
+      <p>Paste a ticket id, or open a counter ticket.</p>
       <form class="row" action="/go" method="get">
         <input name="id" placeholder="ticket id" autocomplete="off" />
         <button class="btn mint" type="submit">Pay</button>
       </form>
+      <p style="margin-top:10px"><a class="btn ghost" href="/pay">New ticket</a></p>
     </article>
     <article class="card">
-      <h3>Till</h3>
-      <p>You are the shop. Invoice in grams. Same ticket online and on location.</p>
-      <a class="btn mint" href="/till">Open the till</a>
+      <h3>KaChat</h3>
+      <p>Message a .kas name. Postage in grams. E2E in the KaChat app.</p>
+      <a class="btn mint" href="/kachat">Open</a>
     </article>
   </div>
-  <p class="lede" style="margin-top:36px">A household bills groceries. A plant bills events. An agent pays without a click. Same meter. <a href="/why">Why, beyond the chain</a> · <a href="/work">Builder work</a></p>
+  <p class="lede" style="margin-top:36px">A household bills groceries. A plant bills events. An agent pays without a click. <a href="/why">Why</a> · <a href="/apps">Apps</a></p>
 </main>
 {{template "footer" .}}
