@@ -59,6 +59,7 @@ The user of a sequenced dApp sees a bill that does not move when KAS/USD moves. 
 ## What success looks like
 
 - An agent resolves `shop.kas`, reads the card, pays in KAS *or* burns grams.
+- Today: Kasware `sendKaspa` of the quoted sompi (KAS fallback) is the L1 receipt. WorkCredit consume waits on a genesis UTXO.
 - A sequenced dApp quotes `50_000 grams`. A shop quotes reserved kUSD and settles KAS. Neither uses an L2.
 - A human still uses KaChat / Kassword / KasRanks as those products exist. This app points; it does not clone them.
 - Nobody ships a UST on Kaspa because “covenants back it”.

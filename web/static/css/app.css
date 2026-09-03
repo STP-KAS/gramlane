@@ -68,6 +68,7 @@ pre {
 .byte.win { box-shadow: inset 0 0 0 2px var(--danger); }
 .byte.slide { background: rgba(255,107,107,.2); color: var(--danger); }
 .bad { color: var(--danger); }
+.ok { color: var(--mint); }
 .warn { color: var(--warn); }
 form.row { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
 input, textarea {

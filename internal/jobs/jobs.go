@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"gramlane/internal/chain"
 	"gramlane/internal/quote"
 )
 
@@ -21,13 +22,16 @@ type Job struct {
 }
 
 type Receipt struct {
-	Job    Job         `json:"job"`
-	Quote  quote.Quote `json:"quote"`
-	Paid   string      `json:"paid"`
-	Payer  string      `json:"payer,omitempty"`
-	Wallet string      `json:"wallet,omitempty"`
-	Output string      `json:"output"`
-	Note   string      `json:"note"`
+	Job      Job         `json:"job"`
+	Quote    quote.Quote `json:"quote"`
+	Paid     string      `json:"paid"`
+	Payer    string      `json:"payer,omitempty"`
+	Wallet   string      `json:"wallet,omitempty"`
+	OnChain  bool        `json:"onChain"`
+	Explorer string      `json:"explorer,omitempty"`
+	TxNote   string      `json:"txNote,omitempty"`
+	Output   string      `json:"output"`
+	Note     string      `json:"note"`
 }
 
 var Catalog = []Job{
@@ -125,7 +129,19 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 		Paid:   paid,
 		Payer:  strings.TrimSpace(payer),
 		Wallet: strings.TrimSpace(wallet),
-		Note:   "HTTP receipt only. This dApp does not verify a WorkCredit UTXO spend on L1. Payer is the connected wallet address if you sent one.",
+		Note:   "WorkCredit consume is not this. KAS fallback is on L1 only if Paid is a real txid Kasware broadcast.",
+	}
+	if chain.IsTxID(paid) {
+		look := chain.Find(paid)
+		r.Explorer = look.Explorer
+		r.OnChain = look.Found
+		if look.Found {
+			r.TxNote = "api.kaspa.org has this tx. Open Explorer."
+		} else if look.Err != "" {
+			r.TxNote = "txid shape, not in api yet (index lag) or " + look.Err
+		}
+	} else {
+		r.TxNote = "not a txid — HTTP receipt only, not on the explorer"
 	}
 	switch j.Kind {
 	case "resolve":

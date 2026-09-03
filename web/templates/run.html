@@ -10,6 +10,9 @@
     <tr><th>paid header</th><td class="mono">{{.Run.Paid}}</td></tr>
     {{if .Run.Payer}}<tr><th>payer</th><td class="mono">{{.Run.Payer}}</td></tr>{{end}}
     {{if .Run.Wallet}}<tr><th>wallet</th><td class="mono">{{.Run.Wallet}}</td></tr>{{end}}
+    <tr><th>on L1 explorer?</th><td>{{if .Run.OnChain}}<span class="ok">yes — api.kaspa.org has the tx</span>{{else}}no{{end}}</td></tr>
+    {{if .Run.Explorer}}<tr><th>explorer</th><td><a href="{{.Run.Explorer}}">{{.Run.Explorer}}</a></td></tr>{{end}}
+    {{if .Run.TxNote}}<tr><th>tx</th><td>{{.Run.TxNote}}</td></tr>{{end}}
     <tr><th>note</th><td>{{.Run.Note}}</td></tr>
   </table>
   <pre>{{.Run.Output}}</pre>
