@@ -41,7 +41,7 @@
   <ol>
     <li>Desk pay-to is <span class="mono">kaspa:qpjm8kz…38atpq</span> — the output of your sale tx. Not your login.</li>
     <li>That 0.5 KAS = 500&nbsp;000 grams at policy. <a href="/genesis">/genesis</a> is the WorkCredit instance: those two keys, 500000 credits, lane SEQ1, compiled with official silverc.</li>
-    <li>The voucher UTXO is <strong>not</strong> on chain yet. Kasware <span class="mono">sendKaspa</span> cannot lock a covenant. Next is a Toccata P2SH deploy of <span class="mono">WorkCredit-live.json</span>.</li>
+    <li>P2SH deploy: <a href="/genesis">/genesis</a> → <strong>Pay 0.5 KAS to P2SH</strong>. That funds the WorkCredit redeem script. consume() is a later spend.</li>
   </ol>
 
   <h2>4. Pay — HTTP or L1</h2>

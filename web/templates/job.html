@@ -25,7 +25,7 @@
     <p class="tiny" data-origin-note></p>
     {{if .Quote}}
     <p>
-      <button class="btn mint" type="button" data-pay-l1 data-sompi="{{.Quote.PaySompi}}">Pay {{.Quote.PayKASText}} KAS</button>
+      <button class="btn mint" type="button" data-pay-l1 data-after="run" data-sompi="{{.Quote.PaySompi}}">Pay {{.Quote.PayKASText}} KAS</button>
     </p>
     {{end}}
     <p class="tiny" data-pay-status></p>

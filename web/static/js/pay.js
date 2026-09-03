@@ -105,9 +105,12 @@
         link.hidden = false;
         link.textContent = "explorer.kaspa.org";
       }
-      say("On L1. Txid " + txid + " — running job.");
-      var form = document.querySelector("form[action='/run']");
-      if (form) form.submit();
+      say("On L1. Txid " + txid);
+      if (btn.getAttribute("data-after") === "run") {
+        say("On L1. Txid " + txid + " — running job.");
+        var form = document.querySelector("form[action='/run']");
+        if (form) form.submit();
+      }
     } catch (e) {
       say((e && e.message ? e.message : String(e)) + " — if Kasware is a black window, close it, Log in, click Pay once.");
     } finally {
