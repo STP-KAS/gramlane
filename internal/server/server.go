@@ -24,6 +24,8 @@ import (
 	"gramlane/internal/seq"
 	"gramlane/internal/wallets"
 	"gramlane/web"
+
+	qrcode "github.com/skip2/go-qrcode"
 )
 
 type Server struct {
@@ -85,6 +87,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/stablegram", s.spendPage)
 	mux.HandleFunc("/pos", s.posPage)
 	mux.HandleFunc("/pay/", s.payPage)
+	mux.HandleFunc("/counter/", s.counterPage)
+	mux.HandleFunc("/qr/", s.qrPNG)
+	mux.HandleFunc("/go", s.goPay)
 	mux.HandleFunc("/api/pos", s.apiPos)
 	mux.HandleFunc("/job/", s.job)
 	mux.HandleFunc("/run", s.runPage)
@@ -372,7 +377,62 @@ func (s *Server) payPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "pay.html", p)
 }
 
+func (s *Server) goPay(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimSpace(r.FormValue("id"))
+	id = strings.TrimPrefix(id, "/pay/")
+	if id == "" {
+		http.Redirect(w, r, "/till", http.StatusSeeOther)
+		return
+	}
+	http.Redirect(w, r, "/pay/"+id, http.StatusSeeOther)
+}
+
+func (s *Server) counterPage(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimPrefix(r.URL.Path, "/counter/")
+	inv, ok := pos.Get(id)
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	s.render(w, "counter.html", page{
+		Title: inv.Item + " · till", Active: "till", Invoice: inv,
+		PayURL: pos.PayURL(origin(r), inv.ID),
+	})
+}
+
+func (s *Server) qrPNG(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimPrefix(r.URL.Path, "/qr/")
+	id = strings.TrimSuffix(id, ".png")
+	inv, ok := pos.Get(id)
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	u := pos.PayURL(origin(r), inv.ID)
+	png, err := qrcode.Encode(u, qrcode.Medium, 256)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = w.Write(png)
+}
+
 func (s *Server) apiPos(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		if id := strings.TrimSpace(r.URL.Query().Get("id")); id != "" {
+			inv, ok := pos.Get(id)
+			if !ok {
+				writeJSON(w, 404, map[string]any{"ok": false, "error": "unknown invoice"})
+				return
+			}
+			writeJSON(w, 200, map[string]any{"ok": true, "invoice": inv, "seq": seq.Snap()})
+			return
+		}
+		writeJSON(w, 200, map[string]any{"ok": true, "invoices": pos.List(), "merchants": pos.Merchants(), "seq": seq.Snap()})
+		return
+	}
 	if r.Method == http.MethodPost {
 		var req struct {
 			Item, Merchant, PayTo, Place, ID, Payer string

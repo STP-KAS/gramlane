@@ -1,0 +1,40 @@
+{{template "header" .}}
+<main class="counter">
+  {{if .Invoice}}
+  <div class="kicker" data-status>{{.Invoice.Status}} · {{.Invoice.Merchant}}</div>
+  <h1>{{.Invoice.Item}}</h1>
+  {{if .Invoice.Shelf}}<p class="lede">{{.Invoice.Shelf}}</p>{{end}}
+  <p class="till">{{.Invoice.Grams}} GRAM</p>
+  {{if eq .Invoice.Status "paid"}}
+  <p class="ok" style="font-size:28px">PAID</p>
+  {{else}}
+  <p><img alt="QR" width="256" height="256" src="/qr/{{.Invoice.ID}}.png" /></p>
+  <p class="tiny">Scan to pay · {{.Invoice.ID}}</p>
+  {{end}}
+  <p class="tiny noprint"><a href="/pay/{{.Invoice.ID}}">Pay page</a> · <a href="/till">Till</a></p>
+  {{end}}
+</main>
+<script>
+(function () {
+  var id = {{if .Invoice}}"{{.Invoice.ID}}"{{else}}""{{end}};
+  if (!id) return;
+  setInterval(function () {
+    fetch("/api/pos?id=" + id).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.invoice && j.invoice.status === "paid") {
+        document.body.classList.add("paid");
+        var st = document.querySelector("[data-status]");
+        if (st) st.textContent = "paid";
+        var t = document.querySelector(".ok");
+        if (!t) {
+          var p = document.createElement("p");
+          p.className = "ok";
+          p.style.fontSize = "28px";
+          p.textContent = "PAID";
+          document.querySelector("main").appendChild(p);
+        }
+      }
+    }).catch(function () {});
+  }, 2000);
+})();
+</script>
+{{template "footer" .}}

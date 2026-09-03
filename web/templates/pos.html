@@ -60,6 +60,7 @@
         </select>
       </div>
     </div>
+    <p class="price" data-preview>grams appear here</p>
     <p><button class="btn mint" type="submit">Open till</button></p>
   </form>
 
@@ -71,9 +72,10 @@
     <p>{{.Invoice.Item}}</p>
     <p class="tiny">Scan or open this pay URL</p>
     <p class="mono"><a href="{{.PayURL}}">{{.PayURL}}</a></p>
-    <p><img alt="QR" width="220" height="220" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&amp;data={{.PayURL}}" /></p>
+    <p><img alt="QR" width="220" height="220" src="/qr/{{.Invoice.ID}}.png" /></p>
     <p>
-      <a class="btn mint" href="{{.PayURL}}">Customer pay</a>
+      <a class="btn mint" href="/counter/{{.Invoice.ID}}">Counter screen</a>
+      <a class="btn ghost" href="{{.PayURL}}">Customer pay</a>
       <button class="btn ghost" type="button" data-copy-text="{{.PayURL}}">Copy link</button>
     </p>
     <p class="tiny">On location: phone on the counter, this QR facing the buyer. Digital: send the link. Same invoice.</p>
@@ -101,7 +103,7 @@
     <tr><th>id</th><th>item</th><th>shelf</th><th>grams</th><th>where</th><th>status</th></tr>
     {{range .Invoices}}
     <tr>
-      <td class="mono"><a href="/pay/{{.ID}}">{{.ID}}</a></td>
+      <td class="mono"><a href="/pay/{{.ID}}">{{.ID}}</a> · <a href="/counter/{{.ID}}">counter</a></td>
       <td>{{.Item}}</td>
       <td>{{.Shelf}}</td>
       <td class="mono">{{.Grams}}</td>

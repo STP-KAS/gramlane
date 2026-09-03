@@ -17,8 +17,11 @@
     </article>
     <article class="card">
       <h3>Pay</h3>
-      <p>Someone handed you a ticket. Burn grams. No new KAS per coffee.</p>
-      <a class="btn mint" href="/till">Open a ticket</a>
+      <p>Someone handed you a ticket. Paste the id. Burn grams.</p>
+      <form class="row" action="/go" method="get">
+        <input name="id" placeholder="ticket id" autocomplete="off" />
+        <button class="btn mint" type="submit">Pay</button>
+      </form>
     </article>
     <article class="card">
       <h3>Till</h3>

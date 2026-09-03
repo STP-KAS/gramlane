@@ -6,7 +6,7 @@
   {{if .Seq}}<p class="lede">In the jar: <strong class="mono">{{.Seq.Remaining}}</strong> grams. <a href="/till">Till</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
-  <form class="row" action="/spend" method="post">
+  <form class="row" action="/stablegram" method="post">
     <div>
       <label>KAS you hold</label>
       <input name="total" value="{{if .Query}}{{.Query}}{{else}}1{{end}}" />
@@ -41,7 +41,7 @@
     <label>desk</label>
     <input class="mono" id="pay-to" value="{{.PayTo}}" />
     <p>
-      <button class="btn mint" type="button" data-pay-l1 data-after="/spend" data-sompi="{{.Aside.PaySompi}}">Set aside {{.Aside.PayKASText}} KAS</button>
+      <button class="btn mint" type="button" data-pay-l1 data-after="/stablegram" data-sompi="{{.Aside.PaySompi}}">Set aside {{.Aside.PayKASText}} KAS</button>
     </p>
     <p class="tiny" data-pay-status></p>
     <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
