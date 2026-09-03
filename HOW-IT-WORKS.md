@@ -38,7 +38,7 @@ So a real naming product still needs one of:
 
 This app compiles `KasName.sil`. It does not submit the registrar.
 
-## 3. Web 4.0 loop (agent)
+## 3. Web4.0 loop (agent)
 
 ```
 resolve name  →  read card  →  call MCP  →  pay 402
@@ -49,7 +49,7 @@ resolve name  →  read card  →  call MCP  →  pay 402
 - **Callable:** `POST /mcp` with tools listed at `GET /mcp`.
 - **Payable:** `GET /api/v1/call/kns.kas` returns HTTP 402. Body asks for KAS to the owner, and (now) also advertises `kaspa-work-credit` grams. Header `X-Kaspa-Payment: <txid>` is accepted at HTTP layer only — **not** verified on-chain.
 
-This is Cloudflare’s 2026 agentic-internet list, not a Kaspa hard fork.
+This is Cloudflare’s 2026 agentic-internet list.
 
 ## 4. KaChat, Kassword, KasRanks, KCC
 

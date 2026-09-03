@@ -17,9 +17,9 @@ Not a single corporation. A **stack** that a human, a wallet, an agent, and a se
 
 The running process is `kns.exe` at `:8080`. It is a resolver, a protocol surface, and a design. It is not the official KNS team, not KaChat, not a deployed registrar, and not a stablecoin issuer.
 
-## Web 4.0, not Kaspa 4.0
+## Web4.0
 
-There is no Kaspa 4.0 fork. Named forks are Crescendo (live), Toccata (live), DAGKnight (KIP-2, proposed). Web 4.0 here is the agentic internet: **readable, discoverable, callable, payable**. A `.kas` name already pays a human. The stack adds an agent card, MCP tools, and a Kaspa-native HTTP 402 so a machine can do the same.
+Web4.0 here is the agentic internet: **readable, discoverable, callable, payable**. A `.kas` name already pays a human. The stack adds an agent card, MCP tools, and a Kaspa-native HTTP 402 so a machine can do the same.
 
 ## The money problem (why work credits exist)
 
