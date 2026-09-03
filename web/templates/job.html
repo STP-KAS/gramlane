@@ -17,25 +17,20 @@
   <p class="tiny">Connected: <span class="mono" data-wallet-addr>(connect in the header)</span></p>
   <p class="tiny" data-origin-note></p>
   <div class="card" style="margin:18px 0">
-    <h3>On-chain without the black Kasware window</h3>
-    <p class="lede">Do <strong>not</strong> send to your logged-in address. Kasware flags that as a no-op. Amount is <strong>0.5 KAS</strong> (above the 0.01 KAS dust / fee floor).</p>
-    <ol>
-      <li>Close any black Kasware window. Open Kasware from the Chrome icon.</li>
-      <li>Send <strong>0.5 KAS</strong> to the <em>desk</em> address below — a different kaspa: than Logged in.</li>
-      <li>Copy the txid, paste it, Run job.</li>
-    </ol>
+    <h3>Pay on this page</h3>
+    <p class="lede">Stay here. <strong>Pay 0.5 KAS</strong> asks Kasware to confirm over this tab — do not open the extension Send screen. Desk address must not be your login (Kasware blocks self-send).</p>
     <p class="tiny">Your login (do not pay this): <span class="mono" data-wallet-addr></span></p>
-    <label>desk address (must differ from login)</label>
-    <input class="mono" id="pay-to" value="{{.PayTo}}" placeholder="kaspa:q… desk / merchant, not your Kasware account" />
-    <label>amount (KAS)</label>
-    <input class="mono" id="pay-amt" readonly value="{{if .Quote}}{{.Quote.PayKASText}}{{else}}0.5{{end}}" />
+    <label>desk address</label>
+    <input class="mono" id="pay-to" value="{{.PayTo}}" placeholder="kaspa:q… not your Logged in address" />
+    <p class="tiny" data-origin-note></p>
+    {{if .Quote}}
     <p>
-      <button class="btn mint" type="button" data-copy="#pay-to">Copy desk address</button>
-      <button class="btn mint" type="button" data-copy="#pay-amt" data-copy-text="0.5">Copy 0.5 KAS</button>
+      <button class="btn mint" type="button" data-pay-l1 data-sompi="{{.Quote.PaySompi}}">Pay {{.Quote.PayKASText}} KAS</button>
     </p>
-    <p class="tiny">4. After Kasware confirms, copy the txid, paste it below, Run job. We look it up on api.kaspa.org / explorer.</p>
+    {{end}}
+    <p class="tiny" data-pay-status></p>
+    <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
   </div>
-  <p class="tiny" data-pay-status></p>
   <form class="row" action="/run" method="post">
     <input type="hidden" name="job" value="{{.Job.ID}}" />
     <input type="hidden" name="payer" value="" />
@@ -50,7 +45,7 @@
     </div>
     <button class="btn mint" type="submit">Run job</button>
   </form>
-  <p class="tiny"><a href="#" data-try-dapp-send>Why we stopped calling sendKaspa</a></p>
+
   <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kns.kas</span> → 402. Retry with header <span class="mono">X-Work-Credit</span>.</p>
   {{end}}
 </main>

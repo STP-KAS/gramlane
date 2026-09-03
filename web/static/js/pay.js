@@ -8,69 +8,128 @@
     if (el) el.textContent = t;
   }
 
+  function loginAddr() {
+    var el = document.querySelector("[data-wallet-addr]");
+    if (!el) return "";
+    return String(el.value || el.textContent || "").trim();
+  }
+
+  function parseTxid(raw) {
+    if (!raw) return "";
+    if (typeof raw === "object") return raw.id || raw.transactionId || raw.txid || "";
+    var s = String(raw).trim();
+    try {
+      var j = JSON.parse(s);
+      return j.id || j.transactionId || j.txid || s;
+    } catch (_) {
+      return s;
+    }
+  }
+
   function copy(text) {
     text = String(text || "").trim();
-    if (!text || text.indexOf("(") === 0) {
-      say("Nothing to copy yet — Log in first for the address.");
-      return;
-    }
+    if (!text) return;
     function fallback() {
-      const ta = document.createElement("textarea");
+      var ta = document.createElement("textarea");
       ta.value = text;
       ta.setAttribute("readonly", "");
       ta.style.position = "fixed";
       ta.style.left = "-9999px";
       document.body.appendChild(ta);
       ta.select();
-      ta.setSelectionRange(0, text.length);
-      var ok = false;
       try {
-        ok = document.execCommand("copy");
+        document.execCommand("copy");
       } catch (_) {}
       document.body.removeChild(ta);
-      say(ok ? "Copied " + text : "Copy failed. Select: " + text);
+      say("Copied " + text);
     }
     if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(
-        function () {
-          say("Copied " + text);
-        },
-        fallback
-      );
-    } else {
-      fallback();
+      navigator.clipboard.writeText(text).then(function () {
+        say("Copied " + text);
+      }, fallback);
+    } else fallback();
+  }
+
+  async function accounts() {
+    var w = window.kasware;
+    if (!w) throw new Error("Kasware is not in this tab. Log in on http://127.0.0.1:8081 first.");
+    if (typeof w.getAccounts === "function") {
+      try {
+        var have = await w.getAccounts();
+        if (have && have[0]) return have;
+      } catch (_) {}
+    }
+    return w.requestAccounts();
+  }
+
+  async function payL1(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    var btn = ev.currentTarget;
+    if (btn.dataset.busy === "1") return;
+    var to = ($("#pay-to") && $("#pay-to").value.trim()) || "";
+    var sompi = Number(btn.getAttribute("data-sompi") || "0");
+    var me = loginAddr();
+    if (!to || to.indexOf("kaspa:") !== 0) {
+      say("Paste a desk kaspa: address first (not your login).");
+      return;
+    }
+    if (me && to === me) {
+      say("Desk address is your login. Kasware will block it. Use a different kaspa:.");
+      return;
+    }
+    if (!sompi) {
+      say("Missing amount.");
+      return;
+    }
+    var modal = document.getElementById("walletModal");
+    if (modal) modal.hidden = true;
+    btn.dataset.busy = "1";
+    btn.disabled = true;
+    say("Kasware confirm should appear over this page — stay here, do not open the extension Send tab.");
+    try {
+      var acc = await accounts();
+      if (!acc || !acc[0]) throw new Error("Log in first.");
+      var payer = $('input[name="payer"]');
+      var wallet = $('input[name="wallet"]');
+      if (payer) payer.value = acc[0];
+      if (wallet) wallet.value = "kasware";
+      var raw = await window.kasware.sendKaspa(to, sompi, { priorityFee: 10000 });
+      var txid = parseTxid(raw);
+      if (!txid) throw new Error("Kasware returned no txid.");
+      var pay = $('input[name="payment"]');
+      if (pay) pay.value = txid;
+      var link = $("[data-explorer]");
+      if (link) {
+        link.href = "https://explorer.kaspa.org/txs/" + txid;
+        link.hidden = false;
+        link.textContent = "explorer.kaspa.org";
+      }
+      say("On L1. Txid " + txid + " — running job.");
+      var form = document.querySelector("form[action='/run']");
+      if (form) form.submit();
+    } catch (e) {
+      say((e && e.message ? e.message : String(e)) + " — if Kasware is a black window, close it, Log in, click Pay once.");
+    } finally {
+      btn.dataset.busy = "0";
+      btn.disabled = false;
     }
   }
 
   function bind() {
-    const host = $("[data-origin-note]");
-    if (host) {
-      host.textContent = "Stay on " + location.origin + " (localhost ≠ 127.0.0.1 for Kasware).";
-    }
+    var host = $("[data-origin-note]");
+    if (host) host.textContent = "Stay on " + location.origin + ".";
+    var payBtn = $("[data-pay-l1]");
+    if (payBtn) payBtn.addEventListener("click", payL1);
     document.querySelectorAll("[data-copy], [data-copy-text]").forEach(function (btn) {
       btn.addEventListener("click", function (ev) {
         ev.preventDefault();
-        const sel = btn.getAttribute("data-copy");
-        const el = sel ? document.querySelector(sel) : null;
-        const direct = btn.getAttribute("data-copy-text");
-        var text = direct || (el ? el.value || el.textContent : "");
-        var login = "";
-        var logged = document.querySelector("[data-wallet-addr]");
-        if (logged) login = (logged.value || logged.textContent || "").trim();
-        if (sel === "#pay-to" && text && login && text === login) {
-          say("That is your login. Kasware will warn. Paste a different desk kaspa: address.");
-          return;
-        }
-        copy(text);
+        var sel = btn.getAttribute("data-copy");
+        var el = sel ? document.querySelector(sel) : null;
+        var direct = btn.getAttribute("data-copy-text");
+        copy(direct || (el ? el.value || el.textContent : ""));
       });
     });
-    const exp = $("[data-try-dapp-send]");
-    if (exp) {
-      exp.addEventListener("click", function (ev) {
-        ev.preventDefault();
-        say("dApp sendKaspa is what froze Kasware. Use Send inside the Kasware extension, amount 0.012, then paste the txid.");
-      });
-    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
