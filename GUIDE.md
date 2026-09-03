@@ -1,5 +1,7 @@
 # Guide
 
+Human steps for **grams** live on the dApp: http://127.0.0.1:8081/guide
+
 ## 0. What you have
 
 - App source: `C:\Users\Remco\kns`

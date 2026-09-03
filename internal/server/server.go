@@ -56,6 +56,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/run", s.runPage)
 	mux.HandleFunc("/honest", s.honest)
 	mux.HandleFunc("/docs", s.docs)
+	mux.HandleFunc("/guide", s.guidePage)
+	mux.HandleFunc("/steps", s.guidePage)
 	mux.HandleFunc("/wallets", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "wallets.html", page{Title: "Wallets · Gramlane", Active: "wallets", Wallets: wallets.All()})
 	})
@@ -168,6 +170,10 @@ func (s *Server) honest(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) docs(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "docs.html", page{Title: "Docs · Gramlane", Active: "docs"})
+}
+
+func (s *Server) guidePage(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "guide.html", page{Title: "Guide · Gramlane", Active: "guide"})
 }
 
 func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
