@@ -1,5 +1,6 @@
 gramlane.exe
 *.exe
 *.exe~
+payto.txt
 .DS_Store
 thumbs.db

@@ -5,14 +5,15 @@ package quote
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 const (
 	SompiPerGram uint64 = 100
 	SompiPerKAS  uint64 = 100_000_000
 	Unit         string = "gram"
-	// KaswareMinSompi is 0.012 KAS. Kasware rejects below 0.01; 0.012 pastes cleanly in the send box.
-	KaswareMinSompi uint64 = 1_200_000
+	// KaswareMinSompi is 0.5 KAS. Wallet min is above 0.01 KAS once fees and volatility count.
+	KaswareMinSompi uint64 = 50_000_000
 )
 
 type Quote struct {
@@ -52,10 +53,17 @@ func Grams(n uint64, lane string) (Quote, error) {
 		KAS:          float64(sompi) / float64(SompiPerKAS),
 		PaySompi:     pay,
 		PayKAS:       float64(pay) / float64(SompiPerKAS),
-		PayKASText:   fmt.Sprintf("%.3f", float64(pay)/float64(SompiPerKAS)),
+		PayKASText:   kasText(pay),
 		Lane:         lane,
 		Scheme:       "kaspa-work-credit",
 		USD:          "not quoted",
-		Note:         "Prepaid L1 grams. Kasware send amount is 0.012 KAS minimum for the send box. Not USD.",
+		Note:         "Prepaid L1 grams. Kasware send is 0.5 KAS to the desk address, not to yourself.",
 	}, nil
+}
+
+func kasText(sompi uint64) string {
+	s := fmt.Sprintf("%.8f", float64(sompi)/float64(SompiPerKAS))
+	s = strings.TrimRight(s, "0")
+	s = strings.TrimRight(s, ".")
+	return s
 }

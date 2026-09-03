@@ -53,7 +53,15 @@
         const sel = btn.getAttribute("data-copy");
         const el = sel ? document.querySelector(sel) : null;
         const direct = btn.getAttribute("data-copy-text");
-        copy(direct || (el ? el.value || el.textContent : ""));
+        var text = direct || (el ? el.value || el.textContent : "");
+        var login = "";
+        var logged = document.querySelector("[data-wallet-addr]");
+        if (logged) login = (logged.value || logged.textContent || "").trim();
+        if (sel === "#pay-to" && text && login && text === login) {
+          say("That is your login. Kasware will warn. Paste a different desk kaspa: address.");
+          return;
+        }
+        copy(text);
       });
     });
     const exp = $("[data-try-dapp-send]");
