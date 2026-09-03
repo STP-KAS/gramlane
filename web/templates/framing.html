@@ -1,8 +1,42 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">silverscript#234</div>
-  <h1>We do not read the other UTXO.</h1>
-  <p class="lede">Gramlane’s WorkCredit only updates <em>this</em> voucher. A sequencer that <span class="mono">readInputState</span>s a holder’s credits is the #234 class: attacker reframes pushes, same hash, fake amount. Full byte diagram on KNS: <a href="http://127.0.0.1:8080/234">http://127.0.0.1:8080/234</a></p>
-  <p><a class="btn mint" href="http://127.0.0.1:8080/234">Open the 42-byte example</a></p>
+  <div class="kicker">silverscript#234 · concrete · closed unmerged</div>
+  <h1>WorkCredit never reads the other voucher.</h1>
+  <p class="lede">Gramlane’s covenant only <span class="mono">validateOutputState</span>s <em>this</em> UTXO. A sequencer that <span class="mono">readInputState</span>s a holder’s credits is the #234 class. These bytes run in-process. <a href="https://github.com/kaspanet/silverscript/pull/234">PR 234</a> is closed, not merged.</p>
+
+  <div class="stats">
+    <div><b>1</b><span>real amount</span></div>
+    <div><b class="bad">264</b><span>vault reads on the reframe</span></div>
+    <div><b>42</b><span>bytes both times</span></div>
+  </div>
+
+  <h2>Canonical — vault {{.Framing.Canonical.VaultAmount}}</h2>
+  <div class="bytes">
+    {{range .Framing.Canonical.Cells}}
+    <div class="byte {{.Class}}"><span class="i">{{.I}}</span><span>{{.Hex}}</span></div>
+    {{end}}
+  </div>
+  <pre>{{.Framing.Canonical.HexSpaced}}</pre>
+
+  <h2>Hostile — still 42 bytes, vault {{.Framing.Attack.VaultAmount}}</h2>
+  <p class="tiny">pin {{if .Framing.Attack.PinOK}}accept{{else}}<span class="bad">{{.Framing.Attack.PinError}}</span>{{end}}</p>
+  <div class="bytes">
+    {{range .Framing.Attack.Cells}}
+    <div class="byte {{.Class}}"><span class="i">{{.I}}</span><span>{{.Hex}}</span></div>
+    {{end}}
+  </div>
+  <pre>{{.Framing.Attack.HexSpaced}}</pre>
+  <p class="lede">Red outline is the vault window (offsets 1–8). Amount 1 becomes 264. The PR’s “~2^59” is 2^59+8 when the real amount is 2^51 ({{.Framing.HugeAttack.VaultAmount}}).</p>
+
+  <h2>Paste hex — decode as the vault</h2>
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  <form class="row" method="get" action="/234">
+    <input name="hex" value="{{if .Query}}{{.Query}}{{else}}{{.Framing.Attack.Hex}}{{end}}" spellcheck="false" style="flex:1;min-width:240px" />
+    <button class="btn mint" type="submit">Decode</button>
+  </form>
+  {{if .Framing.Custom}}
+  <p class="tiny">pasted {{.Framing.Custom.Total}} bytes · vault {{.Framing.Custom.VaultAmount}} · pin {{if .Framing.Custom.PinOK}}ok{{else}}{{.Framing.Custom.PinError}}{{end}}</p>
+  {{end}}
+  <p class="tiny">JSON: <a href="/api/framing">/api/framing</a>. Same diagram on KNS: <a href="http://127.0.0.1:8080/234">:8080/234</a>.</p>
 </main>
 {{template "footer" .}}
