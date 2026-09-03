@@ -69,6 +69,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/explain", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "idea.html", page{Title: "Idea · Gramlane", Active: "idea"})
 	})
+	mux.HandleFunc("/why", func(w http.ResponseWriter, r *http.Request) {
+		s.render(w, "why.html", page{Title: "Why · Gramlane", Active: "why"})
+	})
 	mux.HandleFunc("/feedback", s.feedbackPage)
 	mux.HandleFunc("/api/feedback", s.apiFeedback)
 	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
