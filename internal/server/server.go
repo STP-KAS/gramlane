@@ -189,15 +189,20 @@ func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	paid := strings.TrimSpace(r.FormValue("payment"))
+	payer := strings.TrimSpace(r.FormValue("payer"))
+	wallet := strings.TrimSpace(r.FormValue("wallet"))
+	if paid == "" && payer != "" {
+		paid = wallet + ":" + payer
+	}
 	if paid == "" {
 		qq, _ := jobs.QuoteJob(j)
 		s.render(w, "job.html", page{
 			Title: j.Name, Active: "desk", Job: &j, Query: q, Quote: &qq,
-			Error: "Payment required: burn WorkCredit grams or pay KAS fallback, then paste a receipt id.",
+			Error: "Payment required: connect a wallet, or paste a receipt id.",
 		})
 		return
 	}
-	rec, err := jobs.Run(j, q, paid)
+	rec, err := jobs.RunAs(j, q, paid, payer, wallet)
 	p := page{Title: "Receipt · Gramlane", Active: "desk", Job: &j, Query: q, Run: &rec}
 	if err != nil {
 		p.Error = err.Error()
@@ -244,6 +249,11 @@ func (s *Server) apiRun(w http.ResponseWriter, r *http.Request) {
 	if paid == "" {
 		paid = strings.TrimSpace(r.Header.Get("X-Kaspa-Payment"))
 	}
+	payer := strings.TrimSpace(r.Header.Get("X-Kaspa-Payer"))
+	wallet := strings.TrimSpace(r.Header.Get("X-Kaspa-Wallet"))
+	if paid == "" && payer != "" {
+		paid = wallet + ":" + payer
+	}
 	if paid == "" {
 		qq, _ := jobs.QuoteJob(j)
 		w.Header().Set("Content-Type", "application/json")
@@ -260,7 +270,7 @@ func (s *Server) apiRun(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	rec, err := jobs.Run(j, qname, paid)
+	rec, err := jobs.RunAs(j, qname, paid, payer, wallet)
 	if err != nil {
 		writeJSON(w, 502, map[string]any{"ok": false, "error": err.Error(), "receipt": rec})
 		return

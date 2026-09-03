@@ -13,15 +13,18 @@
   </table>
   {{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  <p class="tiny">Connected: <span class="mono" data-wallet-addr>(connect in the header)</span></p>
   <form class="row" action="/run" method="post">
     <input type="hidden" name="job" value="{{.Job.ID}}" />
+    <input type="hidden" name="payer" value="" />
+    <input type="hidden" name="wallet" value="" />
     <div>
       <label>name or query</label>
       <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
     </div>
     <div>
-      <label>receipt id (X-Work-Credit / txid)</label>
-      <input name="payment" placeholder="local voucher or kas txid" />
+      <label>receipt id (filled from connected wallet)</label>
+      <input name="payment" placeholder="connect wallet, or paste a voucher / txid" />
     </div>
     <button class="btn mint" type="submit">Run job</button>
   </form>

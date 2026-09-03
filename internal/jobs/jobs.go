@@ -21,11 +21,13 @@ type Job struct {
 }
 
 type Receipt struct {
-	Job    Job          `json:"job"`
-	Quote  quote.Quote  `json:"quote"`
-	Paid   string       `json:"paid"`
-	Output string       `json:"output"`
-	Note   string       `json:"note"`
+	Job    Job         `json:"job"`
+	Quote  quote.Quote `json:"quote"`
+	Paid   string      `json:"paid"`
+	Payer  string      `json:"payer,omitempty"`
+	Wallet string      `json:"wallet,omitempty"`
+	Output string      `json:"output"`
+	Note   string      `json:"note"`
 }
 
 var Catalog = []Job{
@@ -109,11 +111,22 @@ func profileURL(name string) string {
 }
 
 func Run(j Job, q string, paid string) (Receipt, error) {
+	return RunAs(j, q, paid, "", "")
+}
+
+func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 	qq, err := QuoteJob(j)
 	if err != nil {
 		return Receipt{}, err
 	}
-	r := Receipt{Job: j, Quote: qq, Paid: paid, Note: "HTTP receipt only. This dApp does not verify a WorkCredit UTXO spend on L1."}
+	r := Receipt{
+		Job:    j,
+		Quote:  qq,
+		Paid:   paid,
+		Payer:  strings.TrimSpace(payer),
+		Wallet: strings.TrimSpace(wallet),
+		Note:   "HTTP receipt only. This dApp does not verify a WorkCredit UTXO spend on L1. Payer is the connected wallet address if you sent one.",
+	}
 	switch j.Kind {
 	case "resolve":
 		b, err := getJSON(ownerURL(q))
