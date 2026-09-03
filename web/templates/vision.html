@@ -1,0 +1,58 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">vision · L1 work-credit lane</div>
+  <h1>Stable work price on L1, not a synthetic dollar.</h1>
+  <p class="lede">Kaspa stays issuer-free. Gramlane is <strong>not a dollar</strong> and does not replace USDT. It is a work-credit lane. dApps invoice jobs in grams (KIP-21 mass). The fee for a named job stays the same in work units. KAS is only the fallback if the user has no prepaid credits.</p>
+
+  <p class="lede">Centralized stables can exist on L2. They do not sit in this path. No mint from Tether. No freeze from Circle. No quoting FX as if it were protocol cost.</p>
+
+  <h2>Use it where the scarce thing is work, not rent</h2>
+  <table>
+    <tr><th>Work</th><th>Grams pay</th><th>Grams are not</th></tr>
+    <tr><td>AI bots / HTTP 402</td><td>The sequenced call</td><td>The model, or the dollar the bot might later spend</td></tr>
+    <tr><td>Messaging postage</td><td>Inclusion of the envelope</td><td>The chat app, the plaintext, encryption</td></tr>
+    <tr><td>Data transfer</td><td>The pull or the write</td><td>The dataset’s market price</td></tr>
+    <tr><td>Vault operations</td><td>The bump, the pin, the spend path</td><td>The KAS locked in the vault</td></tr>
+  </table>
+  <p class="lede">Vaults still lock KAS. Grams pay the <strong>action</strong>.</p>
+
+  <div class="grid">
+    <article class="card">
+      <h3>402 / agent</h3>
+      <p><span class="mono">GET /api/run?job=dag</span> burns prepaid grams. 402 only after inventory is spent.</p>
+      <a class="btn ghost" href="/job/dag">Run heartbeat</a>
+    </article>
+    <article class="card">
+      <h3>Postage</h3>
+      <p>Bill grams for a sequenced envelope. Not KaChat. Not broadcast.</p>
+      <a class="btn ghost" href="/job/postage">Quote postage</a>
+    </article>
+    <article class="card">
+      <h3>Data</h3>
+      <p>Name lookup, profile, DAG heartbeat. Live indexer / api.kaspa.org.</p>
+      <a class="btn ghost" href="/desk">Desk</a>
+    </article>
+    <article class="card">
+      <h3>Vault bump</h3>
+      <p>Grams pay the framing action. The vault still locks KAS. Worked #234.</p>
+      <a class="btn ghost" href="/job/vault">Burn vault grams</a>
+    </article>
+  </div>
+
+  <h2>What this is not</h2>
+  <ul>
+    <li>A unit of account for humans — nobody prices coffee in grams.</li>
+    <li>A savings asset — credits are inventory of work, not a store of value.</li>
+    <li>A claim that “stables are banned.” Liquidity will still touch USDT off to the side. Gramlane just refuses to make that the meter.</li>
+  </ul>
+  <p class="lede">A Toccata covenant can conserve grams. It cannot peg $1. The operator who sold the voucher ate the KAS inventory. That is a business, not a mint.</p>
+
+  {{if .Seq}}<p class="lede">Prepaid now: <strong class="mono">{{.Seq.Remaining}}</strong> / {{.Seq.Credits}} grams{{if .Seq.OnChain}} · voucher UTXO on L1{{end}}. Jobs burn grams. USD is not quoted.</p>{{end}}
+
+  <p class="row">
+    <a class="btn mint" href="/desk">Open the desk</a>
+    <a class="btn ghost" href="/honest">Claims</a>
+    <a class="btn ghost" href="/why">Why</a>
+  </p>
+</main>
+{{template "footer" .}}

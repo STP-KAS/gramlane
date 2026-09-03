@@ -14,6 +14,12 @@ func TestCatalogQuoted(t *testing.T) {
 	if err != nil || q.Grams != j.Grams {
 		t.Fatalf("%v %+v", err, q)
 	}
+	if _, ok := Get("vault"); !ok {
+		t.Fatal("vault job")
+	}
+	if _, ok := Get("postage"); !ok {
+		t.Fatal("postage job")
+	}
 }
 
 func TestPrepaidToken(t *testing.T) {
@@ -22,5 +28,21 @@ func TestPrepaidToken(t *testing.T) {
 	}
 	if prepaidToken("c1799b0de40f71cfd7a153684ef22326ad920d0dca2a8b519ce2c8379c4f7bc2") {
 		t.Fatal("raw txid is kas-fallback unless seq.Accepts")
+	}
+}
+
+func TestVaultAndPostage(t *testing.T) {
+	v, _ := Get("vault")
+	rec, err := RunAs(v, "", "grams", "", "")
+	if err != nil || rec.Output == "" {
+		t.Fatalf("vault %v %s", err, rec.Output)
+	}
+	if rec.Settlement != "prepaid-grams" {
+		t.Fatalf("settle %s", rec.Settlement)
+	}
+	p, _ := Get("postage")
+	rec, err = RunAs(p, "hello.kas", "grams", "", "")
+	if err != nil || rec.Output == "" {
+		t.Fatalf("postage %v", err)
 	}
 }

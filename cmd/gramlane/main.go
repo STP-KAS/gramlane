@@ -15,6 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Gramlane dApp http://localhost%s — L1 work credits, no L2, not a dollar", *addr)
+	log.Printf("Gramlane dApp http://localhost%s — stable work price on L1, not a synthetic dollar", *addr)
 	log.Fatal(http.ListenAndServe(*addr, s.Handler()))
 }

@@ -4,13 +4,17 @@
   <h1>What this dApp is.</h1>
   <table>
     <tr><th>Claim</th><th></th><th>Meaning</th></tr>
-    <tr><td>Work credits replace USDC for sequenced fees</td><td class="chip">possible</td><td>They replace the *fee unit*, not the dollar. 1 GRAM = 1 KIP-21 gram.</td></tr>
+    <tr><td>Stable work price on L1</td><td class="chip">live</td><td>A named job costs N grams. That is the meter. Not FX.</td></tr>
+    <tr><td>This replaces USDT</td><td class="chip bad">wrong</td><td>Gramlane does not replace a dollar. Liquidity can still touch USDT off to the side.</td></tr>
     <tr><td>This is a stablecoin</td><td class="chip bad">wrong</td><td>No peg, no reserve, no oracle. Issuer is a sequencer with inventory risk.</td></tr>
-    <tr><td>Covenants mint USD</td><td class="chip bad">wrong</td><td>Scripts conserve state. They do not print purchasing power.</td></tr>
-    <tr><td>L2 USDC is in scope</td><td class="chip bad">wrong</td><td>This dApp refuses L2. No Igra, no bridged dollar.</td></tr>
-    <tr><td>HTTP 402 verifies L1</td><td class="chip">local</td><td>402 only after prepaid grams cannot cover the job. WorkCredit.sil consume() is a later P2SH spend. This process does not broadcast it.</td></tr>
-    <tr><td>Jobs burn prepaid grams instead of USDT</td><td class="chip">live</td><td>500000 grams from the 0.5 KAS sale + funded P2SH. Operator ledger until consume(). Not a dollar peg.</td></tr>
+    <tr><td>Stables are banned</td><td class="chip bad">wrong</td><td>They can exist on L2. They do not sit in this path. No Tether mint, no Circle freeze here.</td></tr>
+    <tr><td>Covenants mint USD</td><td class="chip bad">wrong</td><td>Scripts conserve grams. They do not print purchasing power.</td></tr>
+    <tr><td>Vault grams are the lock</td><td class="chip bad">wrong</td><td>Vaults lock KAS. Grams pay the action (bump, pin, spend path).</td></tr>
+    <tr><td>L2 USDC is in scope</td><td class="chip bad">wrong</td><td>This dApp refuses L2. No Igra, no bridged dollar in the fee path.</td></tr>
+    <tr><td>HTTP 402 verifies L1</td><td class="chip">local</td><td>402 only after prepaid grams cannot cover the job. WorkCredit consume() is a later P2SH spend.</td></tr>
+    <tr><td>Jobs burn prepaid grams</td><td class="chip">live</td><td>500000 grams from the 0.5 KAS sale + funded P2SH. Operator ledger until consume().</td></tr>
     <tr><td>Jobs hit live Kaspa data</td><td class="chip">indexer</td><td>KNS indexer + api.kaspa.org. Not consensus uniqueness.</td></tr>
   </table>
+  <p class="lede"><a href="/vision">Vision</a> is the short form.</p>
 </main>
 {{template "footer" .}}

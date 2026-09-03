@@ -1,6 +1,8 @@
 package jobs
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +11,7 @@ import (
 	"time"
 
 	"gramlane/internal/chain"
+	"gramlane/internal/framing"
 	"gramlane/internal/quote"
 )
 
@@ -42,6 +45,8 @@ var Catalog = []Job{
 	{ID: "dag", Name: "BlockDAG heartbeat", Blurb: "Read virtual DAA from api.kaspa.org. Cheap inclusion probe.", Grams: 5_000, Lane: "SEQ1", Kind: "dag"},
 	{ID: "profile", Name: "Pull KNS profile texts", Blurb: "Avatar, x, website if the indexer has them.", Grams: 22_000, Lane: "KNS1", Kind: "profile"},
 	{ID: "batch", Name: "Batch three resolves", Blurb: "kns.kas + kaspa.kas + kachat.kas. One voucher burn.", Grams: 40_000, Lane: "KNS1", Kind: "batch"},
+	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: 8_000, Lane: "SEQ1", Kind: "vault"},
+	{ID: "postage", Name: "Message postage", Blurb: "Bill grams for a sequenced envelope. Not the chat app. Not USD. Not broadcast.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
 }
 
 func Get(id string) (Job, bool) {
@@ -214,6 +219,41 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 			parts = append(parts, n+":\n"+pretty(b))
 		}
 		r.Output = strings.Join(parts, "\n\n")
+	case "vault":
+		v := framing.Demo()
+		if hx := strings.TrimSpace(q); hx != "" && hx != "kns.kas" {
+			got, err := framing.DecodeHex(hx)
+			if err != nil {
+				return r, err
+			}
+			v.Custom = &got
+		}
+		b, err := json.MarshalIndent(v, "", "  ")
+		if err != nil {
+			return r, err
+		}
+		r.Output = string(b)
+	case "postage":
+		msg := strings.TrimSpace(q)
+		if msg == "" || msg == "kns.kas" {
+			msg = "hello.kas"
+		}
+		if len(msg) > 1024 {
+			msg = msg[:1024]
+		}
+		sum := sha256.Sum256([]byte(msg))
+		env := map[string]any{
+			"bytes":       len(msg),
+			"sha256":      hex.EncodeToString(sum[:]),
+			"gramsBilled": j.Grams,
+			"lane":        j.Lane,
+			"note":        "Postage is sequenced inclusion of this envelope. Not KaChat. Not broadcast. Encryption stays with the messenger. Grams pay the stamp, not the letter.",
+		}
+		b, err := json.MarshalIndent(env, "", "  ")
+		if err != nil {
+			return r, err
+		}
+		r.Output = string(b)
 	default:
 		return r, fmt.Errorf("unknown job")
 	}

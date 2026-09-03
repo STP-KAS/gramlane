@@ -1,10 +1,10 @@
 {{template "header" .}}
 <main>
   <div class="kicker">project delusional · <a href="https://x.com/StppStp">@StppStp</a> · dApp 1 · grams · Kaspa L1</div>
-  <h1>Buy inclusion, not a dollar.</h1>
-  <p class="lede">Gramlane is a sequenced work desk. Jobs are priced in grams of named-lane mass. A Toccata covenant can conserve those grams. It cannot peg USD. There is no L2 in this product. Settlement here is prepaid Work Credits on L1 — not USDT. If you wanted a shop that waits for a Kaspa-native stable, that is the other dApp.</p>
+  <h1>Stable work price on L1, not a synthetic dollar.</h1>
+  <p class="lede">Gramlane is an L1 work-credit lane. dApps invoice jobs in grams, not USD. Kaspa stays issuer-free. This is not USDT, not a peg, not a freeze. KAS is only the fallback if prepaid credits are empty. Vaults still lock KAS — grams pay the action.</p>
   {{if .Seq}}<p class="lede">Prepaid inventory: <strong class="mono">{{.Seq.Remaining}}</strong> / {{.Seq.Credits}} grams{{if .Seq.OnChain}} · voucher UTXO on L1{{end}}. Jobs burn grams. No second 0.5 KAS.</p>{{end}}
-  <p><a class="btn mint" href="/job/dag">Run heartbeat</a> <a class="btn ghost" href="/desk">Desk</a> <a class="btn ghost" href="/why">Why</a> <a class="btn ghost" href="/idea">Idea</a></p>
+  <p><a class="btn mint" href="/job/dag">Run heartbeat</a> <a class="btn ghost" href="/vision">Vision</a> <a class="btn ghost" href="/desk">Desk</a> <a class="btn ghost" href="/why">Why</a></p>
   <div class="grid">
     {{range .Jobs}}
     <article class="card">
