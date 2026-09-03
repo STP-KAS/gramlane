@@ -20,7 +20,7 @@ func TestKaswareFloorIsOneCentKAS(t *testing.T) {
 	if q.Sompi != 500_000 || q.KAS != 0.005 {
 		t.Fatalf("policy %+v", q)
 	}
-	if q.PaySompi != KaswareMinSompi || q.PayKASText != "0.012" {
+	if q.PaySompi != KaswareMinSompi || q.PayKASText != "0.5" {
 		t.Fatalf("kasware floor %+v", q)
 	}
 }

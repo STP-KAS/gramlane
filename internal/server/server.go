@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"gramlane/internal/desk"
 	"gramlane/internal/feedback"
 	"gramlane/internal/framing"
 	"gramlane/internal/jobs"
@@ -33,6 +34,7 @@ type page struct {
 	Run     *jobs.Receipt
 	Wallets []wallets.Wallet
 	Framing *framing.View
+	PayTo   string
 }
 
 func New(addr string) (*Server, error) {
@@ -155,7 +157,7 @@ func (s *Server) job(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	q, err := jobs.QuoteJob(j)
-	p := page{Title: j.Name + " · Gramlane", Active: "desk", Job: &j, Query: r.URL.Query().Get("q")}
+	p := page{Title: j.Name + " · Gramlane", Active: "desk", Job: &j, Query: r.URL.Query().Get("q"), PayTo: desk.PayTo()}
 	if err != nil {
 		p.Error = err.Error()
 	} else {

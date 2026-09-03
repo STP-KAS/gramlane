@@ -18,19 +18,20 @@
   <p class="tiny" data-origin-note></p>
   <div class="card" style="margin:18px 0">
     <h3>On-chain without the black Kasware window</h3>
-    <p class="lede">The dApp <span class="mono">sendKaspa</span> popup is what hangs. Send from <strong>Kasware’s own window</strong> (puzzle-piece icon), not from this page.</p>
+    <p class="lede">Do <strong>not</strong> send to your logged-in address. Kasware flags that as a no-op. Amount is <strong>0.5 KAS</strong> (above the 0.01 KAS dust / fee floor).</p>
     <ol>
-      <li>Close every black Kasware tab/window.</li>
-      <li>Click the Kasware icon in Chrome → it should show your balance (not a spinner).</li>
-      <li>In Kasware Send, paste the address, amount <strong>0.012</strong> KAS.</li>
+      <li>Close any black Kasware window. Open Kasware from the Chrome icon.</li>
+      <li>Send <strong>0.5 KAS</strong> to the <em>desk</em> address below — a different kaspa: than Logged in.</li>
+      <li>Copy the txid, paste it, Run job.</li>
     </ol>
-    <label>address</label>
-    <input class="mono" id="pay-to" data-wallet-addr readonly value="" />
+    <p class="tiny">Your login (do not pay this): <span class="mono" data-wallet-addr></span></p>
+    <label>desk address (must differ from login)</label>
+    <input class="mono" id="pay-to" value="{{.PayTo}}" placeholder="kaspa:q… desk / merchant, not your Kasware account" />
     <label>amount (KAS)</label>
-    <input class="mono" id="pay-amt" readonly value="{{if .Quote}}{{.Quote.PayKASText}}{{else}}0.012{{end}}" />
+    <input class="mono" id="pay-amt" readonly value="{{if .Quote}}{{.Quote.PayKASText}}{{else}}0.5{{end}}" />
     <p>
-      <button class="btn mint" type="button" data-copy="#pay-to">Copy address</button>
-      <button class="btn mint" type="button" data-copy="#pay-amt" data-copy-text="{{if .Quote}}{{.Quote.PayKASText}}{{else}}0.012{{end}}">Copy 0.012 KAS</button>
+      <button class="btn mint" type="button" data-copy="#pay-to">Copy desk address</button>
+      <button class="btn mint" type="button" data-copy="#pay-amt" data-copy-text="0.5">Copy 0.5 KAS</button>
     </p>
     <p class="tiny">4. After Kasware confirms, copy the txid, paste it below, Run job. We look it up on api.kaspa.org / explorer.</p>
   </div>
