@@ -18,7 +18,7 @@ body { min-height: 100vh; }
   position: sticky; top: 0; background: rgba(5,9,8,.88); backdrop-filter: blur(12px);
 }
 .brand { color: var(--mint); text-decoration: none; font-family: "IBM Plex Mono", monospace; font-weight: 700; letter-spacing: .12em; }
-.nav nav { display: flex; gap: 14px; flex: 1; flex-wrap: wrap; }
+.nav nav { display: flex; gap: 18px; flex: 1; flex-wrap: wrap; }
 .nav a { color: var(--muted); text-decoration: none; font-size: 14px; }
 .nav a.on, .nav a:hover { color: var(--mint); }
 main { padding: 40px 28px 72px; max-width: 1080px; margin: 0 auto; }
@@ -88,6 +88,9 @@ select {
 @media (max-width: 720px) { .split { grid-template-columns: 1fr; } }
 .till { font-family: Syne, sans-serif; font-size: clamp(40px, 10vw, 88px); line-height: 1; color: var(--mint); margin: 8px 0 16px; }
 .tillbox { text-align: center; }
+.meter { margin: 8px 0 28px; }
+.meter span { color: var(--muted); letter-spacing: .12em; text-transform: uppercase; font-size: 12px; font-family: "IBM Plex Mono", monospace; }
+.doors { margin-top: 8px; }
 .tillbox img { background: #fff; border-radius: 12px; padding: 8px; }
 .wmodal {
   position: fixed; inset: 0; z-index: 40;

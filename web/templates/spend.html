@@ -1,9 +1,9 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">spend pile · hold KAS · spend grams</div>
-  <h1>Set KAS aside. Spend grams.</h1>
-  <p class="lede">Keep a volatile pile (KAS). Convert a share into prepaid grams — that spend pile does not move when KAS/USD does. Efficient: one L1 send funds hundreds of sequenced POS payments. Cheap: no 0.5 KAS per coffee. Decentralized: Kaspa L1, no Tether mint, no Circle freeze. Exact value means <strong>exact grams</strong>, not $1.</p>
-  {{if .Seq}}<p class="lede">Spend pile now: <strong class="mono">{{.Seq.Remaining}}</strong> grams. <a href="/pos">Open a till</a> · <a href="/convert?from=remaining">Convert remaining</a></p>{{end}}
+  <div class="kicker">the jar</div>
+  <h1>Fill the spend jar.</h1>
+  <p class="lede">Keep KAS. Put a share aside as grams. One send, many tills. Exact grams, not $1.</p>
+  {{if .Seq}}<p class="lede">In the jar: <strong class="mono">{{.Seq.Remaining}}</strong> grams. <a href="/till">Till</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <form class="row" action="/spend" method="post">
@@ -55,6 +55,6 @@
     <li>You burn grams. No new volatile KAS send per sale.</li>
     <li>Merchant is owed grams on this rail (operator settlement) or takes KAS fallback to their <span class="mono">kaspa:</span>.</li>
   </ol>
-  <p class="lede">Not USDT. If a cafe chases dollars they will reprice grams. Your pile still holds the same grams. <a href="/pos">Merchant till</a></p>
+  <p class="lede">Not USDT. If a cafe chases dollars they will reprice grams. Your jar still holds the same grams. <a href="/till">Till</a></p>
 </main>
 {{template "footer" .}}

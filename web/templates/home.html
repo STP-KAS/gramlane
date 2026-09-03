@@ -1,24 +1,31 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">project delusional · <a href="https://x.com/StppStp">@StppStp</a> · dApp 1 · grams · Kaspa L1</div>
-  <h1>Stable work price on L1, not a synthetic dollar.</h1>
-  <p class="lede">Set KAS aside into prepaid grams. Spend them at a digital or on-location till. The spend pile does not move when KAS/USD does. Not a dollar. Not Tether. Sequenced on Kaspa L1.</p>
-  {{if .Seq}}<p class="lede">Spend pile: <strong class="mono">{{.Seq.Remaining}}</strong> / {{.Seq.Credits}} grams{{if .Seq.OnChain}} · voucher UTXO on L1{{end}}.</p>{{end}}
-  <p>
-    <a class="btn mint" href="/spend">Set aside</a>
-    <a class="btn ghost" href="/pos">POS till</a>
-    <a class="btn ghost" href="/convert">Convert</a>
-    <a class="btn ghost" href="/idea">Idea</a>
-  </p>
-  <div class="grid">
-    {{range .Jobs}}
-    <article class="card">
-      <h3>{{.Name}}</h3>
-      <p>{{.Blurb}}</p>
-      <p class="price">{{.Grams}} GRAM · lane {{.Lane}}</p>
-      <a class="btn ghost" href="/job/{{.ID}}">Quote</a>
-    </article>
-    {{end}}
+  <div class="kicker">the jar · not a coin</div>
+  <h1>Keep a jar of spend.</h1>
+  <p class="lede">Hold KAS. Put a share aside as grams. Pay a till — a link on the phone, a QR on the counter. The jar does not move when the exchange rate does. Not a dollar. Not Tether.</p>
+  {{if .Seq}}
+  <div class="meter">
+    <div class="till">{{.Seq.Remaining}}</div>
+    <span>grams in the jar</span>
   </div>
+  {{end}}
+  <div class="grid doors">
+    <article class="card">
+      <h3>Fund</h3>
+      <p>Set 50% aside, or any share. One send fills the jar.</p>
+      <a class="btn mint" href="/spend">Set aside</a>
+    </article>
+    <article class="card">
+      <h3>Pay</h3>
+      <p>Someone handed you a ticket. Burn grams. No new KAS per coffee.</p>
+      <a class="btn mint" href="/till">Open a ticket</a>
+    </article>
+    <article class="card">
+      <h3>Till</h3>
+      <p>You are the shop. Invoice in grams. Same ticket online and on location.</p>
+      <a class="btn mint" href="/till">Open the till</a>
+    </article>
+  </div>
+  <p class="lede" style="margin-top:36px">A household bills groceries. A plant bills events. An agent pays without a click. Same meter. <a href="/why">Why, beyond the chain</a> · <a href="/work">Builder work</a></p>
 </main>
 {{template "footer" .}}

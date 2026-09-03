@@ -13,24 +13,15 @@
 <body>
   <header class="nav">
     <a class="brand" href="/">GRAMLANE</a>
-    <a class="tiny" href="https://x.com/StppStp">@StppStp</a>
     <nav>
-      <a href="/vision" class="{{if eq .Active "vision"}}on{{end}}">Vision</a>
-      <a href="/idea" class="{{if eq .Active "idea"}}on{{end}}">Idea</a>
+      <a href="/" class="{{if eq .Active "home"}}on{{end}}">Home</a>
       <a href="/spend" class="{{if eq .Active "spend"}}on{{end}}">Spend</a>
-      <a href="/pos" class="{{if eq .Active "pos"}}on{{end}}">POS</a>
-      <a href="/vault" class="{{if eq .Active "vault"}}on{{end}}">Vault</a>
-      <a href="/postage" class="{{if eq .Active "postage"}}on{{end}}">Post</a>
-      <a href="/agent" class="{{if eq .Active "agent"}}on{{end}}">Agent</a>
-      <a href="/site" class="{{if eq .Active "site"}}on{{end}}">Site</a>
-      <a href="/desk" class="{{if eq .Active "desk"}}on{{end}}">Desk</a>
-      <a href="/convert" class="{{if eq .Active "convert"}}on{{end}}">Convert</a>
-      <a href="/guide" class="{{if eq .Active "guide"}}on{{end}}">Guide</a>
-      <a href="/genesis" class="{{if eq .Active "genesis"}}on{{end}}">Genesis</a>
+      <a href="/till" class="{{if eq .Active "till"}}on{{end}}">Till</a>
+      <a href="/work" class="{{if eq .Active "work"}}on{{end}}">Work</a>
+      <a href="/why" class="{{if eq .Active "why"}}on{{end}}">Why</a>
     </nav>
     <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
-    <span class="tiny" data-wallet-status></span>
-    {{if .Seq}}<span class="chip">{{.Seq.Remaining}} GRAM · L1 · no L2</span>{{else}}<span class="chip">L1 · grams · no L2</span>{{end}}
+    {{if .Seq}}<span class="chip">{{.Seq.Remaining}} GRAM</span>{{end}}
   </header>
 {{end}}
