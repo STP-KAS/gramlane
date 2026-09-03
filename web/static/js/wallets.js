@@ -1,6 +1,7 @@
 (function () {
   const KEY_ADDR = "kaspaAddress";
   const KEY_WALLET = "kaspaWallet";
+  const KEY_NAME = "kaspaName";
 
   function shortAddr(a) {
     if (!a) return "";
@@ -43,20 +44,23 @@
     el.textContent = msg || "";
   }
 
-  function persist(id, address) {
+  function persist(id, address, name) {
     try {
       sessionStorage.setItem(KEY_ADDR, address);
       sessionStorage.setItem(KEY_WALLET, id);
+      if (name) sessionStorage.setItem(KEY_NAME, name);
+      else sessionStorage.removeItem(KEY_NAME);
     } catch (_) {}
-    window.dispatchEvent(new CustomEvent("kaspa-wallet", { detail: { id: id, address: address } }));
+    window.dispatchEvent(new CustomEvent("kaspa-wallet", { detail: { id: id, address: address, name: name || "" } }));
   }
 
   function clearSession() {
     try {
       sessionStorage.removeItem(KEY_ADDR);
       sessionStorage.removeItem(KEY_WALLET);
+      sessionStorage.removeItem(KEY_NAME);
     } catch (_) {}
-    window.dispatchEvent(new CustomEvent("kaspa-wallet", { detail: { id: "", address: "" } }));
+    window.dispatchEvent(new CustomEvent("kaspa-wallet", { detail: { id: "", address: "", name: "" } }));
   }
 
   function current() {
@@ -64,18 +68,25 @@
       return {
         id: sessionStorage.getItem(KEY_WALLET) || "",
         address: sessionStorage.getItem(KEY_ADDR) || "",
+        name: sessionStorage.getItem(KEY_NAME) || "",
       };
     } catch (_) {
-      return { id: "", address: "" };
+      return { id: "", address: "", name: "" };
     }
+  }
+
+  function display(c) {
+    if (c && c.name) return c.name;
+    if (c && c.address) return shortAddr(c.address);
+    return "";
   }
 
   function paintButtons() {
     const c = current();
     document.querySelectorAll("[data-wallet-connect]").forEach(function (btn) {
       if (c.address) {
-        btn.textContent = "Logged in";
-        btn.title = c.address;
+        btn.textContent = display(c);
+        btn.title = c.name ? c.name + " · " + c.address : c.address;
         btn.dataset.connected = c.id;
       } else {
         btn.textContent = btn.getAttribute("data-idle-label") || "Log in";
@@ -168,9 +179,12 @@
     if (id === "kasware") r = await connectKasware();
     else if (id === "kastle") r = await connectKastle();
     else throw new Error("This wallet has no in-page provider.");
-    persist(r.id, r.address);
+    persist(r.id, r.address, "");
     paintButtons();
     status("Logged in");
+    loadIdentity(r.address).then(function (id) {
+      if (id && id.names && id.names.length > 1 && !id.linked) openNameModal(id);
+    });
     return r;
   }
 
@@ -203,7 +217,10 @@
 
   async function clickLogin(btn) {
     if (current().address) {
-      status("Logged in · " + shortAddr(current().address));
+      loadIdentity(current().address).then(function (id) {
+        if (id && id.names && id.names.length > 1) openNameModal(id);
+        else status(display(current()) + (current().name ? "" : " · " + shortAddr(current().address)));
+      });
       return;
     }
     const id = preferredWallet();
@@ -225,8 +242,9 @@
   async function resume() {
     const quiet = await kaswareAccountsQuiet();
     if (quiet[0]) {
-      persist("kasware", quiet[0]);
+      persist("kasware", quiet[0], current().name);
       paintButtons();
+      loadIdentity(quiet[0]);
       return;
     }
     paintButtons();
@@ -255,6 +273,19 @@
     });
     document.addEventListener("click", function (e) {
       if (e.target.closest("[data-wallet-close]")) closeModal();
+      if (e.target.closest("[data-kns-close]")) {
+        var km = document.getElementById("knsModal");
+        if (km) km.hidden = true;
+      }
+      if (e.target.closest("[data-kns-clear]")) {
+        pickName("");
+        return;
+      }
+      var kns = e.target.closest("[data-kns-pick]");
+      if (kns) {
+        pickName(kns.getAttribute("data-kns-pick"));
+        return;
+      }
       const out = e.target.closest("[data-wallet-logout]");
       if (out) {
         logout().catch(function (err) {
@@ -271,6 +302,86 @@
       if (e.target.id === "walletModal") closeModal();
     });
     resume();
+  }
+
+  async function loadIdentity(address) {
+    if (!address) return null;
+    try {
+      const res = await fetch("/api/id?address=" + encodeURIComponent(address));
+      const j = await res.json();
+      const id = j && j.id ? j.id : null;
+      if (!id) return null;
+      var name = id.linked || "";
+      if (!name && id.names && id.names.length === 1) name = id.names[0];
+      persist(current().id || "kasware", address, name);
+      paintButtons();
+      window._gramlaneId = id;
+      return id;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function openNameModal(id) {
+    var m = document.getElementById("knsModal");
+    if (!m) {
+      var wrap = document.createElement("div");
+      wrap.innerHTML =
+        '<div id="knsModal" class="wmodal" hidden><div class="wmodal-card">' +
+        '<div class="wmodal-head"><strong>Link a .kas name</strong>' +
+        '<button type="button" class="btn ghost" data-kns-close>Close</button></div>' +
+        '<p class="tiny">This Kaspa address owns more than one domain. Pick the one Gramlane should show. Permanent on this site until you change it.</p>' +
+        '<input id="knsFilter" placeholder="filter" style="width:100%;margin:10px 0" />' +
+        '<div id="knsList" class="kns-list"></div>' +
+        '<p style="margin-top:12px"><button type="button" class="btn ghost" data-kns-clear>Show kaspa address</button></p>' +
+        "</div></div>";
+      document.body.appendChild(wrap.firstElementChild);
+      m = document.getElementById("knsModal");
+    }
+    var list = document.getElementById("knsList");
+    var names = (id && id.names) || [];
+    function draw(filter) {
+      filter = (filter || "").toLowerCase();
+      list.innerHTML = names
+        .filter(function (n) {
+          return !filter || n.indexOf(filter) !== -1;
+        })
+        .map(function (n) {
+          var on = current().name === n ? " mint" : " ghost";
+          return '<button type="button" class="btn' + on + '" data-kns-pick="' + n + '">' + n + "</button>";
+        })
+        .join(" ");
+    }
+    draw("");
+    var f = document.getElementById("knsFilter");
+    f.oninput = function () {
+      draw(f.value);
+    };
+    m.hidden = false;
+  }
+
+  function pickName(name) {
+    var c = current();
+    if (!c.address) return;
+    fetch("/api/id", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ address: c.address, name: name || "" }),
+    })
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (j) {
+        var linked = j && j.id && j.id.linked ? j.id.linked : name || "";
+        persist(c.id, c.address, linked);
+        paintButtons();
+        var m = document.getElementById("knsModal");
+        if (m) m.hidden = true;
+        status(linked ? "Linked " + linked : "Showing kaspa address");
+      })
+      .catch(function (err) {
+        status(err.message || String(err));
+      });
   }
 
   window.KaspaWallets = { connect: connect, logout: logout, current: current, detected: detected, paintButtons: paintButtons };
