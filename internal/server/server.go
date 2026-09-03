@@ -12,6 +12,7 @@ import (
 	"gramlane/internal/desk"
 	"gramlane/internal/feedback"
 	"gramlane/internal/framing"
+	"gramlane/internal/genesis"
 	"gramlane/internal/jobs"
 	"gramlane/internal/quote"
 	"gramlane/internal/wallets"
@@ -35,6 +36,7 @@ type page struct {
 	Wallets []wallets.Wallet
 	Framing *framing.View
 	PayTo   string
+	Genesis *genesis.Plan
 }
 
 func New(addr string) (*Server, error) {
@@ -60,6 +62,13 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/docs", s.docs)
 	mux.HandleFunc("/guide", s.guidePage)
 	mux.HandleFunc("/steps", s.guidePage)
+	mux.HandleFunc("/genesis", s.genesisPage)
+	mux.HandleFunc("/api/genesis", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, 200, map[string]any{"ok": true, "data": genesis.Live(), "payTo": desk.PayTo()})
+	})
+	mux.HandleFunc("/api/genesis/artifact", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "contracts/v1/WorkCredit-live.json")
+	})
 	mux.HandleFunc("/wallets", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "wallets.html", page{Title: "Wallets · Gramlane", Active: "wallets", Wallets: wallets.All()})
 	})
@@ -176,6 +185,11 @@ func (s *Server) docs(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) guidePage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "guide.html", page{Title: "Guide · Gramlane", Active: "guide"})
+}
+
+func (s *Server) genesisPage(w http.ResponseWriter, r *http.Request) {
+	p := genesis.Live()
+	s.render(w, "genesis.html", page{Title: "Genesis · Gramlane", Active: "genesis", Genesis: &p, PayTo: desk.PayTo()})
 }
 
 func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
