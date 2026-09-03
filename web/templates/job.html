@@ -7,7 +7,8 @@
   {{if .Quote}}
   <table>
     <tr><th>grams</th><td class="mono">{{.Quote.Grams}}</td></tr>
-    <tr><th>KAS fallback</th><td class="mono">{{.Quote.KAS}} KAS ({{.Quote.Sompi}} sompi)</td></tr>
+    <tr><th>KAS fallback (policy)</th><td class="mono">{{.Quote.KAS}} KAS ({{.Quote.Sompi}} sompi)</td></tr>
+    <tr><th>Send in Kasware</th><td class="mono">{{.Quote.PayKAS}} KAS ({{.Quote.PaySompi}} sompi) — wallet minimum 0.01 KAS</td></tr>
     <tr><th>USD</th><td>{{.Quote.USD}}</td></tr>
     <tr><th>scheme</th><td class="mono">{{.Quote.Scheme}}</td></tr>
   </table>
@@ -21,11 +22,11 @@
     <ol>
       <li>Close every black Kasware tab/window.</li>
       <li>Click the Kasware icon in Chrome → it should show your balance (not a spinner).</li>
-      <li>Send <strong>{{if .Quote}}{{.Quote.KAS}} KAS{{else}}the quoted KAS{{end}}</strong> ({{if .Quote}}{{.Quote.Sompi}} sompi{{end}}) to the same address that is connected here:</li>
+      <li>Send <strong>{{if .Quote}}{{.Quote.PayKAS}} KAS{{else}}0.01 KAS{{end}}</strong> (Kasware will not send less than 0.01 KAS). {{if .Quote}}{{.Quote.PaySompi}} sompi.{{end}}</li>
     </ol>
     <p class="mono" data-wallet-addr id="pay-to">(connect first)</p>
     <p><button class="btn ghost" type="button" data-copy="#pay-to">Copy address</button>
-      {{if .Quote}}<button class="btn ghost" type="button" data-copy-text="{{.Quote.KAS}}">Copy {{.Quote.KAS}} KAS</button>{{end}}</p>
+      {{if .Quote}}<button class="btn ghost" type="button" data-copy-text="{{.Quote.PayKAS}}">Copy {{.Quote.PayKAS}} KAS</button>{{end}}</p>
     <p class="tiny">4. After Kasware confirms, copy the txid, paste it below, Run job. We look it up on api.kaspa.org / explorer.</p>
   </div>
   <p class="tiny" data-pay-status></p>

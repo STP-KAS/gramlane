@@ -11,3 +11,16 @@ func TestMillionGramsIsOneKAS(t *testing.T) {
 		t.Fatalf("%+v", q)
 	}
 }
+
+func TestKaswareFloorIsOneCentKAS(t *testing.T) {
+	q, err := Grams(5_000, "SEQ1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if q.Sompi != 500_000 || q.KAS != 0.005 {
+		t.Fatalf("policy %+v", q)
+	}
+	if q.PaySompi != KaswareMinSompi || q.PayKAS != 0.01 {
+		t.Fatalf("kasware floor %+v", q)
+	}
+}
