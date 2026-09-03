@@ -38,8 +38,10 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/guide` | Step-by-step: what you do with grams |
 | `/genesis` | WorkCredit instance: 0.5 KAS sale + funded P2SH voucher UTXO |
 | `/stablegram` | Set aside % of KAS into the Stablegram jar |
-| `/pos` | Merchant till — digital + on-location QR |
-| `/pay/{id}` | Pay a POS invoice from prepaid grams |
+| `/pay` | Pay hub — EUR/USD ticket, QR, counter |
+| `/pay/{id}` | Pay a ticket from the jar |
+| `/kachat` | KaChat: resolve .kas, postage, pay that wallet |
+| `/apps` | Apps: KaChat, vault, agent, site, jobs |
 | `/convert` | KAS ↔ grams at policy 100 sompi/gram. Not a KCC-20 |
 | `/desk` | Job catalog in GRAM |
 | `/job/resolve` | Quote + burn prepaid grams |

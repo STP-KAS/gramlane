@@ -1,10 +1,15 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">work · builders</div>
-  <h1>Jobs in grams.</h1>
-  <p class="lede">The till is for shops. This page is for sequenced work: vault bump, postage, agent, site, lookups. Same jar. Same grams.</p>
+  <div class="kicker">apps · Gramlane</div>
+  <h1>Apps in grams.</h1>
+  <p class="lede">KaChat, vault, agent, site, lookups. Same Stablegram jar. Pay is the till.</p>
   {{if .Seq}}<p class="lede">Jar: <strong class="mono">{{.Seq.Remaining}}</strong> GRAM.</p>{{end}}
   <div class="grid">
+    <article class="card">
+      <h3>KaChat</h3>
+      <p>Resolve a .kas name. Stamp postage. Pay them from the jar. E2E stays in KaChat.</p>
+      <a class="btn mint" href="/kachat">Open</a>
+    </article>
     <article class="card">
       <h3>Vault</h3>
       <p>Grams pay the bump. KAS stays locked.</p>

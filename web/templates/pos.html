@@ -1,12 +1,12 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">till · online or on the counter</div>
+  <div class="kicker">pay · online or on the counter</div>
   <h1>One ticket. Two doors.</h1>
   <p class="lede">A URL for the phone. A QR for the shop. Same grams. Customer pays from the jar.</p>
   {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> grams. <a href="/stablegram">Stablegram</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
-  <form action="/pos" method="post">
+  <form action="/pay" method="post">
     <div class="row">
       <div>
         <label>item</label>
@@ -45,11 +45,11 @@
     <div class="row">
       <div>
         <label>merchant</label>
-        <input name="merchant" placeholder="cafe.kas" />
+        <input name="merchant" placeholder="cafe.kas" value="{{.Query}}" />
       </div>
       <div>
         <label>KAS fallback (kaspa:)</label>
-        <input class="mono" name="payTo" placeholder="kaspa:q… optional" />
+        <input class="mono" name="payTo" placeholder="kaspa:q… optional" value="{{.To}}" />
       </div>
       <div>
         <label>where</label>
@@ -61,7 +61,7 @@
       </div>
     </div>
     <p class="price" data-preview>grams appear here</p>
-    <p><button class="btn mint" type="submit">Open till</button></p>
+    <p><button class="btn mint" type="submit">Open ticket</button></p>
   </form>
 
   {{if .Invoice}}
