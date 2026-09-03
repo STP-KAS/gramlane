@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"io/fs"
@@ -9,11 +10,14 @@ import (
 	"net/http"
 	"strings"
 
+	"gramlane/internal/agent"
 	"gramlane/internal/desk"
 	"gramlane/internal/feedback"
 	"gramlane/internal/framing"
 	"gramlane/internal/genesis"
 	"gramlane/internal/jobs"
+	"gramlane/internal/names"
+	"gramlane/internal/post"
 	"gramlane/internal/quote"
 	"gramlane/internal/seq"
 	"gramlane/internal/wallets"
@@ -39,6 +43,11 @@ type page struct {
 	PayTo   string
 	Genesis *genesis.Plan
 	Seq     *seq.Ledger
+	Stamps  []post.Stamp
+	Site    *names.Page
+	Card    *agent.Card
+	Reply   *agent.Reply
+	HasGrok bool
 }
 
 func New(addr string) (*Server, error) {
@@ -86,13 +95,20 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/vision", s.visionPage)
 	mux.HandleFunc("/explain", s.visionPage)
 	mux.HandleFunc("/idea", func(w http.ResponseWriter, r *http.Request) {
-		s.render(w, "idea.html", page{Title: "Idea · Gramlane", Active: "vision"})
+		s.render(w, "idea.html", page{Title: "Idea · Gramlane", Active: "idea", Jobs: jobs.Catalog})
 	})
 	mux.HandleFunc("/why", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "why.html", page{Title: "Why · Gramlane", Active: "why"})
 	})
 	mux.HandleFunc("/234", s.framingPage)
 	mux.HandleFunc("/framing", s.framingPage)
+	mux.HandleFunc("/vault", s.vaultPage)
+	mux.HandleFunc("/postage", s.postagePage)
+	mux.HandleFunc("/post", s.postagePage)
+	mux.HandleFunc("/agent", s.agentPage)
+	mux.HandleFunc("/api/agent", s.apiAgent)
+	mux.HandleFunc("/site/", s.siteName)
+	mux.HandleFunc("/site", s.sitePage)
 	mux.HandleFunc("/api/framing", func(w http.ResponseWriter, r *http.Request) {
 		v := framing.Demo()
 		if hx := strings.TrimSpace(r.URL.Query().Get("hex")); hx != "" {
@@ -113,6 +129,8 @@ func (s *Server) Handler() http.Handler {
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
 			"vision":         "stable work price on L1, not a synthetic dollar",
+			"products":       []string{"vault", "postage", "agent", "site"},
+			"grok":           agent.HasKey(),
 			"gramsRemaining": led.Remaining, "credits": led.Credits,
 			"voucherOnChain": led.OnChain, "saleTx": led.SaleTx,
 			"voucherTx": led.VoucherTx, "p2sh": led.P2SH,
@@ -207,6 +225,163 @@ func (s *Server) guidePage(w http.ResponseWriter, r *http.Request) {
 func (s *Server) genesisPage(w http.ResponseWriter, r *http.Request) {
 	p := genesis.Live()
 	s.render(w, "genesis.html", page{Title: "Genesis · Gramlane", Active: "genesis", Genesis: &p, PayTo: desk.PayTo()})
+}
+
+func (s *Server) burnJob(id, q, payer string) (jobs.Job, jobs.Receipt, error) {
+	j, ok := jobs.Get(id)
+	if !ok {
+		return jobs.Job{}, jobs.Receipt{}, fmt.Errorf("unknown job")
+	}
+	paid := settlePaid(j, "grams")
+	if paid == "" {
+		return j, jobs.Receipt{}, fmt.Errorf("prepaid grams are spent")
+	}
+	rec, err := jobs.RunAs(j, q, paid, payer, "")
+	if err != nil {
+		return j, rec, err
+	}
+	applyBurn(&rec, j, paid)
+	return j, rec, nil
+}
+
+func (s *Server) vaultPage(w http.ResponseWriter, r *http.Request) {
+	v := framing.Demo()
+	j, _ := jobs.Get("vault")
+	p := page{Title: "Vault bump · Gramlane", Active: "vault", Framing: &v, Job: &j, PayTo: desk.PayTo(), Query: r.FormValue("hex")}
+	if hx := strings.TrimSpace(p.Query); hx != "" {
+		got, err := framing.DecodeHex(hx)
+		if err != nil {
+			p.Error = err.Error()
+		} else {
+			v.Custom = &got
+			p.Framing = &v
+		}
+	}
+	if r.Method == http.MethodPost {
+		_, rec, err := s.burnJob("vault", p.Query, r.FormValue("payer"))
+		p.Run = &rec
+		if err != nil {
+			p.Error = err.Error()
+		}
+	}
+	s.render(w, "vault.html", p)
+}
+
+func (s *Server) postagePage(w http.ResponseWriter, r *http.Request) {
+	j, _ := jobs.Get("postage")
+	p := page{Title: "Postage · Gramlane", Active: "postage", Job: &j, PayTo: desk.PayTo(), Query: r.FormValue("q")}
+	if r.Method == http.MethodPost {
+		_, rec, err := s.burnJob("postage", p.Query, r.FormValue("payer"))
+		p.Run = &rec
+		if err != nil {
+			p.Error = err.Error()
+		}
+	}
+	p.Stamps = post.List()
+	s.render(w, "postage.html", p)
+}
+
+func (s *Server) agentPage(w http.ResponseWriter, r *http.Request) {
+	j, _ := jobs.Get("agent")
+	name := strings.TrimSpace(r.FormValue("name"))
+	if name == "" {
+		name = strings.TrimSpace(r.URL.Query().Get("q"))
+	}
+	prompt := strings.TrimSpace(r.FormValue("prompt"))
+	p := page{Title: "Agent · Gramlane", Active: "agent", Job: &j, PayTo: desk.PayTo(), Query: name, HasGrok: agent.HasKey()}
+	if name != "" && r.Method == http.MethodGet {
+		if c, err := agent.CardFor(name); err == nil {
+			p.Card = c
+		} else {
+			p.Error = err.Error()
+		}
+	}
+	if r.Method == http.MethodPost {
+		q := name
+		if prompt != "" {
+			if name != "" {
+				q = name + " | " + prompt
+			} else {
+				q = prompt
+			}
+		}
+		_, rec, err := s.burnJob("agent", q, r.FormValue("payer"))
+		p.Run = &rec
+		if err != nil {
+			p.Error = err.Error()
+		}
+		if name != "" {
+			if c, err := agent.CardFor(name); err == nil {
+				p.Card = c
+			}
+		}
+		if rec.Output != "" && prompt != "" {
+			var rep agent.Reply
+			if json.Unmarshal([]byte(rec.Output), &rep) == nil {
+				p.Reply = &rep
+			}
+		}
+	}
+	s.render(w, "agent.html", p)
+}
+
+func (s *Server) apiAgent(w http.ResponseWriter, r *http.Request) {
+	name := strings.TrimSpace(r.URL.Query().Get("name"))
+	if name == "" {
+		name = "kns.kas"
+	}
+	if r.Method == http.MethodGet && r.URL.Query().Get("ask") == "" {
+		c, err := agent.CardFor(name)
+		if err != nil {
+			writeJSON(w, 502, map[string]any{"ok": false, "error": err.Error()})
+			return
+		}
+		writeJSON(w, 200, map[string]any{"ok": true, "card": c, "grok": agent.HasKey()})
+		return
+	}
+	j, rec, err := s.burnJob("agent", name+" | "+r.URL.Query().Get("ask"), "")
+	if err != nil {
+		writeJSON(w, 402, map[string]any{"ok": false, "error": err.Error(), "job": j, "receipt": rec})
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "receipt": rec, "seq": seq.Snap(), "grok": agent.HasKey()})
+}
+
+func (s *Server) sitePage(w http.ResponseWriter, r *http.Request) {
+	j, _ := jobs.Get("site")
+	q := strings.TrimSpace(r.FormValue("q"))
+	if q == "" {
+		q = strings.TrimSpace(r.URL.Query().Get("q"))
+	}
+	p := page{Title: "Site builder · Gramlane", Active: "site", Job: &j, PayTo: desk.PayTo(), Query: q}
+	if r.Method == http.MethodPost {
+		if q == "" {
+			q = "kns.kas"
+		}
+		_, rec, err := s.burnJob("site", q, r.FormValue("payer"))
+		p.Run = &rec
+		if err != nil {
+			p.Error = err.Error()
+		} else if site, lerr := names.Lookup(q); lerr == nil {
+			p.Site = site
+		}
+	}
+	s.render(w, "site.html", p)
+}
+
+func (s *Server) siteName(w http.ResponseWriter, r *http.Request) {
+	name := strings.TrimPrefix(r.URL.Path, "/site/")
+	if name == "" {
+		s.sitePage(w, r)
+		return
+	}
+	j, _ := jobs.Get("site")
+	site, err := names.Lookup(name)
+	p := page{Title: names.Normalize(name) + " · Gramlane", Active: "site", Job: &j, Site: site, Query: names.Normalize(name)}
+	if err != nil {
+		p.Error = err.Error()
+	}
+	s.render(w, "domain.html", p)
 }
 
 func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {

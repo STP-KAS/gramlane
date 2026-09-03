@@ -1,0 +1,47 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">AI agent · HTTP 402 · grams pay the call</div>
+  <h1>A machine that pays in grams.</h1>
+  <p class="lede">Build an agent card from a live .kas name, then ask. If <span class="mono">XAI_API_KEY</span> is set this process calls Grok on api.x.ai. Otherwise it is a local tools agent — not a fake LLM. Grams pay the sequenced call, not a dollar.</p>
+  {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}} · {{if .HasGrok}}<span class="ok">Grok wired</span>{{else}}local tools{{end}}</p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Run}}<p class="ok">Called. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}
+
+  {{if and .Seq .Job (ge .Seq.Remaining .Job.Grams)}}
+  <form action="/agent" method="post">
+    <div class="row">
+      <div>
+        <label>.kas name (card)</label>
+        <input name="name" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+      </div>
+    </div>
+    <label>ask</label>
+    <textarea name="prompt" rows="4" placeholder="What does this name own, and what do grams pay?"></textarea>
+    <p style="margin-top:12px">
+      <button class="btn mint" type="submit">Ask — burn {{.Job.Grams}} grams</button>
+      <button class="btn ghost" type="submit" name="prompt" value="">Card only</button>
+    </p>
+  </form>
+  {{else}}
+  <p class="lede">Prepaid remaining cannot cover an agent call. <a href="/job/agent">KAS fallback</a>.</p>
+  {{end}}
+
+  {{if .Reply}}
+  <div class="card" style="margin:18px 0">
+    <h3>{{.Reply.Model}}</h3>
+    <pre>{{.Reply.Text}}</pre>
+    <p class="tiny">{{.Reply.Warning}}</p>
+  </div>
+  {{end}}
+  {{if .Card}}
+  <div class="card" style="margin:18px 0">
+    <h3>{{.Card.Name}}</h3>
+    <p>{{.Card.Description}}</p>
+    <p class="mono">{{.Card.Owner}}</p>
+    <p class="tiny">{{.Card.Warning}}</p>
+    <p><a class="btn ghost" href="/site/{{.Card.Name}}">Open generated site</a> <a class="btn ghost" href="/api/agent?name={{.Card.Name}}">Card JSON</a></p>
+  </div>
+  {{end}}
+  <p class="tiny">API: <span class="mono">GET /api/agent?name=kns.kas</span> · <span class="mono">GET /api/run?job=agent&amp;q=kns.kas | What is Gramlane?</span></p>
+</main>
+{{template "footer" .}}

@@ -1,8 +1,6 @@
 package jobs
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,8 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"gramlane/internal/agent"
 	"gramlane/internal/chain"
 	"gramlane/internal/framing"
+	"gramlane/internal/names"
+	"gramlane/internal/post"
 	"gramlane/internal/quote"
 )
 
@@ -47,6 +48,8 @@ var Catalog = []Job{
 	{ID: "batch", Name: "Batch three resolves", Blurb: "kns.kas + kaspa.kas + kachat.kas. One voucher burn.", Grams: 40_000, Lane: "KNS1", Kind: "batch"},
 	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: 8_000, Lane: "SEQ1", Kind: "vault"},
 	{ID: "postage", Name: "Message postage", Blurb: "Bill grams for a sequenced envelope. Not the chat app. Not USD. Not broadcast.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
+	{ID: "agent", Name: "AI agent call", Blurb: "HTTP 402 for a machine. Grok if XAI_API_KEY is set; otherwise local tools. Grams pay the call.", Grams: 25_000, Lane: "AGENT", Kind: "agent"},
+	{ID: "site", Name: ".kas site builder", Blurb: "Generate a web page from a live KNS name. Link-in-bio from indexer texts, not IPFS.", Grams: 15_000, Lane: "KNS1", Kind: "site"},
 }
 
 func Get(id string) (Job, bool) {
@@ -234,22 +237,41 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 		}
 		r.Output = string(b)
 	case "postage":
-		msg := strings.TrimSpace(q)
-		if msg == "" || msg == "kns.kas" {
-			msg = "hello.kas"
+		st := post.StampMsg(r.Payer, q, j.Grams)
+		b, err := json.MarshalIndent(st, "", "  ")
+		if err != nil {
+			return r, err
 		}
-		if len(msg) > 1024 {
-			msg = msg[:1024]
+		r.Output = string(b)
+	case "agent":
+		name, prompt := splitAgentQ(q)
+		if prompt == "" {
+			c, err := agent.CardFor(name)
+			if err != nil {
+				return r, err
+			}
+			b, err := json.MarshalIndent(c, "", "  ")
+			if err != nil {
+				return r, err
+			}
+			r.Output = string(b)
+			break
 		}
-		sum := sha256.Sum256([]byte(msg))
-		env := map[string]any{
-			"bytes":       len(msg),
-			"sha256":      hex.EncodeToString(sum[:]),
-			"gramsBilled": j.Grams,
-			"lane":        j.Lane,
-			"note":        "Postage is sequenced inclusion of this envelope. Not KaChat. Not broadcast. Encryption stays with the messenger. Grams pay the stamp, not the letter.",
+		rep, err := agent.Ask(prompt, name)
+		if err != nil {
+			return r, err
 		}
-		b, err := json.MarshalIndent(env, "", "  ")
+		b, err := json.MarshalIndent(rep, "", "  ")
+		if err != nil {
+			return r, err
+		}
+		r.Output = string(b)
+	case "site":
+		p, err := names.Lookup(q)
+		if err != nil {
+			return r, err
+		}
+		b, err := json.MarshalIndent(p, "", "  ")
 		if err != nil {
 			return r, err
 		}
@@ -258,4 +280,19 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 		return r, fmt.Errorf("unknown job")
 	}
 	return r, nil
+}
+
+func splitAgentQ(q string) (name, prompt string) {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return "kns.kas", "What is Gramlane?"
+	}
+	if i := strings.Index(q, " | "); i >= 0 {
+		return strings.TrimSpace(q[:i]), strings.TrimSpace(q[i+3:])
+	}
+	low := strings.ToLower(q)
+	if strings.HasSuffix(low, ".kas") && !strings.Contains(q, " ") {
+		return names.Normalize(q), ""
+	}
+	return "", q
 }

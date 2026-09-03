@@ -1,0 +1,25 @@
+{{template "header" .}}
+<main>
+  {{if .Site}}
+  <div class="kicker">generated from KNS indexer · not IPFS</div>
+  {{if .Site.Avatar}}<img class="site-av" src="{{.Site.Avatar}}" alt="" />{{end}}
+  <h1>{{.Site.Name}}</h1>
+  {{if .Site.Bio}}<p class="lede">{{.Site.Bio}}</p>{{end}}
+  <p class="mono">{{.Site.Owner}}</p>
+  <p>
+    {{if .Site.PayURI}}<button class="btn mint" type="button" data-copy-text="{{.Site.PayURI}}">Copy pay URI</button>{{end}}
+    {{if .Site.X}}<a class="btn ghost" href="{{.Site.X}}">X</a>{{end}}
+    {{if .Site.GitHub}}<a class="btn ghost" href="{{.Site.GitHub}}">GitHub</a>{{end}}
+    {{if .Site.Website}}<a class="btn ghost" href="{{.Site.Website}}">Website</a>{{end}}
+    {{if .Site.Telegram}}<a class="btn ghost" href="{{.Site.Telegram}}">Telegram</a>{{end}}
+    <a class="btn ghost" href="/agent?q={{.Site.Name}}">Agent</a>
+    <a class="btn ghost" href="/site?q={{.Site.Name}}">Rebuild (grams)</a>
+  </p>
+  <p class="tiny">{{.Site.Warning}} Sequenced build: POST /site burns {{if .Job}}{{.Job.Grams}}{{end}} grams.</p>
+  {{else}}
+  <h1>Name not found.</h1>
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  <p><a class="btn mint" href="/site">Site builder</a></p>
+  {{end}}
+</main>
+{{template "footer" .}}

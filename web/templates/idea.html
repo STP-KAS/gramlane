@@ -1,23 +1,45 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">idea · see vision</div>
-  <h1>This URL is the work-credit lane.</h1>
-  <p class="lede">Three local Kaspa L1 sites. You are on <strong>Gramlane</strong> (http://127.0.0.1:8081). Not a dollar. Not a USDT replacement. The full write-up is <a href="/vision">Vision</a>.</p>
-  <p class="lede">One line: <strong>stable work price on L1, not a synthetic dollar.</strong></p>
+  <div class="kicker">idea · four kinds of work</div>
+  <h1>Invoice the action, not the dollar.</h1>
+  <p class="lede">Gramlane is the L1 work-credit lane. Kaspa stays issuer-free. A named job costs N grams. That number does not move when KAS/USD does. USDT can sit off to the side. It is not the meter.</p>
+  <p class="lede">Four products. Vaults still lock KAS — grams pay the bump. Postage stamps the envelope, not the chat. The agent is callable and payable. A .kas name already has a page if you build it.</p>
+
   <div class="grid">
     <article class="card">
-      <h3>KNS :8080</h3>
-      <p>Names and agents. <a href="http://127.0.0.1:8080/idea">Explain that site</a>.</p>
+      <h3>Vault bump</h3>
+      <p>Grams pay the framing action. Same 42 bytes: amount 1, hostile packing reads 264. The lock is still KAS.</p>
+      <p class="price">8 000 GRAM</p>
+      <a class="btn mint" href="/vault">Bump</a>
     </article>
     <article class="card">
-      <h3>This site</h3>
-      <p>Jobs in GRAM. 1 credit = 1 KIP-21 gram. Prepaid inventory burns those grams. KAS fallback if remaining is empty.</p>
+      <h3>Message postage</h3>
+      <p>Grams pay the stamp. Not KaChat, not broadcast, not encrypted. The messenger still owns the letter.</p>
+      <p class="price">9 000 GRAM</p>
+      <a class="btn mint" href="/postage">Stamp</a>
     </article>
     <article class="card">
-      <h3>Kaspa Till :8082</h3>
-      <p>When the invoice really is money. <a href="http://127.0.0.1:8082/idea">Explain that site</a>.</p>
+      <h3>AI agent</h3>
+      <p>HTTP 402 for a machine. Grok if a key is present; local tools if not. Grams pay the call.</p>
+      <p class="price">25 000 GRAM</p>
+      <a class="btn mint" href="/agent">Call</a>
+    </article>
+    <article class="card">
+      <h3>.kas site builder</h3>
+      <p>Indexer profile → a generated web page. Link-in-bio, not IPFS. Grams pay the build.</p>
+      <p class="price">15 000 GRAM</p>
+      <a class="btn mint" href="/site">Build</a>
     </article>
   </div>
-  <p><a class="btn mint" href="/vision">Read the vision</a> <a class="btn ghost" href="/desk">Desk</a> <a class="btn ghost" href="/honest">Claims</a></p>
+
+  <h2>What this is not</h2>
+  <ul>
+    <li>A unit of account for humans — coffee is not priced in grams.</li>
+    <li>A savings asset — credits are inventory of work.</li>
+    <li>A claim that stables are banned — liquidity will still touch USDT off to the side.</li>
+    <li>A clone of KNS :8080 — names live there; this lane bills the work of using them.</li>
+  </ul>
+  <p class="lede">One line: <strong>stable work price on L1, not a synthetic dollar.</strong></p>
+  <p><a class="btn ghost" href="/vision">Vision</a> <a class="btn ghost" href="/desk">All jobs</a> <a class="btn ghost" href="/honest">Claims</a></p>
 </main>
 {{template "footer" .}}

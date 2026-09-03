@@ -29,7 +29,11 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | Path | What |
 | --- | --- |
 | `/vision` | Stable work price on L1, not a synthetic dollar |
-| `/idea` | Short pointer at the three local sites |
+| `/idea` | Four products: vault, postage, agent, site |
+| `/vault` | Vault bump — grams pay the action, KAS stays locked |
+| `/postage` | Message postage board |
+| `/agent` | AI agent (Grok or local tools) |
+| `/site` | .kas web domain builder |
 | `/why` | Bill the action, not the exchange rate |
 | `/guide` | Step-by-step: what you do with grams |
 | `/genesis` | WorkCredit instance: 0.5 KAS sale + funded P2SH voucher UTXO |

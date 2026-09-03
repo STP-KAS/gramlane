@@ -30,3 +30,10 @@ A Toccata covenant can conserve grams. It cannot peg `$1`. The operator who sold
 ## Live on this dApp
 
 Prepaid grams from a 0.5 KAS L1 sale, with a funded WorkCredit P2SH. Jobs burn that inventory. `consume()` of the UTXO is a later 2-sig spend — operator accounting until then. USD is never quoted.
+
+| Path | Work |
+| --- | --- |
+| `/vault` | Vault bump (not the lock) |
+| `/postage` | Message postage |
+| `/agent` | AI agent call (Grok if `XAI_API_KEY`, else local tools) |
+| `/site` | .kas site builder from the live indexer |

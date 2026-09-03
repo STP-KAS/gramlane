@@ -1,0 +1,45 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">vault bump · grams pay the action</div>
+  <h1>Vaults still lock KAS. Grams pay the bump.</h1>
+  <p class="lede">This is the sequenced vault operation — not the value locked. Worked #234: the same 42 bytes, amount 1, a hostile packing reads <strong>264</strong>. Gramlane never <span class="mono">readInputState</span>s a foreign UTXO.</p>
+  {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Run}}<p class="ok">Bumped. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}
+
+  <div class="stats">
+    <div><b>1</b><span>real amount</span></div>
+    <div><b class="bad">264</b><span>vault reads on the reframe</span></div>
+    <div><b>42</b><span>bytes both times</span></div>
+  </div>
+
+  {{if .Framing}}
+  <h2>Canonical — vault {{.Framing.Canonical.VaultAmount}}</h2>
+  <div class="bytes">
+    {{range .Framing.Canonical.Cells}}
+    <div class="byte {{.Class}}"><span class="i">{{.I}}</span><span>{{.Hex}}</span></div>
+    {{end}}
+  </div>
+  <h2>Hostile — still 42 bytes, vault {{.Framing.Attack.VaultAmount}}</h2>
+  <div class="bytes">
+    {{range .Framing.Attack.Cells}}
+    <div class="byte {{.Class}}"><span class="i">{{.I}}</span><span>{{.Hex}}</span></div>
+    {{end}}
+  </div>
+  {{end}}
+
+  {{if and .Seq .Job (ge .Seq.Remaining .Job.Grams)}}
+  <form class="row" action="/vault" method="post">
+    <input type="hidden" name="payment" value="grams" />
+    <div style="flex:1;min-width:240px">
+      <label>optional hex (decode as the vault)</label>
+      <input name="hex" value="{{.Query}}" spellcheck="false" />
+    </div>
+    <button class="btn mint" type="submit">Bump — burn {{.Job.Grams}} grams</button>
+  </form>
+  {{else}}
+  <p class="lede">Prepaid remaining cannot cover this bump. <a href="/job/vault">KAS fallback</a>.</p>
+  {{end}}
+  <p class="tiny">JSON: <a href="/api/run?job=vault">/api/run?job=vault</a> · raw bytes: <a href="/234">/234</a></p>
+</main>
+{{template "footer" .}}
