@@ -27,8 +27,9 @@
       <a href="/feedback" class="{{if eq .Active "feedback"}}on{{end}}">Feedback</a>
       <a href="/safety" class="{{if eq .Active "safety"}}on{{end}}">Safety</a>
     </nav>
-    <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Connect wallet">Connect wallet</button>
+    <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
+    <span class="tiny" data-wallet-status></span>
     <span class="chip">L1 · grams · no L2</span>
   </header>
 {{end}}
