@@ -57,6 +57,7 @@ type page struct {
 	Invoices  []pos.Invoice
 	Merchants []pos.Merchant
 	PayURL    string
+	Sign      *pos.Sign
 }
 
 func New(addr string) (*Server, error) {
@@ -81,6 +82,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/convert", s.convertPage)
 	mux.HandleFunc("/api/convert", s.apiConvert)
 	mux.HandleFunc("/spend", s.spendPage)
+	mux.HandleFunc("/stablegram", s.spendPage)
 	mux.HandleFunc("/pos", s.posPage)
 	mux.HandleFunc("/pay/", s.payPage)
 	mux.HandleFunc("/api/pos", s.apiPos)
@@ -283,7 +285,7 @@ func (s *Server) spendPage(w http.ResponseWriter, r *http.Request) {
 	if n, err := strconv.ParseUint(r.FormValue("pct"), 10, 64); err == nil {
 		pct = n
 	}
-	p := page{Title: "Spend · Gramlane", Active: "spend", Query: total, PayTo: desk.PayTo()}
+	p := page{Title: "Stablegram · Gramlane", Active: "stablegram", Query: total, PayTo: desk.PayTo()}
 	a, err := quote.SetAside(total, pct)
 	if err != nil {
 		p.Error = err.Error()
@@ -314,16 +316,39 @@ func (s *Server) posPage(w http.ResponseWriter, r *http.Request) {
 				grams = c.Grams
 			}
 		}
-		inv, err := pos.Create(r.FormValue("item"), grams, r.FormValue("merchant"), r.FormValue("payTo"), r.FormValue("place"))
-		if err != nil {
-			p.Error = err.Error()
-		} else {
-			p.Invoice = inv
-			p.PayURL = pos.PayURL(origin(r), inv.ID)
+		fiat := strings.TrimSpace(r.FormValue("fiat"))
+		ccy := strings.TrimSpace(r.FormValue("ccy"))
+		rate := strings.TrimSpace(r.FormValue("rate"))
+		var bill quote.FiatBill
+		if grams == 0 && fiat != "" {
+			b, err := quote.FromFiat(fiat, ccy, rate)
+			if err != nil {
+				p.Error = err.Error()
+			} else {
+				bill = b
+				grams = b.Grams
+				pos.SaveSign(pos.Sign{Ccy: b.Ccy, KasInFiat: b.KasInFiat})
+			}
+		} else if ccy != "" && rate != "" {
+			pos.SaveSign(pos.Sign{Ccy: ccy, KasInFiat: rate})
+		}
+		if p.Error == "" {
+			inv, err := pos.Create(r.FormValue("item"), grams, r.FormValue("merchant"), r.FormValue("payTo"), r.FormValue("place"))
+			if err != nil {
+				p.Error = err.Error()
+			} else {
+				if bill.Grams > 0 {
+					inv = pos.SetShelf(inv.ID, bill.Amount, bill.Ccy, bill.KasInFiat, bill.Label)
+				}
+				p.Invoice = inv
+				p.PayURL = pos.PayURL(origin(r), inv.ID)
+			}
 		}
 	}
 	p.Invoices = pos.List()
 	p.Merchants = pos.Merchants()
+	sg := pos.LoadSign()
+	p.Sign = &sg
 	s.render(w, "pos.html", p)
 }
 

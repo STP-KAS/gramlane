@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">the jar</div>
-  <h1>Fill the spend jar.</h1>
+  <div class="kicker">stablegram</div>
+  <h1>Fill the Stablegram jar.</h1>
   <p class="lede">Keep KAS. Put a share aside as grams. One send, many tills. Exact grams, not $1.</p>
   {{if .Seq}}<p class="lede">In the jar: <strong class="mono">{{.Seq.Remaining}}</strong> grams. <a href="/till">Till</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
