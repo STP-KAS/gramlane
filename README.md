@@ -28,6 +28,8 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | Path | What |
 | --- | --- |
+| `/idea` | What this URL is |
+| `/why` | Beyond the chain: bill the event, not FX |
 | `/desk` | Job catalog in GRAM |
 | `/job/resolve` | Quote + run a name lookup |
 | `/api/run?job=dag` | HTTP 402 until `X-Work-Credit` |
