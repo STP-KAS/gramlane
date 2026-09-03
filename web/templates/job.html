@@ -13,16 +13,22 @@
   </table>
   {{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
-  <p class="tiny">Connected: <span class="mono" data-wallet-addr>(unlock Kasware on this origin)</span></p>
+  <p class="tiny">Connected: <span class="mono" data-wallet-addr>(connect in the header)</span></p>
   <p class="tiny" data-origin-note></p>
-  <p class="lede">On-chain path: one Kasware send, quoted sompi, to <em>your</em> address. If Kasware is a black spinner, close that window, click the extension, unlock, then press Pay once.</p>
-  {{if .Quote}}
-  <p>
-    <button class="btn mint" type="button" data-pay-l1 data-job="{{.Job.ID}}" data-grams="{{.Quote.Grams}}" data-sompi="{{.Quote.Sompi}}">Pay {{.Quote.KAS}} KAS on L1</button>
-  </p>
-  {{end}}
+  <div class="card" style="margin:18px 0">
+    <h3>On-chain without the black Kasware window</h3>
+    <p class="lede">The dApp <span class="mono">sendKaspa</span> popup is what hangs. Send from <strong>Kasware’s own window</strong> (puzzle-piece icon), not from this page.</p>
+    <ol>
+      <li>Close every black Kasware tab/window.</li>
+      <li>Click the Kasware icon in Chrome → it should show your balance (not a spinner).</li>
+      <li>Send <strong>{{if .Quote}}{{.Quote.KAS}} KAS{{else}}the quoted KAS{{end}}</strong> ({{if .Quote}}{{.Quote.Sompi}} sompi{{end}}) to the same address that is connected here:</li>
+    </ol>
+    <p class="mono" data-wallet-addr id="pay-to">(connect first)</p>
+    <p><button class="btn ghost" type="button" data-copy="#pay-to">Copy address</button>
+      {{if .Quote}}<button class="btn ghost" type="button" data-copy-text="{{.Quote.KAS}}">Copy {{.Quote.KAS}} KAS</button>{{end}}</p>
+    <p class="tiny">4. After Kasware confirms, copy the txid, paste it below, Run job. We look it up on api.kaspa.org / explorer.</p>
+  </div>
   <p class="tiny" data-pay-status></p>
-  <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
   <form class="row" action="/run" method="post">
     <input type="hidden" name="job" value="{{.Job.ID}}" />
     <input type="hidden" name="payer" value="" />
@@ -32,11 +38,12 @@
       <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
     </div>
     <div>
-      <label>txid after Pay, then Run job</label>
-      <input name="payment" placeholder="txid from Kasware, or local receipt" />
+      <label>paste Kasware txid</label>
+      <input name="payment" placeholder="64-character txid" autocomplete="off" />
     </div>
-    <button class="btn ghost" type="submit">Run job</button>
+    <button class="btn mint" type="submit">Run job</button>
   </form>
+  <p class="tiny"><a href="#" data-try-dapp-send>Why we stopped calling sendKaspa</a></p>
   <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kns.kas</span> → 402. Retry with header <span class="mono">X-Work-Credit</span>.</p>
   {{end}}
 </main>

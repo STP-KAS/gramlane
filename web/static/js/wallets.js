@@ -106,8 +106,6 @@
     if (payer) payer.value = c.address || "";
     const wallet = document.querySelector('input[name="wallet"]');
     if (wallet) wallet.value = c.id || "";
-    const pay = document.querySelector('input[name="payment"]');
-    if (pay && c.address && !pay.value) pay.value = (c.id ? c.id + ":" : "") + c.address;
   }
 
   async function connect(id) {
