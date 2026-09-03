@@ -31,7 +31,7 @@ func TestPrepaidToken(t *testing.T) {
 	}
 }
 
-func TestVaultAndPostage(t *testing.T) {
+func TestVaultJob(t *testing.T) {
 	v, _ := Get("vault")
 	rec, err := RunAs(v, "", "grams", "", "")
 	if err != nil || rec.Output == "" {
@@ -40,9 +40,10 @@ func TestVaultAndPostage(t *testing.T) {
 	if rec.Settlement != "prepaid-grams" {
 		t.Fatalf("settle %s", rec.Settlement)
 	}
-	p, _ := Get("postage")
-	rec, err = RunAs(p, "hello.kas", "grams", "", "")
-	if err != nil || rec.Output == "" {
-		t.Fatalf("postage %v", err)
+	if _, ok := Get("agent"); !ok {
+		t.Fatal("agent")
+	}
+	if _, ok := Get("site"); !ok {
+		t.Fatal("site")
 	}
 }

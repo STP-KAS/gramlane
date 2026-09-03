@@ -1,0 +1,36 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">message postage · grams pay the stamp</div>
+  <h1>Stamp the envelope. Not the letter.</h1>
+  <p class="lede">Postage is sequenced inclusion of a short message. Not KaChat. Not broadcast. Not encrypted. Grams pay the stamp. The chat app still owns the plaintext path.</p>
+  {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Run}}<p class="ok">Stamped. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}
+
+  {{if and .Seq .Job (ge .Seq.Remaining .Job.Grams)}}
+  <form action="/postage" method="post">
+    <label>message (280 chars)</label>
+    <textarea name="q" rows="4" maxlength="280" placeholder="hello.kas">{{.Query}}</textarea>
+    <p style="margin-top:12px"><button class="btn mint" type="submit">Stamp — burn {{.Job.Grams}} grams</button></p>
+  </form>
+  {{else}}
+  <p class="lede">Prepaid remaining cannot cover postage. <a href="/job/postage">KAS fallback</a>.</p>
+  {{end}}
+
+  <h2>Board (this PC)</h2>
+  {{if .Stamps}}
+  <table>
+    <tr><th>when</th><th>grams</th><th>envelope</th></tr>
+    {{range .Stamps}}
+    <tr>
+      <td class="tiny">{{.When}}</td>
+      <td class="mono">{{.Grams}}</td>
+      <td>{{.Text}}<div class="tiny mono">{{.SHA256}}</div></td>
+    </tr>
+    {{end}}
+  </table>
+  {{else}}
+  <p class="lede">No stamps yet.</p>
+  {{end}}
+</main>
+{{template "footer" .}}
