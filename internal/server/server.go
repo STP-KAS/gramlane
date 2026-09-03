@@ -76,6 +76,8 @@ func (s *Server) Handler() http.Handler {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	mux.HandleFunc("/", s.home)
 	mux.HandleFunc("/desk", s.desk)
+	mux.HandleFunc("/work", s.desk)
+	mux.HandleFunc("/till", s.posPage)
 	mux.HandleFunc("/convert", s.convertPage)
 	mux.HandleFunc("/api/convert", s.apiConvert)
 	mux.HandleFunc("/spend", s.spendPage)
@@ -107,14 +109,10 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/safety", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "safety.html", page{Title: "Safety · Gramlane", Active: "safety"})
 	})
-	mux.HandleFunc("/vision", s.visionPage)
-	mux.HandleFunc("/explain", s.visionPage)
-	mux.HandleFunc("/idea", func(w http.ResponseWriter, r *http.Request) {
-		s.render(w, "idea.html", page{Title: "Idea · Gramlane", Active: "idea", Jobs: jobs.Catalog})
-	})
-	mux.HandleFunc("/why", func(w http.ResponseWriter, r *http.Request) {
-		s.render(w, "why.html", page{Title: "Why · Gramlane", Active: "why"})
-	})
+	mux.HandleFunc("/vision", s.whyPage)
+	mux.HandleFunc("/explain", s.whyPage)
+	mux.HandleFunc("/idea", s.whyPage)
+	mux.HandleFunc("/why", s.whyPage)
 	mux.HandleFunc("/234", s.framingPage)
 	mux.HandleFunc("/framing", s.framingPage)
 	mux.HandleFunc("/vault", s.vaultPage)
@@ -198,15 +196,15 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	s.render(w, "home.html", page{Title: "Gramlane — L1 work desk", Active: "home", Jobs: jobs.Catalog})
+	s.render(w, "home.html", page{Title: "Gramlane", Active: "home"})
 }
 
-func (s *Server) visionPage(w http.ResponseWriter, r *http.Request) {
-	s.render(w, "vision.html", page{Title: "Vision · Gramlane", Active: "vision"})
+func (s *Server) whyPage(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "why.html", page{Title: "Why · Gramlane", Active: "why"})
 }
 
 func (s *Server) desk(w http.ResponseWriter, r *http.Request) {
-	s.render(w, "desk.html", page{Title: "Desk · Gramlane", Active: "desk", Jobs: jobs.Catalog})
+	s.render(w, "desk.html", page{Title: "Work · Gramlane", Active: "work", Jobs: jobs.Catalog})
 }
 
 func convertFromRequest(r *http.Request) (quote.Convert, error) {
@@ -305,7 +303,7 @@ func (s *Server) spendPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) posPage(w http.ResponseWriter, r *http.Request) {
-	p := page{Title: "POS · Gramlane", Active: "pos", PayTo: desk.PayTo()}
+	p := page{Title: "Till · Gramlane", Active: "till", PayTo: desk.PayTo()}
 	if r.Method == http.MethodPost {
 		grams := uint64(0)
 		if n, err := strconv.ParseUint(strings.ReplaceAll(r.FormValue("grams"), ",", ""), 10, 64); err == nil {
@@ -336,7 +334,7 @@ func (s *Server) payPage(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	p := page{Title: "Pay · Gramlane", Active: "pos", Invoice: inv, PayURL: pos.PayURL(origin(r), inv.ID), PayTo: inv.PayTo}
+	p := page{Title: "Pay · Gramlane", Active: "till", Invoice: inv, PayURL: pos.PayURL(origin(r), inv.ID), PayTo: inv.PayTo}
 	if r.Method == http.MethodPost && inv.Status != "paid" {
 		paid, err := pos.Pay(inv.ID, r.FormValue("payer"))
 		if err != nil {
@@ -385,7 +383,7 @@ func (s *Server) job(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	q, err := jobs.QuoteJob(j)
-	p := page{Title: j.Name + " · Gramlane", Active: "desk", Job: &j, Query: r.URL.Query().Get("q"), PayTo: desk.PayTo()}
+	p := page{Title: j.Name + " · Gramlane", Active: "work", Job: &j, Query: r.URL.Query().Get("q"), PayTo: desk.PayTo()}
 	if err != nil {
 		p.Error = err.Error()
 	} else {
@@ -431,7 +429,7 @@ func (s *Server) burnJob(id, q, payer string) (jobs.Job, jobs.Receipt, error) {
 func (s *Server) vaultPage(w http.ResponseWriter, r *http.Request) {
 	v := framing.Demo()
 	j, _ := jobs.Get("vault")
-	p := page{Title: "Vault bump · Gramlane", Active: "vault", Framing: &v, Job: &j, PayTo: desk.PayTo(), Query: r.FormValue("hex")}
+	p := page{Title: "Vault bump · Gramlane", Active: "work", Framing: &v, Job: &j, PayTo: desk.PayTo(), Query: r.FormValue("hex")}
 	if hx := strings.TrimSpace(p.Query); hx != "" {
 		got, err := framing.DecodeHex(hx)
 		if err != nil {
@@ -453,7 +451,7 @@ func (s *Server) vaultPage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) postagePage(w http.ResponseWriter, r *http.Request) {
 	j, _ := jobs.Get("postage")
-	p := page{Title: "Postage · Gramlane", Active: "postage", Job: &j, PayTo: desk.PayTo(), Query: r.FormValue("q")}
+	p := page{Title: "Postage · Gramlane", Active: "work", Job: &j, PayTo: desk.PayTo(), Query: r.FormValue("q")}
 	if r.Method == http.MethodPost {
 		_, rec, err := s.burnJob("postage", p.Query, r.FormValue("payer"))
 		p.Run = &rec
@@ -472,7 +470,7 @@ func (s *Server) agentPage(w http.ResponseWriter, r *http.Request) {
 		name = strings.TrimSpace(r.URL.Query().Get("q"))
 	}
 	prompt := strings.TrimSpace(r.FormValue("prompt"))
-	p := page{Title: "Agent · Gramlane", Active: "agent", Job: &j, PayTo: desk.PayTo(), Query: name, HasGrok: agent.HasKey()}
+	p := page{Title: "Agent · Gramlane", Active: "work", Job: &j, PayTo: desk.PayTo(), Query: name, HasGrok: agent.HasKey()}
 	if name != "" && r.Method == http.MethodGet {
 		if c, err := agent.CardFor(name); err == nil {
 			p.Card = c
@@ -537,7 +535,7 @@ func (s *Server) sitePage(w http.ResponseWriter, r *http.Request) {
 	if q == "" {
 		q = strings.TrimSpace(r.URL.Query().Get("q"))
 	}
-	p := page{Title: "Site builder · Gramlane", Active: "site", Job: &j, PayTo: desk.PayTo(), Query: q}
+	p := page{Title: "Site builder · Gramlane", Active: "work", Job: &j, PayTo: desk.PayTo(), Query: q}
 	if r.Method == http.MethodPost {
 		if q == "" {
 			q = "kns.kas"
@@ -561,7 +559,7 @@ func (s *Server) siteName(w http.ResponseWriter, r *http.Request) {
 	}
 	j, _ := jobs.Get("site")
 	site, err := names.Lookup(name)
-	p := page{Title: names.Normalize(name) + " · Gramlane", Active: "site", Job: &j, Site: site, Query: names.Normalize(name)}
+	p := page{Title: names.Normalize(name) + " · Gramlane", Active: "work", Job: &j, Site: site, Query: names.Normalize(name)}
 	if err != nil {
 		p.Error = err.Error()
 	}
@@ -577,7 +575,7 @@ func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
 	q := r.FormValue("q")
 	j, ok := jobs.Get(id)
 	if !ok {
-		s.render(w, "job.html", page{Title: "Run", Active: "desk", Error: "unknown job"})
+		s.render(w, "job.html", page{Title: "Run", Active: "work", Error: "unknown job"})
 		return
 	}
 	paid := strings.TrimSpace(r.FormValue("payment"))
@@ -590,13 +588,13 @@ func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
 	if paid == "" {
 		qq, _ := jobs.QuoteJob(j)
 		s.render(w, "job.html", page{
-			Title: j.Name, Active: "desk", Job: &j, Query: q, Quote: &qq,
+			Title: j.Name, Active: "work", Job: &j, Query: q, Quote: &qq,
 			Error: "Prepaid grams are spent. Pay KAS fallback or paste a receipt id.",
 		})
 		return
 	}
 	rec, err := jobs.RunAs(j, q, paid, payer, wallet)
-	p := page{Title: "Receipt · Gramlane", Active: "desk", Job: &j, Query: q, Run: &rec}
+	p := page{Title: "Receipt · Gramlane", Active: "work", Job: &j, Query: q, Run: &rec}
 	if err != nil {
 		p.Error = err.Error()
 		s.render(w, "run.html", p)

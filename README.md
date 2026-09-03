@@ -28,8 +28,8 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | Path | What |
 | --- | --- |
-| `/vision` | Stable work price on L1, not a synthetic dollar |
-| `/idea` | Four products: vault, postage, agent, site |
+| `/` | The jar — fund, pay, till |
+| `/why` | Beyond the chain: household, plant, agent, counter |
 | `/vault` | Vault bump — grams pay the action, KAS stays locked |
 | `/postage` | Message postage board |
 | `/agent` | AI agent (Grok or local tools) |

@@ -1,9 +1,9 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">point of sale · digital + on location</div>
-  <h1>Invoice in grams. Take it at the counter.</h1>
-  <p class="lede">A till anywhere: a URL for online, a QR for the shop floor. Customer pays from a prepaid spend pile on Kaspa L1. Cheap sequenced burns — not a volatile KAS send per coffee, not a Tether mint.</p>
-  {{if .Seq}}<p class="lede">Customer spend pile: <span class="mono">{{.Seq.Remaining}}</span> grams. <a href="/spend">Set aside KAS</a></p>{{end}}
+  <div class="kicker">till · online or on the counter</div>
+  <h1>One ticket. Two doors.</h1>
+  <p class="lede">A URL for the phone. A QR for the shop. Same grams. Customer pays from the jar.</p>
+  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> grams. <a href="/spend">Fill it</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <form action="/pos" method="post">
