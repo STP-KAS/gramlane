@@ -1,7 +1,19 @@
 pragma silverscript ^0.1.0;
 
-// Gramlane dApp — prepaid L1 grams. Not a dollar. No L2.
-// 1 credit = 1 gram of named-lane mass.
+// Compiled with official silverc v1-rc1
+// https://github.com/kaspanet/silverscript/releases/tag/v1-rc1
+//
+// WorkCredit is a prepaid *work voucher*, not a dollar.
+// 1 credit = 1 gram of named-lane mass (KIP-21 compute/storage/transient).
+// The covenant conserves the holder's remaining grams. It does not mint USD,
+// does not read an oracle, and does not force miners to include a tx.
+//
+// Mint: the issuer (sequencer / dApp operator) signs extra grams into this UTXO
+// after the holder paid KAS off-script. That is inventory, not a USDC reserve.
+// Consume: holder + issuer co-sign a burn = "this much work was sequenced".
+// Transfer: holder moves the whole voucher.
+//
+// Uniqueness of *lane* is a convention (byte[32] id), not consensus.
 
 contract WorkCredit(pubkey initIssuer, pubkey initHolder, int initCredits, byte[32] initLane) {
     pubkey issuer = initIssuer;

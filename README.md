@@ -31,6 +31,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/idea` | What this URL is |
 | `/why` | Beyond the chain: bill the event, not FX |
 | `/guide` | Step-by-step: what you do with grams |
+| `/genesis` | WorkCredit instance for the 0.5 KAS L1 sale (compiled, UTXO not broadcast) |
 | `/desk` | Job catalog in GRAM |
 | `/job/resolve` | Quote + run a name lookup |
 | `/api/run?job=dag` | HTTP 402 until `X-Work-Credit` |

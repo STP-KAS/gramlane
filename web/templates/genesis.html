@@ -1,0 +1,27 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">WorkCredit genesis · after the 0.5 KAS sale</div>
+  <h1>Prepaid grams, not a second 0.5 KAS.</h1>
+  {{if .Genesis}}
+  <p class="lede">You already paid <strong>{{.Genesis.SaleKAS}} KAS</strong> on L1. That sale is the till. This page is the voucher those grams should live in: issuer = desk, holder = your Kasware, <strong>{{.Genesis.Credits}}</strong> credits, lane {{.Genesis.Lane}}.</p>
+  <table>
+    <tr><th>sale tx</th><td class="mono"><a href="{{.Genesis.Explorer}}">{{.Genesis.SaleTx}}</a></td></tr>
+    <tr><th>on-chain sale</th><td>{{if .Genesis.OnChainSale}}yes{{else}}no{{end}}</td></tr>
+    <tr><th>voucher UTXO</th><td>{{if .Genesis.VoucherOnChain}}yes{{else}}<strong>not broadcast</strong>{{end}}</td></tr>
+    <tr><th>desk (issuer)</th><td class="mono">{{.Genesis.Desk}}</td></tr>
+    <tr><th>holder</th><td class="mono">{{.Genesis.Holder}}</td></tr>
+    <tr><th>issuer x-only</th><td class="mono">{{.Genesis.IssuerPub}}</td></tr>
+    <tr><th>holder x-only</th><td class="mono">{{.Genesis.HolderPub}}</td></tr>
+    <tr><th>credits</th><td>{{.Genesis.Credits}} grams</td></tr>
+    <tr><th>template hash</th><td class="mono">{{.Genesis.TemplateHash}}</td></tr>
+    <tr><th>artifact</th><td class="mono">{{.Genesis.Artifact}}</td></tr>
+  </table>
+  <p class="lede">{{.Genesis.Note}}</p>
+  <p class="tiny">Kasware <span class="mono">getPublicKey</span> should match holder x-only (last 32 bytes if the wallet returns compressed 33).</p>
+  <pre>GET /api/genesis
+compiled: contracts/v1/WorkCredit-live.json
+ctor: {{.Genesis.CtorPath}}</pre>
+  {{end}}
+  <p><a class="btn mint" href="/job/dag">Back to heartbeat</a> <a class="btn ghost" href="/guide">Guide</a></p>
+</main>
+{{template "footer" .}}
