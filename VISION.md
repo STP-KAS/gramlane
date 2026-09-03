@@ -12,6 +12,7 @@ Centralized stables can exist on L2. They do not sit in Gramlane’s path. No mi
 
 | Work | What grams pay | What grams are not |
 | --- | --- | --- |
+| POS / spend pile | The till ticket (digital or on-location) | A dollar, Tether, Circle |
 | AI bots / HTTP 402 | The sequenced call | The model’s output, the dollar the bot might later spend |
 | Messaging postage | Inclusion of the envelope | The message, the chat app, encryption |
 | Data transfer | The pull / the write | The dataset’s market price |
@@ -21,8 +22,8 @@ Vaults still lock KAS. Grams pay the **action**.
 
 ## What this is not
 
-- A unit of account for humans (nobody prices coffee in grams).
-- A savings asset (credits are inventory of work, not a store of value).
+- A dollar (coffee at a Gramlane till is prepaid grams, not $1).
+- A savings asset that tracks CPI (the hold pile is KAS; the spend pile is grams).
 - A claim that “stables are banned.” Liquidity will still touch USDT off to the side. Gramlane just refuses to make that the **meter**.
 
 A Toccata covenant can conserve grams. It cannot peg `$1`. The operator who sold the voucher ate the KAS inventory. That is a business, not a mint.
@@ -33,6 +34,9 @@ Prepaid grams from a 0.5 KAS L1 sale, with a funded WorkCredit P2SH. Jobs burn t
 
 | Path | Work |
 | --- | --- |
+| `/spend` | Set KAS aside into a gram spend pile |
+| `/pos` | Merchant till — digital URL + on-location QR |
+| `/pay/{id}` | Customer pays an invoice from prepaid grams |
 | `/vault` | Vault bump (not the lock) |
 | `/postage` | Message postage |
 | `/agent` | AI agent call (Grok if `XAI_API_KEY`, else local tools) |

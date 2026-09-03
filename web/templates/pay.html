@@ -1,0 +1,33 @@
+{{template "header" .}}
+<main>
+  {{if .Invoice}}
+  <div class="kicker">{{.Invoice.Place}} · {{.Invoice.Merchant}}</div>
+  <h1>{{.Invoice.Item}}</h1>
+  <p class="till">{{.Invoice.Grams}} GRAM</p>
+  {{if .Seq}}<p class="lede">Your spend pile: <span class="mono">{{.Seq.Remaining}}</span> grams.</p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if eq .Invoice.Status "paid"}}
+  <p class="ok">Paid. Sequenced gram burn. Not a dollar. Merchant tab updated on this rail.</p>
+  <p class="tiny">{{.Invoice.PaidWhen}} · {{.Invoice.Payer}}</p>
+  {{else}}
+  {{if and .Seq (ge .Seq.Remaining .Invoice.Grams)}}
+  <form action="/pay/{{.Invoice.ID}}" method="post">
+    <input type="hidden" name="payer" value="" />
+    <button class="btn mint" type="submit">Pay {{.Invoice.Grams}} grams</button>
+  </form>
+  <p class="tiny">Burns prepaid grams. No new KAS send. Stay on this origin.</p>
+  {{else}}
+  <p class="lede">Spend pile cannot cover this bill. <a href="/spend">Set aside KAS</a> or pay KAS fallback if the merchant posted an address.</p>
+  {{if .Invoice.PayTo}}
+  <div class="card">
+    <p>KAS fallback to merchant (volatile). Desk must not be your login.</p>
+    <input class="mono" id="pay-to" value="{{.Invoice.PayTo}}" readonly />
+    <p class="tiny" data-pay-status></p>
+  </div>
+  {{end}}
+  {{end}}
+  {{end}}
+  <p class="tiny">Invoice {{.Invoice.ID}} · <a href="/pos">Till</a></p>
+  {{end}}
+</main>
+{{template "footer" .}}

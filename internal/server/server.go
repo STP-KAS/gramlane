@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"gramlane/internal/agent"
@@ -17,6 +18,7 @@ import (
 	"gramlane/internal/genesis"
 	"gramlane/internal/jobs"
 	"gramlane/internal/names"
+	"gramlane/internal/pos"
 	"gramlane/internal/post"
 	"gramlane/internal/quote"
 	"gramlane/internal/seq"
@@ -30,26 +32,31 @@ type Server struct {
 }
 
 type page struct {
-	Title   string
-	Active  string
-	Query   string
-	Error   string
-	Jobs    []jobs.Job
-	Job     *jobs.Job
-	Quote   *quote.Quote
-	Run     *jobs.Receipt
-	Wallets []wallets.Wallet
-	Framing *framing.View
-	PayTo   string
-	Genesis *genesis.Plan
-	Seq     *seq.Ledger
-	Stamps  []post.Stamp
-	Site    *names.Page
-	Card    *agent.Card
-	Reply   *agent.Reply
-	HasGrok bool
-	Conv    *quote.Convert
-	Fits    []jobs.Fit
+	Title     string
+	Active    string
+	Query     string
+	Error     string
+	Jobs      []jobs.Job
+	Job       *jobs.Job
+	Quote     *quote.Quote
+	Run       *jobs.Receipt
+	Wallets   []wallets.Wallet
+	Framing   *framing.View
+	PayTo     string
+	Genesis   *genesis.Plan
+	Seq       *seq.Ledger
+	Stamps    []post.Stamp
+	Site      *names.Page
+	Card      *agent.Card
+	Reply     *agent.Reply
+	HasGrok   bool
+	Conv      *quote.Convert
+	Fits      []jobs.Fit
+	Aside     *quote.Aside
+	Invoice   *pos.Invoice
+	Invoices  []pos.Invoice
+	Merchants []pos.Merchant
+	PayURL    string
 }
 
 func New(addr string) (*Server, error) {
@@ -71,6 +78,10 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/desk", s.desk)
 	mux.HandleFunc("/convert", s.convertPage)
 	mux.HandleFunc("/api/convert", s.apiConvert)
+	mux.HandleFunc("/spend", s.spendPage)
+	mux.HandleFunc("/pos", s.posPage)
+	mux.HandleFunc("/pay/", s.payPage)
+	mux.HandleFunc("/api/pos", s.apiPos)
 	mux.HandleFunc("/job/", s.job)
 	mux.HandleFunc("/run", s.runPage)
 	mux.HandleFunc("/honest", s.honest)
@@ -133,7 +144,7 @@ func (s *Server) Handler() http.Handler {
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
 			"vision":         "stable work price on L1, not a synthetic dollar",
-			"products":       []string{"vault", "postage", "agent", "site", "convert"},
+			"products":       []string{"spend", "pos", "vault", "postage", "agent", "site", "convert"},
 			"sompiPerGram":   quote.SompiPerGram,
 			"grok":           agent.HasKey(),
 			"gramsRemaining": led.Remaining, "credits": led.Credits,
@@ -255,6 +266,115 @@ func (s *Server) apiConvert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true, "convert": c, "fits": jobs.Fits(c.Grams), "seq": seq.Snap()})
+}
+
+func origin(r *http.Request) string {
+	host := r.Host
+	if host == "" {
+		host = "127.0.0.1:8081"
+	}
+	return "http://" + host
+}
+
+func (s *Server) spendPage(w http.ResponseWriter, r *http.Request) {
+	total := strings.TrimSpace(r.FormValue("total"))
+	if total == "" {
+		total = "1"
+	}
+	pct := uint64(50)
+	if n, err := strconv.ParseUint(r.FormValue("pct"), 10, 64); err == nil {
+		pct = n
+	}
+	p := page{Title: "Spend · Gramlane", Active: "spend", Query: total, PayTo: desk.PayTo()}
+	a, err := quote.SetAside(total, pct)
+	if err != nil {
+		p.Error = err.Error()
+	} else {
+		p.Aside = &a
+	}
+	if r.Method == http.MethodPost {
+		tx := strings.TrimSpace(r.FormValue("payment"))
+		if tx != "" && p.Aside != nil {
+			grams := p.Aside.PaySompi / quote.SompiPerGram
+			if _, err := seq.MintFromTx(tx, grams, p.Aside.PaySompi); err != nil {
+				p.Error = err.Error()
+			}
+		}
+	}
+	s.render(w, "spend.html", p)
+}
+
+func (s *Server) posPage(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "POS · Gramlane", Active: "pos", PayTo: desk.PayTo()}
+	if r.Method == http.MethodPost {
+		grams := uint64(0)
+		if n, err := strconv.ParseUint(strings.ReplaceAll(r.FormValue("grams"), ",", ""), 10, 64); err == nil {
+			grams = n
+		}
+		if grams == 0 && r.FormValue("kas") != "" {
+			if c, err := quote.FromKAS(r.FormValue("kas")); err == nil {
+				grams = c.Grams
+			}
+		}
+		inv, err := pos.Create(r.FormValue("item"), grams, r.FormValue("merchant"), r.FormValue("payTo"), r.FormValue("place"))
+		if err != nil {
+			p.Error = err.Error()
+		} else {
+			p.Invoice = inv
+			p.PayURL = pos.PayURL(origin(r), inv.ID)
+		}
+	}
+	p.Invoices = pos.List()
+	p.Merchants = pos.Merchants()
+	s.render(w, "pos.html", p)
+}
+
+func (s *Server) payPage(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimPrefix(r.URL.Path, "/pay/")
+	inv, ok := pos.Get(id)
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	p := page{Title: "Pay · Gramlane", Active: "pos", Invoice: inv, PayURL: pos.PayURL(origin(r), inv.ID), PayTo: inv.PayTo}
+	if r.Method == http.MethodPost && inv.Status != "paid" {
+		paid, err := pos.Pay(inv.ID, r.FormValue("payer"))
+		if err != nil {
+			p.Error = err.Error()
+		}
+		if paid != nil {
+			p.Invoice = paid
+		}
+	}
+	s.render(w, "pay.html", p)
+}
+
+func (s *Server) apiPos(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		var req struct {
+			Item, Merchant, PayTo, Place, ID, Payer string
+			Grams                                   uint64
+		}
+		body, _ := io.ReadAll(io.LimitReader(r.Body, 1<<16))
+		_ = json.Unmarshal(body, &req)
+		if req.ID != "" {
+			inv, err := pos.Pay(req.ID, req.Payer)
+			if err != nil {
+				writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error(), "invoice": inv})
+				return
+			}
+			writeJSON(w, 200, map[string]any{"ok": true, "invoice": inv, "seq": seq.Snap()})
+			return
+		}
+		inv, err := pos.Create(req.Item, req.Grams, req.Merchant, req.PayTo, req.Place)
+		if err != nil {
+			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
+			return
+		}
+		writeJSON(w, 200, map[string]any{"ok": true, "invoice": inv, "pay": pos.PayURL(origin(r), inv.ID)})
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "invoices": pos.List(), "merchants": pos.Merchants(), "seq": seq.Snap()})
 }
 
 func (s *Server) job(w http.ResponseWriter, r *http.Request) {

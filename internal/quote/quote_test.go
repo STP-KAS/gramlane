@@ -42,3 +42,13 @@ func TestConvertHalfKASIs500kGrams(t *testing.T) {
 		t.Fatalf("%v %+v", err, s)
 	}
 }
+
+func TestSetAsideHalf(t *testing.T) {
+	a, err := SetAside("2", 50)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if a.Spend.Grams != 1_000_000 || a.Hold.Grams != 1_000_000 {
+		t.Fatalf("%+v", a)
+	}
+}

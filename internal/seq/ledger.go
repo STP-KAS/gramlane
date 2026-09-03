@@ -26,6 +26,13 @@ type Burn struct {
 	Left  uint64 `json:"remaining"`
 }
 
+type Mint struct {
+	When  string `json:"when"`
+	Tx    string `json:"tx"`
+	Grams uint64 `json:"grams"`
+	Sompi uint64 `json:"sompi"`
+}
+
 type Ledger struct {
 	Holder     string `json:"holder"`
 	Desk       string `json:"desk"`
@@ -39,6 +46,7 @@ type Ledger struct {
 	OnChain    bool   `json:"voucherOnChain"`
 	Note       string `json:"note"`
 	Burns      []Burn `json:"burns"`
+	Mints      []Mint `json:"mints,omitempty"`
 }
 
 var (
@@ -103,6 +111,7 @@ func Snap() Ledger {
 	l := openLocked()
 	cp := *l
 	cp.Burns = append([]Burn(nil), l.Burns...)
+	cp.Mints = append([]Mint(nil), l.Mints...)
 	return cp
 }
 
@@ -154,6 +163,40 @@ func BurnGrams(job string, grams uint64, paid string) (*Ledger, error) {
 	}
 	cp := *l
 	cp.Burns = append([]Burn(nil), l.Burns...)
+	cp.Mints = append([]Mint(nil), l.Mints...)
+	return &cp, nil
+}
+
+func MintFromTx(tx string, grams, sompi uint64) (*Ledger, error) {
+	tx = strings.ToLower(strings.TrimSpace(tx))
+	if !chain.IsTxID(tx) {
+		return nil, fmt.Errorf("txid")
+	}
+	if grams == 0 {
+		return nil, fmt.Errorf("grams")
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	l := openLocked()
+	for _, m := range l.Mints {
+		if m.Tx == tx {
+			return l, fmt.Errorf("txid already minted")
+		}
+	}
+	l.Credits += grams
+	l.Remaining += grams
+	l.Mints = append(l.Mints, Mint{
+		When:  time.Now().UTC().Format(time.RFC3339),
+		Tx:    tx,
+		Grams: grams,
+		Sompi: sompi,
+	})
+	if err := save(l); err != nil {
+		return l, err
+	}
+	cp := *l
+	cp.Burns = append([]Burn(nil), l.Burns...)
+	cp.Mints = append([]Mint(nil), l.Mints...)
 	return &cp, nil
 }
 

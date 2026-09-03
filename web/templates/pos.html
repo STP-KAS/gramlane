@@ -1,0 +1,92 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">point of sale · digital + on location</div>
+  <h1>Invoice in grams. Take it at the counter.</h1>
+  <p class="lede">A till anywhere: a URL for online, a QR for the shop floor. Customer pays from a prepaid spend pile on Kaspa L1. Cheap sequenced burns — not a volatile KAS send per coffee, not a Tether mint.</p>
+  {{if .Seq}}<p class="lede">Customer spend pile: <span class="mono">{{.Seq.Remaining}}</span> grams. <a href="/spend">Set aside KAS</a></p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+
+  <form action="/pos" method="post">
+    <div class="row">
+      <div>
+        <label>item</label>
+        <input name="item" placeholder="coffee" required />
+      </div>
+      <div>
+        <label>grams</label>
+        <input name="grams" placeholder="50000" />
+      </div>
+      <div>
+        <label>or KAS at policy</label>
+        <input name="kas" placeholder="0.05" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>merchant</label>
+        <input name="merchant" placeholder="cafe.kas" />
+      </div>
+      <div>
+        <label>KAS fallback (kaspa:)</label>
+        <input class="mono" name="payTo" placeholder="kaspa:q… optional" />
+      </div>
+      <div>
+        <label>where</label>
+        <select name="place">
+          <option value="both">digital + location</option>
+          <option value="location">on location</option>
+          <option value="digital">digital only</option>
+        </select>
+      </div>
+    </div>
+    <p><button class="btn mint" type="submit">Open till</button></p>
+  </form>
+
+  {{if .Invoice}}
+  <div class="card tillbox">
+    <div class="kicker">{{.Invoice.Place}} · {{.Invoice.Merchant}} · {{.Invoice.ID}}</div>
+    <p class="till">{{.Invoice.Grams}} GRAM</p>
+    <p>{{.Invoice.Item}}</p>
+    <p class="tiny">Scan or open this pay URL</p>
+    <p class="mono"><a href="{{.PayURL}}">{{.PayURL}}</a></p>
+    <p><img alt="QR" width="220" height="220" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&amp;data={{.PayURL}}" /></p>
+    <p>
+      <a class="btn mint" href="{{.PayURL}}">Customer pay</a>
+      <button class="btn ghost" type="button" data-copy-text="{{.PayURL}}">Copy link</button>
+    </p>
+    <p class="tiny">On location: phone on the counter, this QR facing the buyer. Digital: send the link. Same invoice.</p>
+  </div>
+  {{end}}
+
+  {{if .Merchants}}
+  <h2>Merchant tabs (grams owed on this rail)</h2>
+  <table>
+    <tr><th>merchant</th><th>owed grams</th><th>fallback</th></tr>
+    {{range .Merchants}}
+    <tr>
+      <td>{{.Name}}</td>
+      <td class="mono">{{.Owed}}</td>
+      <td class="mono">{{.PayTo}}</td>
+    </tr>
+    {{end}}
+  </table>
+  <p class="tiny">Owed grams are operator settlement until WorkCredit transfer/consume or a KAS payout. Not a Circle balance.</p>
+  {{end}}
+
+  {{if .Invoices}}
+  <h2>Tickets</h2>
+  <table>
+    <tr><th>id</th><th>item</th><th>grams</th><th>where</th><th>status</th></tr>
+    {{range .Invoices}}
+    <tr>
+      <td class="mono"><a href="/pay/{{.ID}}">{{.ID}}</a></td>
+      <td>{{.Item}}</td>
+      <td class="mono">{{.Grams}}</td>
+      <td>{{.Place}}</td>
+      <td>{{if eq .Status "paid"}}<span class="ok">paid</span>{{else}}open{{end}}</td>
+    </tr>
+    {{end}}
+  </table>
+  {{end}}
+</main>
+{{template "footer" .}}

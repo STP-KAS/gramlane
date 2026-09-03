@@ -1,0 +1,60 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">spend pile · hold KAS · spend grams</div>
+  <h1>Set KAS aside. Spend grams.</h1>
+  <p class="lede">Keep a volatile pile (KAS). Convert a share into prepaid grams — that spend pile does not move when KAS/USD does. Efficient: one L1 send funds hundreds of sequenced POS payments. Cheap: no 0.5 KAS per coffee. Decentralized: Kaspa L1, no Tether mint, no Circle freeze. Exact value means <strong>exact grams</strong>, not $1.</p>
+  {{if .Seq}}<p class="lede">Spend pile now: <strong class="mono">{{.Seq.Remaining}}</strong> grams. <a href="/pos">Open a till</a> · <a href="/convert?from=remaining">Convert remaining</a></p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+
+  <form class="row" action="/spend" method="post">
+    <div>
+      <label>KAS you hold</label>
+      <input name="total" value="{{if .Query}}{{.Query}}{{else}}1{{end}}" />
+    </div>
+    <div>
+      <label>% to spend pile</label>
+      <input name="pct" value="{{if .Aside}}{{.Aside.Percent}}{{else}}50{{end}}" />
+    </div>
+    <button class="btn ghost" type="submit">Plan split</button>
+    <input type="hidden" name="payment" value="" />
+    <input type="hidden" name="payer" value="" />
+    <input type="hidden" name="wallet" value="" />
+  </form>
+
+  {{if .Aside}}
+  <div class="split">
+    <article class="card">
+      <h3>Hold</h3>
+      <p class="price">{{.Aside.Hold.KASText}} KAS</p>
+      <p>Stays KAS. Volatile. This is the pile you keep.</p>
+    </article>
+    <article class="card">
+      <h3>Spend {{.Aside.Percent}}%</h3>
+      <p class="price">{{.Aside.Spend.Grams}} GRAM</p>
+      <p>{{.Aside.Spend.KASText}} KAS at policy. This is the till unit. It does not reprice when KAS moves.</p>
+    </article>
+  </div>
+  {{if .Aside.FloorNote}}<p class="warn">{{.Aside.FloorNote}}</p>{{end}}
+  <div class="card" style="margin:18px 0">
+    <h3>Fund the spend pile on L1</h3>
+    <p class="lede">Kasware sends <strong>{{.Aside.PayKASText}} KAS</strong> to the desk — not your login. That mints grams at 100 sompi/gram into this sequencer’s spend pile.</p>
+    <label>desk</label>
+    <input class="mono" id="pay-to" value="{{.PayTo}}" />
+    <p>
+      <button class="btn mint" type="button" data-pay-l1 data-after="/spend" data-sompi="{{.Aside.PaySompi}}">Set aside {{.Aside.PayKASText}} KAS</button>
+    </p>
+    <p class="tiny" data-pay-status></p>
+    <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
+  </div>
+  {{end}}
+
+  <h2>How this is worldwide POS without a dollar</h2>
+  <ol>
+    <li>Set aside a share of KAS once. Grams are the spend inventory.</li>
+    <li>A merchant opens a till in grams — digital link or on-location QR.</li>
+    <li>You burn grams. No new volatile KAS send per sale.</li>
+    <li>Merchant is owed grams on this rail (operator settlement) or takes KAS fallback to their <span class="mono">kaspa:</span>.</li>
+  </ol>
+  <p class="lede">Not USDT. If a cafe chases dollars they will reprice grams. Your pile still holds the same grams. <a href="/pos">Merchant till</a></p>
+</main>
+{{template "footer" .}}

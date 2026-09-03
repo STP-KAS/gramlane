@@ -2,14 +2,13 @@
 <main>
   <div class="kicker">project delusional · <a href="https://x.com/StppStp">@StppStp</a> · dApp 1 · grams · Kaspa L1</div>
   <h1>Stable work price on L1, not a synthetic dollar.</h1>
-  <p class="lede">Four billed actions: vault bump, message postage, AI agent, .kas site builder. Grams meter the work. Vaults still lock KAS. USDT can sit off to the side. KAS is only the fallback if prepaid credits are empty.</p>
-  {{if .Seq}}<p class="lede">Prepaid inventory: <strong class="mono">{{.Seq.Remaining}}</strong> / {{.Seq.Credits}} grams{{if .Seq.OnChain}} · voucher UTXO on L1{{end}}.</p>{{end}}
+  <p class="lede">Set KAS aside into prepaid grams. Spend them at a digital or on-location till. The spend pile does not move when KAS/USD does. Not a dollar. Not Tether. Sequenced on Kaspa L1.</p>
+  {{if .Seq}}<p class="lede">Spend pile: <strong class="mono">{{.Seq.Remaining}}</strong> / {{.Seq.Credits}} grams{{if .Seq.OnChain}} · voucher UTXO on L1{{end}}.</p>{{end}}
   <p>
-    <a class="btn mint" href="/idea">Idea</a>
-    <a class="btn ghost" href="/vault">Vault</a>
-    <a class="btn ghost" href="/postage">Post</a>
-    <a class="btn ghost" href="/agent">Agent</a>
-    <a class="btn ghost" href="/site">Site</a>
+    <a class="btn mint" href="/spend">Set aside</a>
+    <a class="btn ghost" href="/pos">POS till</a>
+    <a class="btn ghost" href="/convert">Convert</a>
+    <a class="btn ghost" href="/idea">Idea</a>
   </p>
   <div class="grid">
     {{range .Jobs}}

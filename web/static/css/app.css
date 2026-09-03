@@ -84,6 +84,11 @@ select {
   background: #030605; border: 1px solid var(--line); color: var(--ink);
   border-radius: 12px; padding: 10px 12px; font: inherit;
 }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 22px 0; }
+@media (max-width: 720px) { .split { grid-template-columns: 1fr; } }
+.till { font-family: Syne, sans-serif; font-size: clamp(40px, 10vw, 88px); line-height: 1; color: var(--mint); margin: 8px 0 16px; }
+.tillbox { text-align: center; }
+.tillbox img { background: #fff; border-radius: 12px; padding: 8px; }
 .wmodal {
   position: fixed; inset: 0; z-index: 40;
   background: rgba(4, 10, 8, 0.72);

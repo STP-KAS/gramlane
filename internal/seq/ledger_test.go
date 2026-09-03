@@ -36,6 +36,18 @@ func TestBurnPrepaidGrams(t *testing.T) {
 	}
 }
 
+func TestMintFromTx(t *testing.T) {
+	ResetForTest(t.TempDir())
+	tx := "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+	led, err := MintFromTx(tx, 10_000, 1_000_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if led.Remaining != 510_000 || led.Credits != 510_000 {
+		t.Fatalf("%+v", led)
+	}
+}
+
 func TestAcceptsSaleTx(t *testing.T) {
 	ResetForTest(t.TempDir())
 	if !Accepts("c1799b0de40f71cfd7a153684ef22326ad920d0dca2a8b519ce2c8379c4f7bc2") {

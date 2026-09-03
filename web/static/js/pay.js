@@ -106,9 +106,13 @@
         link.textContent = "explorer.kaspa.org";
       }
       say("On L1. Txid " + txid);
-      if (btn.getAttribute("data-after") === "run") {
+      var after = btn.getAttribute("data-after");
+      if (after === "run") {
         say("On L1. Txid " + txid + " — running job.");
         var form = document.querySelector("form[action='/run']");
+        if (form) form.submit();
+      } else if (after) {
+        var form = document.querySelector("form[action='" + after + "']") || document.querySelector(after);
         if (form) form.submit();
       }
     } catch (e) {

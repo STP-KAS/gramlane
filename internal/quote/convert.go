@@ -115,6 +115,52 @@ func ParseKAS(s string) (uint64, error) {
 	return out + frac, nil
 }
 
+// Aside splits a KAS pile: hold (volatile) vs spend (prepaid grams).
+type Aside struct {
+	Percent    uint64  `json:"percent"`
+	TotalSompi uint64  `json:"totalSompi"`
+	Hold       Convert `json:"hold"`
+	Spend      Convert `json:"spend"`
+	PaySompi   uint64  `json:"paySompi"`
+	PayKASText string  `json:"payKasText"`
+	FloorNote  string  `json:"floorNote,omitempty"`
+}
+
+func SetAside(totalKAS string, pct uint64) (Aside, error) {
+	if pct == 0 || pct > 100 {
+		pct = 50
+	}
+	tot, err := ParseKAS(totalKAS)
+	if err != nil {
+		return Aside{}, err
+	}
+	spendS := tot * pct / 100
+	holdS := tot - spendS
+	spend, err := FromSompi(spendS)
+	if err != nil {
+		return Aside{}, err
+	}
+	hold, err := FromSompi(holdS)
+	if err != nil {
+		return Aside{}, err
+	}
+	pay := spendS
+	note := ""
+	if spendS > 0 && spendS < KaswareMinSompi {
+		pay = KaswareMinSompi
+		note = "Kasware min send is 0.5 KAS. Your share at policy is smaller; sending 0.5 KAS mints 500000 grams into the spend pile."
+	}
+	return Aside{
+		Percent:    pct,
+		TotalSompi: tot,
+		Hold:       hold,
+		Spend:      spend,
+		PaySompi:   pay,
+		PayKASText: kasText(pay),
+		FloorNote:  note,
+	}, nil
+}
+
 func pack(src string, grams, sompi, dust uint64) (Convert, error) {
 	return Convert{
 		Source:       src,
