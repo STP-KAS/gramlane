@@ -8,7 +8,7 @@
   <table>
     <tr><th>grams</th><td class="mono">{{.Quote.Grams}}</td></tr>
     <tr><th>KAS fallback (policy)</th><td class="mono">{{.Quote.KAS}} KAS ({{.Quote.Sompi}} sompi)</td></tr>
-    <tr><th>Send in Kasware</th><td class="mono">{{.Quote.PayKAS}} KAS ({{.Quote.PaySompi}} sompi) — wallet minimum 0.01 KAS</td></tr>
+    <tr><th>Send in Kasware</th><td class="mono">{{.Quote.PayKASText}} KAS ({{.Quote.PaySompi}} sompi)</td></tr>
     <tr><th>USD</th><td>{{.Quote.USD}}</td></tr>
     <tr><th>scheme</th><td class="mono">{{.Quote.Scheme}}</td></tr>
   </table>
@@ -22,11 +22,16 @@
     <ol>
       <li>Close every black Kasware tab/window.</li>
       <li>Click the Kasware icon in Chrome → it should show your balance (not a spinner).</li>
-      <li>Send <strong>{{if .Quote}}{{.Quote.PayKAS}} KAS{{else}}0.01 KAS{{end}}</strong> (Kasware will not send less than 0.01 KAS). {{if .Quote}}{{.Quote.PaySompi}} sompi.{{end}}</li>
+      <li>In Kasware Send, paste the address, amount <strong>0.012</strong> KAS.</li>
     </ol>
-    <p class="mono" data-wallet-addr id="pay-to">(connect first)</p>
-    <p><button class="btn ghost" type="button" data-copy="#pay-to">Copy address</button>
-      {{if .Quote}}<button class="btn ghost" type="button" data-copy-text="{{.Quote.PayKAS}}">Copy {{.Quote.PayKAS}} KAS</button>{{end}}</p>
+    <label>address</label>
+    <input class="mono" id="pay-to" data-wallet-addr readonly value="" />
+    <label>amount (KAS)</label>
+    <input class="mono" id="pay-amt" readonly value="{{if .Quote}}{{.Quote.PayKASText}}{{else}}0.012{{end}}" />
+    <p>
+      <button class="btn mint" type="button" data-copy="#pay-to">Copy address</button>
+      <button class="btn mint" type="button" data-copy="#pay-amt" data-copy-text="{{if .Quote}}{{.Quote.PayKASText}}{{else}}0.012{{end}}">Copy 0.012 KAS</button>
+    </p>
     <p class="tiny">4. After Kasware confirms, copy the txid, paste it below, Run job. We look it up on api.kaspa.org / explorer.</p>
   </div>
   <p class="tiny" data-pay-status></p>

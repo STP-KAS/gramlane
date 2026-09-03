@@ -84,7 +84,8 @@
       }
     });
     document.querySelectorAll("[data-wallet-addr]").forEach(function (el) {
-      el.textContent = c.address || "";
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") el.value = c.address || "";
+      else el.textContent = c.address || "";
     });
     document.querySelectorAll("[data-wallet-logout]").forEach(function (btn) {
       btn.hidden = !c.address;

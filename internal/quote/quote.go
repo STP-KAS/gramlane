@@ -11,8 +11,8 @@ const (
 	SompiPerGram uint64 = 100
 	SompiPerKAS  uint64 = 100_000_000
 	Unit         string = "gram"
-	// KaswareMinSompi is 0.01 KAS. Kasware's send field rejects smaller amounts.
-	KaswareMinSompi uint64 = 1_000_000
+	// KaswareMinSompi is 0.012 KAS. Kasware rejects below 0.01; 0.012 pastes cleanly in the send box.
+	KaswareMinSompi uint64 = 1_200_000
 )
 
 type Quote struct {
@@ -24,6 +24,7 @@ type Quote struct {
 	KAS          float64 `json:"kas"`
 	PaySompi     uint64  `json:"paySompi"`
 	PayKAS       float64 `json:"payKas"`
+	PayKASText   string  `json:"payKasText"`
 	Lane         string  `json:"lane,omitempty"`
 	Scheme       string  `json:"scheme"`
 	USD          string  `json:"usd"`
@@ -51,9 +52,10 @@ func Grams(n uint64, lane string) (Quote, error) {
 		KAS:          float64(sompi) / float64(SompiPerKAS),
 		PaySompi:     pay,
 		PayKAS:       float64(pay) / float64(SompiPerKAS),
+		PayKASText:   fmt.Sprintf("%.3f", float64(pay)/float64(SompiPerKAS)),
 		Lane:         lane,
 		Scheme:       "kaspa-work-credit",
 		USD:          "not quoted",
-		Note:         "Prepaid L1 grams. Kasware send minimum is 0.01 KAS (not USD). Policy fallback may be smaller; pay the Kasware floor on-chain.",
+		Note:         "Prepaid L1 grams. Kasware send amount is 0.012 KAS minimum for the send box. Not USD.",
 	}, nil
 }
