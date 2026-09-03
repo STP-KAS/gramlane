@@ -39,10 +39,10 @@
 
   <h2>4. Pay the 402 (honest: HTTP only)</h2>
   <ol>
+    <li>Connect Kasware or Kastle in the header (once). The receipt field fills with your address.</li>
     <li>In <strong>name or query</strong> leave <span class="mono">kns.kas</span> or type another name (for resolve / rank / profile).</li>
-    <li>In <strong>receipt id</strong> type any id, e.g. <span class="mono">local-demo</span>.</li>
-    <li>Click <strong>Run job</strong>.</li>
-    <li>If you leave receipt blank, the page says payment required. That is the 402.</li>
+    <li>Click <strong>Run job</strong>. No extra paste needed if you are connected.</li>
+    <li>If you are not connected and leave receipt blank, the page says payment required. That is the 402.</li>
   </ol>
   <p class="tiny">This process does <strong>not</strong> broadcast a Toccata spend and does <strong>not</strong> check a WorkCredit UTXO. The header is accepted at HTTP layer. Miners still want KAS. The intended on-chain object is <span class="mono">WorkCredit.sil</span> (mint / consume / transfer) — compiled, not genesis’d by this UI.</p>
 

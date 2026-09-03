@@ -8,6 +8,8 @@
     <tr><th>job</th><td>{{.Run.Job.Name}}</td></tr>
     <tr><th>grams billed</th><td class="mono">{{.Run.Quote.Grams}}</td></tr>
     <tr><th>paid header</th><td class="mono">{{.Run.Paid}}</td></tr>
+    {{if .Run.Payer}}<tr><th>payer</th><td class="mono">{{.Run.Payer}}</td></tr>{{end}}
+    {{if .Run.Wallet}}<tr><th>wallet</th><td class="mono">{{.Run.Wallet}}</td></tr>{{end}}
     <tr><th>note</th><td>{{.Run.Note}}</td></tr>
   </table>
   <pre>{{.Run.Output}}</pre>
