@@ -3,6 +3,11 @@
     return document.querySelector(sel);
   }
 
+  function say(t) {
+    const el = $("[data-pay-status]");
+    if (el) el.textContent = t;
+  }
+
   function parseTxid(raw) {
     if (!raw) return "";
     if (typeof raw === "object") {
@@ -17,66 +22,56 @@
     }
   }
 
-  async function refreshBalance() {
-    const el = $("[data-kas-balance]");
-    if (!el || !window.kasware || !window.kasware.getBalance) return;
-    try {
-      const b = await window.kasware.getBalance();
-      if (!b || b.total == null) {
-        el.textContent = "balance: (unlock Kasware)";
-        return;
-      }
-      const kas = Number(b.total) / 1e8;
-      el.textContent = "Kasware balance: " + kas.toFixed(8) + " KAS";
-    } catch (e) {
-      el.textContent = "balance: " + (e.message || e);
+  async function accounts() {
+    const w = window.kasware;
+    if (!w) throw new Error("Kasware not injected. Chrome + unlocked Kasware on this exact URL.");
+    if (typeof w.getAccounts === "function") {
+      const have = await w.getAccounts();
+      if (have && have[0]) return have;
     }
+    if (typeof w.requestAccounts !== "function") throw new Error("Kasware has no requestAccounts");
+    return w.requestAccounts();
   }
 
   async function payL1(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
     const btn = ev.currentTarget;
     const sompi = Number(btn.getAttribute("data-sompi") || "0");
-    const job = btn.getAttribute("data-job") || "";
-    const grams = btn.getAttribute("data-grams") || "";
-    const status = $("[data-pay-status]");
     const pay = $('input[name="payment"]');
     const payer = $('input[name="payer"]');
     const wallet = $('input[name="wallet"]');
     const link = $("[data-explorer]");
-    function say(t) {
-      if (status) status.textContent = t;
-    }
-    if (!window.kasware) {
-      say("Kasware is not in this page. Open this URL in Chrome with Kasware unlocked.");
-      return;
-    }
     if (!sompi || sompi < 1) {
       say("No quote sompi.");
       return;
     }
+    if (btn.dataset.busy === "1") return;
+    btn.dataset.busy = "1";
     btn.disabled = true;
-    say("Kasware popup: approve the send. This is the KAS fallback, to your own address. WorkCredit consume is not this.");
+    say("One Kasware window only. If it is already black: close it, click the Kasware icon, unlock, then try this button again.");
     try {
-      const acc = await window.kasware.requestAccounts();
+      const acc = await accounts();
       const to = acc && acc[0];
-      if (!to) throw new Error("no account");
+      if (!to) throw new Error("Kasware returned no address. Unlock the wallet.");
       if (payer) payer.value = to;
       if (wallet) wallet.value = "kasware";
-      const payload = "gramlane:" + job + ":" + grams;
-      const raw = await window.kasware.sendKaspa(to, sompi, { payload: payload });
+      // No payload, no second popup, no page navigation — those black-screen Kasware.
+      const raw = await window.kasware.sendKaspa(to, sompi, { priorityFee: 10000 });
       const txid = parseTxid(raw);
       if (!txid) throw new Error("Kasware returned no txid");
       if (pay) pay.value = txid;
       if (link) {
         link.href = "https://explorer.kaspa.org/txs/" + txid;
         link.hidden = false;
-        link.textContent = "explorer.kaspa.org/txs/" + txid.slice(0, 12) + "…";
+        link.textContent = "Open on explorer.kaspa.org";
       }
-      say("Broadcast. Txid " + txid + " — that is on L1. Click Run job.");
-      const form = btn.closest("form") || document.querySelector("form[action='/run']");
-      if (form) form.submit();
+      say("Broadcast. Txid " + txid + ". Now click Run job — do not reload.");
     } catch (e) {
-      say(e && e.message ? e.message : String(e));
+      const msg = e && e.message ? e.message : String(e);
+      say(msg + " — close the black Kasware window, unlock the extension, retry. Use http://127.0.0.1:8081 (not localhost).");
+    } finally {
+      btn.dataset.busy = "0";
       btn.disabled = false;
     }
   }
@@ -84,7 +79,11 @@
   function bind() {
     const btn = $("[data-pay-l1]");
     if (btn) btn.addEventListener("click", payL1);
-    refreshBalance();
+    const host = $("[data-origin-note]");
+    if (host) {
+      host.textContent =
+        "This tab origin is " + location.origin + ". Kasware treats localhost and 127.0.0.1 as different sites. Stay on this one.";
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);

@@ -14,8 +14,15 @@
   {{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   <p class="tiny">Connected: <span class="mono" data-wallet-addr>(unlock Kasware on this origin)</span></p>
-  <p class="tiny" data-kas-balance>Kasware balance: …</p>
-  <p class="lede">To put this bill <strong>on the explorer</strong>: Kasware sends the quoted KAS <em>to your own address</em> (fallback). You approve the popup. That txid is L1. WorkCredit consume is still not this.</p>
+  <p class="tiny" data-origin-note></p>
+  <p class="lede">On-chain path: one Kasware send, quoted sompi, to <em>your</em> address. If Kasware is a black spinner, close that window, click the extension, unlock, then press Pay once.</p>
+  {{if .Quote}}
+  <p>
+    <button class="btn mint" type="button" data-pay-l1 data-job="{{.Job.ID}}" data-grams="{{.Quote.Grams}}" data-sompi="{{.Quote.Sompi}}">Pay {{.Quote.KAS}} KAS on L1</button>
+  </p>
+  {{end}}
+  <p class="tiny" data-pay-status></p>
+  <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
   <form class="row" action="/run" method="post">
     <input type="hidden" name="job" value="{{.Job.ID}}" />
     <input type="hidden" name="payer" value="" />
@@ -25,16 +32,11 @@
       <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
     </div>
     <div>
-      <label>txid (after Pay on L1) or HTTP receipt</label>
-      <input name="payment" placeholder="Kasware txid, or local receipt" />
+      <label>txid after Pay, then Run job</label>
+      <input name="payment" placeholder="txid from Kasware, or local receipt" />
     </div>
-    {{if .Quote}}
-    <button class="btn mint" type="button" data-pay-l1 data-job="{{.Job.ID}}" data-grams="{{.Quote.Grams}}" data-sompi="{{.Quote.Sompi}}">Pay {{.Quote.KAS}} KAS on L1</button>
-    {{end}}
     <button class="btn ghost" type="submit">Run job</button>
   </form>
-  <p class="tiny" data-pay-status></p>
-  <p><a class="mono" data-explorer hidden href="#"></a></p>
   <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kns.kas</span> → 402. Retry with header <span class="mono">X-Work-Credit</span>.</p>
   {{end}}
 </main>
