@@ -111,6 +111,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/seq", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]any{"ok": true, "data": seq.Snap()})
 	})
+	mux.HandleFunc("/api/id", s.apiID)
 	mux.HandleFunc("/api/genesis/artifact", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "contracts/v1/WorkCredit-live.json")
 	})
@@ -874,6 +875,40 @@ func applyBurn(rec *jobs.Receipt, j jobs.Job, paid string) {
 	rec.Settlement = "prepaid-grams"
 	rec.Remaining = led.Remaining
 	rec.Note = "Sequencer inventory from the 0.5 KAS sale + P2SH UTXO. This burn is operator accounting until consume() spends that UTXO."
+}
+
+func (s *Server) apiID(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		body, _ := io.ReadAll(io.LimitReader(r.Body, 1<<16))
+		var req struct{ Address, Name string }
+		_ = json.Unmarshal(body, &req)
+		if req.Address == "" {
+			req.Address = r.FormValue("address")
+			req.Name = r.FormValue("name")
+		}
+		if err := names.Link(req.Address, req.Name); err != nil {
+			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
+			return
+		}
+		id, err := names.ForAddress(req.Address)
+		if err != nil {
+			writeJSON(w, 200, map[string]any{"ok": true, "linked": names.Linked(req.Address)})
+			return
+		}
+		writeJSON(w, 200, map[string]any{"ok": true, "id": id})
+		return
+	}
+	addr := strings.TrimSpace(r.URL.Query().Get("address"))
+	if addr == "" {
+		writeJSON(w, 400, map[string]any{"ok": false, "error": "address"})
+		return
+	}
+	id, err := names.ForAddress(addr)
+	if err != nil {
+		writeJSON(w, 502, map[string]any{"ok": false, "error": err.Error(), "address": addr})
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "id": id})
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
