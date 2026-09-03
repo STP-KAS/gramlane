@@ -22,16 +22,18 @@ type Job struct {
 }
 
 type Receipt struct {
-	Job      Job         `json:"job"`
-	Quote    quote.Quote `json:"quote"`
-	Paid     string      `json:"paid"`
-	Payer    string      `json:"payer,omitempty"`
-	Wallet   string      `json:"wallet,omitempty"`
-	OnChain  bool        `json:"onChain"`
-	Explorer string      `json:"explorer,omitempty"`
-	TxNote   string      `json:"txNote,omitempty"`
-	Output   string      `json:"output"`
-	Note     string      `json:"note"`
+	Job        Job         `json:"job"`
+	Quote      quote.Quote `json:"quote"`
+	Paid       string      `json:"paid"`
+	Payer      string      `json:"payer,omitempty"`
+	Wallet     string      `json:"wallet,omitempty"`
+	OnChain    bool        `json:"onChain"`
+	Explorer   string      `json:"explorer,omitempty"`
+	TxNote     string      `json:"txNote,omitempty"`
+	Settlement string      `json:"settlement,omitempty"`
+	Remaining  uint64      `json:"gramsRemaining,omitempty"`
+	Output     string      `json:"output"`
+	Note       string      `json:"note"`
 }
 
 var Catalog = []Job{
@@ -114,6 +116,14 @@ func profileURL(name string) string {
 	return "https://api.knsdomains.org/mainnet/api/v1/domain/" + name + ".kas/profile"
 }
 
+func prepaidToken(paid string) bool {
+	switch strings.ToLower(strings.TrimSpace(paid)) {
+	case "grams", "prepaid", "work-credit", "kaspa-work-credit":
+		return true
+	}
+	return false
+}
+
 func Run(j Job, q string, paid string) (Receipt, error) {
 	return RunAs(j, q, paid, "", "")
 }
@@ -131,16 +141,23 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 		Wallet: strings.TrimSpace(wallet),
 		Note:   "WorkCredit consume is not this. KAS fallback is on L1 only if Paid is a real txid Kasware broadcast.",
 	}
-	if chain.IsTxID(paid) {
+	switch {
+	case prepaidToken(paid):
+		r.Settlement = "prepaid-grams"
+		r.TxNote = "prepaid sequencer grams — not a new KAS send"
+		r.Note = "Sequencer inventory from the 0.5 KAS sale + P2SH UTXO. This burn is operator accounting until consume() spends that UTXO."
+	case chain.IsTxID(paid):
 		look := chain.Find(paid)
 		r.Explorer = look.Explorer
 		r.OnChain = look.Found
+		r.Settlement = "kas-fallback"
 		if look.Found {
 			r.TxNote = "api.kaspa.org has this tx. Open Explorer."
 		} else if look.Err != "" {
 			r.TxNote = "txid shape, not in api yet (index lag) or " + look.Err
 		}
-	} else {
+	default:
+		r.Settlement = "http-receipt"
 		r.TxNote = "not a txid — HTTP receipt only, not on the explorer"
 	}
 	switch j.Kind {

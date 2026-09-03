@@ -3,11 +3,18 @@
   <div class="kicker">WorkCredit genesis · after the 0.5 KAS sale</div>
   <h1>Prepaid grams, not a second 0.5 KAS.</h1>
   {{if .Genesis}}
-  <p class="lede">You already paid <strong>{{.Genesis.SaleKAS}} KAS</strong> on L1. That sale is the till. This page is the voucher those grams should live in: issuer = desk, holder = your Kasware, <strong>{{.Genesis.Credits}}</strong> credits, lane {{.Genesis.Lane}}.</p>
+  <p class="lede">You already paid <strong>{{.Genesis.SaleKAS}} KAS</strong> on L1. That sale is the till. Jobs burn those grams on the sequencer ledger. This is fee settlement, not a Tether-like dollar.</p>
   <table>
     <tr><th>sale tx</th><td class="mono"><a href="{{.Genesis.Explorer}}">{{.Genesis.SaleTx}}</a></td></tr>
-    <tr><th>on-chain sale</th><td>{{if .Genesis.OnChainSale}}yes{{else}}no{{end}}</td></tr>
-    <tr><th>voucher UTXO</th><td>{{if .Genesis.VoucherOnChain}}yes{{else}}<strong>not broadcast</strong>{{end}}</td></tr>
+    <tr><th>on-chain sale</th><td>{{if .Genesis.OnChainSale}}<span class="ok">yes</span>{{else}}no{{end}}</td></tr>
+    <tr><th>voucher UTXO</th><td>{{if .Genesis.VoucherOnChain}}<span class="ok">funded on L1</span>{{else}}<strong>not broadcast</strong>{{end}}</td></tr>
+    {{if .Genesis.VoucherTx}}
+    <tr><th>outpoint</th><td class="mono"><a href="https://explorer.kaspa.org/txs/{{.Genesis.VoucherTx}}">{{.Genesis.VoucherTx}}:{{.Genesis.VoucherIdx}}</a></td></tr>
+    {{end}}
+    {{if .Seq}}
+    <tr><th>grams remaining</th><td class="mono">{{.Seq.Remaining}} / {{.Seq.Credits}}</td></tr>
+    <tr><th>burns</th><td class="mono">{{len .Seq.Burns}}</td></tr>
+    {{end}}
     <tr><th>desk (issuer)</th><td class="mono">{{.Genesis.Desk}}</td></tr>
     <tr><th>holder</th><td class="mono">{{.Genesis.Holder}}</td></tr>
     <tr><th>issuer x-only</th><td class="mono">{{.Genesis.IssuerPub}}</td></tr>
@@ -18,6 +25,18 @@
   </table>
   <p class="lede">{{.Genesis.Note}}</p>
   {{if .Genesis.P2SH}}
+  {{if .Genesis.VoucherOnChain}}
+  <div class="card" style="margin:18px 0">
+    <h3>P2SH is already funded</h3>
+    <p class="lede">Do not send another 0.5 KAS here. The redeem script holds the voucher UTXO. Jobs on the desk burn prepaid grams. <span class="mono">consume()</span> is a later 2-sig spend of this output — not a job run.</p>
+    <table>
+      <tr><th>P2SH</th><td class="mono">{{.Genesis.P2SH}}</td></tr>
+      <tr><th>script hash</th><td class="mono">{{.Genesis.ScriptHash}}</td></tr>
+      <tr><th>redeem bytes</th><td>{{.Genesis.RedeemLen}}</td></tr>
+    </table>
+    <p><a class="btn mint" href="/job/dag">Burn grams on a job</a> <a class="btn ghost" href="/desk">Desk</a></p>
+  </div>
+  {{else}}
   <div class="card" style="margin:18px 0">
     <h3>Deploy: fund this P2SH</h3>
     <p class="lede">Stay on this tab. Pay sends <strong>{{.Genesis.FundKAS}} KAS</strong> to the script-hash address. Kasware confirm pops here — not the extension Send screen. This is not your login and not the desk P2PK.</p>
@@ -36,11 +55,13 @@
     <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
   </div>
   {{end}}
+  {{end}}
   <p class="tiny">Kasware <span class="mono">getPublicKey</span> should match holder x-only (last 32 bytes if compressed 33).</p>
   <pre>GET /api/genesis
+GET /api/seq
 GET /api/genesis/artifact
 ctor: {{.Genesis.CtorPath}}</pre>
   {{end}}
-  <p><a class="btn mint" href="/job/dag">Back to heartbeat</a> <a class="btn ghost" href="/guide">Guide</a></p>
+  <p><a class="btn mint" href="/job/dag">Run heartbeat from grams</a> <a class="btn ghost" href="/guide">Guide</a></p>
 </main>
 {{template "footer" .}}

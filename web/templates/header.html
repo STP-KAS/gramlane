@@ -31,6 +31,6 @@
     <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
     <span class="tiny" data-wallet-status></span>
-    <span class="chip">L1 · grams · no L2</span>
+    {{if .Seq}}<span class="chip">{{.Seq.Remaining}} GRAM · L1 · no L2</span>{{else}}<span class="chip">L1 · grams · no L2</span>{{end}}
   </header>
 {{end}}

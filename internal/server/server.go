@@ -15,6 +15,7 @@ import (
 	"gramlane/internal/genesis"
 	"gramlane/internal/jobs"
 	"gramlane/internal/quote"
+	"gramlane/internal/seq"
 	"gramlane/internal/wallets"
 	"gramlane/web"
 )
@@ -37,6 +38,7 @@ type page struct {
 	Framing *framing.View
 	PayTo   string
 	Genesis *genesis.Plan
+	Seq     *seq.Ledger
 }
 
 func New(addr string) (*Server, error) {
@@ -64,7 +66,10 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/steps", s.guidePage)
 	mux.HandleFunc("/genesis", s.genesisPage)
 	mux.HandleFunc("/api/genesis", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, map[string]any{"ok": true, "data": genesis.Live(), "payTo": desk.PayTo()})
+		writeJSON(w, 200, map[string]any{"ok": true, "data": genesis.Live(), "seq": seq.Snap(), "payTo": desk.PayTo()})
+	})
+	mux.HandleFunc("/api/seq", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, 200, map[string]any{"ok": true, "data": seq.Snap()})
 	})
 	mux.HandleFunc("/api/genesis/artifact", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "contracts/v1/WorkCredit-live.json")
@@ -104,9 +109,13 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/feedback", s.feedbackPage)
 	mux.HandleFunc("/api/feedback", s.apiFeedback)
 	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		led := seq.Snap()
 		writeJSON(w, 200, map[string]any{
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
+			"gramsRemaining": led.Remaining, "credits": led.Credits,
+			"voucherOnChain": led.OnChain, "saleTx": led.SaleTx,
+			"voucherTx": led.VoucherTx, "p2sh": led.P2SH,
 		})
 	})
 	mux.HandleFunc("/api/jobs", func(w http.ResponseWriter, r *http.Request) {
@@ -123,6 +132,10 @@ func (s *Server) Handler() http.Handler {
 }
 
 func (s *Server) render(w http.ResponseWriter, name string, p page) {
+	if p.Seq == nil {
+		snap := seq.Snap()
+		p.Seq = &snap
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := s.T.ExecuteTemplate(w, name, p); err != nil {
 		log.Println("template", name, err)
@@ -210,11 +223,12 @@ func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
 	if paid == "" && payer != "" {
 		paid = wallet + ":" + payer
 	}
+	paid = settlePaid(j, paid)
 	if paid == "" {
 		qq, _ := jobs.QuoteJob(j)
 		s.render(w, "job.html", page{
 			Title: j.Name, Active: "desk", Job: &j, Query: q, Quote: &qq,
-			Error: "Payment required: connect a wallet, or paste a receipt id.",
+			Error: "Prepaid grams are spent. Pay KAS fallback or paste a receipt id.",
 		})
 		return
 	}
@@ -222,7 +236,11 @@ func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
 	p := page{Title: "Receipt · Gramlane", Active: "desk", Job: &j, Query: q, Run: &rec}
 	if err != nil {
 		p.Error = err.Error()
+		s.render(w, "run.html", p)
+		return
 	}
+	applyBurn(&rec, j, paid)
+	p.Run = &rec
 	s.render(w, "run.html", p)
 }
 
@@ -238,7 +256,8 @@ func (s *Server) apiQuote(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
 		return
 	}
-	writeJSON(w, 200, map[string]any{"ok": true, "job": j, "quote": q})
+	led := seq.Snap()
+	writeJSON(w, 200, map[string]any{"ok": true, "job": j, "quote": q, "seq": led, "prepaid": led.Remaining >= j.Grams})
 }
 
 func (s *Server) apiRun(w http.ResponseWriter, r *http.Request) {
@@ -270,15 +289,18 @@ func (s *Server) apiRun(w http.ResponseWriter, r *http.Request) {
 	if paid == "" && payer != "" {
 		paid = wallet + ":" + payer
 	}
+	paid = settlePaid(j, paid)
 	if paid == "" {
 		qq, _ := jobs.QuoteJob(j)
+		led := seq.Snap()
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusPaymentRequired)
 		_ = json.NewEncoder(w).Encode(map[string]any{
-			"error": "Payment Required",
-			"note":  "Burn WorkCredit grams (kaspa-work-credit) or pay KAS fallback. Not USD. No L2. Header X-Work-Credit or X-Kaspa-Payment is accepted at HTTP layer only.",
-			"job":   j,
-			"quote": qq,
+			"error":          "Payment Required",
+			"note":           "Prepaid grams are spent. Burn WorkCredit grams or pay KAS fallback. Not USD. No L2. Header X-Work-Credit or X-Kaspa-Payment.",
+			"job":            j,
+			"quote":          qq,
+			"gramsRemaining": led.Remaining,
 			"accepts": []map[string]any{
 				{"scheme": "kaspa-work-credit", "asset": "GRAM", "grams": j.Grams, "lane": j.Lane},
 				{"scheme": "kaspa", "asset": "KAS", "sompi": qq.Sompi},
@@ -291,7 +313,8 @@ func (s *Server) apiRun(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 502, map[string]any{"ok": false, "error": err.Error(), "receipt": rec})
 		return
 	}
-	writeJSON(w, 200, map[string]any{"ok": true, "receipt": rec})
+	applyBurn(&rec, j, paid)
+	writeJSON(w, 200, map[string]any{"ok": true, "receipt": rec, "seq": seq.Snap()})
 }
 
 func (s *Server) feedbackPage(w http.ResponseWriter, r *http.Request) {
@@ -324,6 +347,40 @@ func (s *Server) apiFeedback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true, "id": n.ID, "dir": feedback.Dir(), "note": "This site never DMs you."})
+}
+
+func settlePaid(j jobs.Job, paid string) string {
+	paid = strings.TrimSpace(paid)
+	if seq.CanBurn(j.Grams) {
+		if paid == "" || seq.Accepts(paid) {
+			if paid == "" {
+				return "grams"
+			}
+			return paid
+		}
+		return paid
+	}
+	if seq.Accepts(paid) {
+		return ""
+	}
+	return paid
+}
+
+func applyBurn(rec *jobs.Receipt, j jobs.Job, paid string) {
+	if !seq.Accepts(paid) {
+		return
+	}
+	led, err := seq.BurnGrams(j.ID, j.Grams, paid)
+	if err != nil {
+		if rec.TxNote != "" {
+			rec.TxNote += " — "
+		}
+		rec.TxNote += "ledger: " + err.Error()
+		return
+	}
+	rec.Settlement = "prepaid-grams"
+	rec.Remaining = led.Remaining
+	rec.Note = "Sequencer inventory from the 0.5 KAS sale + P2SH UTXO. This burn is operator accounting until consume() spends that UTXO."
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {

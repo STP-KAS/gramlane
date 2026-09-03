@@ -6,6 +6,9 @@ package genesis
 import (
 	"encoding/hex"
 	"os"
+	"strconv"
+
+	"gramlane/internal/chain"
 )
 
 const (
@@ -43,6 +46,8 @@ type Plan struct {
 	RedeemLen      int    `json:"redeemLen"`
 	FundSompi      uint64 `json:"fundSompi"`
 	FundKAS        string `json:"fundKas"`
+	VoucherTx      string `json:"voucherTx,omitempty"`
+	VoucherIdx     int    `json:"voucherIndex"`
 }
 
 func Live() Plan {
@@ -73,6 +78,12 @@ func Live() Plan {
 		p.P2SH = addr
 		p.ScriptHash = hash
 		p.RedeemLen = n
+		if utxos, err := chain.AddressUTXOs(addr); err == nil && len(utxos) > 0 {
+			p.VoucherOnChain = true
+			p.VoucherTx = utxos[0].TxID
+			p.VoucherIdx = utxos[0].Index
+			p.Note = "P2SH UTXO is on L1 (" + utxos[0].TxID + ":" + strconv.Itoa(utxos[0].Index) + "). 500000 grams prepaid. Jobs burn grams on the sequencer ledger. consume() of this UTXO is still a later spend."
+		}
 	} else {
 		p.Note += " P2SH encode failed: " + err.Error()
 	}

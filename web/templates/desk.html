@@ -2,7 +2,8 @@
 <main>
   <div class="kicker">Work desk</div>
   <h1>Jobs in grams.</h1>
-  <p class="lede">Each run asks for a WorkCredit burn (or KAS fallback at 100 sompi/gram). Receipts are HTTP-layer. The covenant is the ledger; this process does not broadcast Toccata spends.</p>
+  <p class="lede">Each run burns prepaid grams from the 0.5 KAS L1 sale (or KAS fallback at 100 sompi/gram when inventory is empty). Receipts are HTTP-layer. consume() of the P2SH UTXO is a later spend — this process does not broadcast it.</p>
+  {{if .Seq}}<p class="lede">Remaining: <strong class="mono">{{.Seq.Remaining}}</strong> / {{.Seq.Credits}} GRAM{{if .Seq.OnChain}} · voucher on L1{{end}}.</p>{{end}}
   <table>
     <tr><th>Job</th><th>Lane</th><th>Grams</th><th></th></tr>
     {{range .Jobs}}

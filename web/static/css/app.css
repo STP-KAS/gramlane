@@ -76,6 +76,8 @@ input, textarea {
   border-radius: 12px; padding: 10px 12px; font: inherit;
 }
 label { color: var(--muted); font-size: 13px; display: block; margin-bottom: 6px; }
+details { margin: 18px 0; color: var(--muted); }
+details summary { cursor: pointer; color: var(--mint); }
 .wmodal {
   position: fixed; inset: 0; z-index: 40;
   background: rgba(4, 10, 8, 0.72);
