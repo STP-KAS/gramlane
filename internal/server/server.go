@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"gramlane/internal/feedback"
+	"gramlane/internal/framing"
 	"gramlane/internal/jobs"
 	"gramlane/internal/quote"
 	"gramlane/internal/wallets"
@@ -22,15 +23,16 @@ type Server struct {
 }
 
 type page struct {
-	Title  string
-	Active string
-	Query  string
-	Error  string
-	Jobs   []jobs.Job
-	Job    *jobs.Job
-	Quote  *quote.Quote
+	Title   string
+	Active  string
+	Query   string
+	Error   string
+	Jobs    []jobs.Job
+	Job     *jobs.Job
+	Quote   *quote.Quote
 	Run     *jobs.Receipt
 	Wallets []wallets.Wallet
+	Framing *framing.View
 }
 
 func New(addr string) (*Server, error) {
@@ -72,8 +74,19 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/why", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "why.html", page{Title: "Why · Gramlane", Active: "why"})
 	})
-	mux.HandleFunc("/234", func(w http.ResponseWriter, r *http.Request) {
-		s.render(w, "framing.html", page{Title: "#234 · Gramlane", Active: "why"})
+	mux.HandleFunc("/234", s.framingPage)
+	mux.HandleFunc("/framing", s.framingPage)
+	mux.HandleFunc("/api/framing", func(w http.ResponseWriter, r *http.Request) {
+		v := framing.Demo()
+		if hx := strings.TrimSpace(r.URL.Query().Get("hex")); hx != "" {
+			got, err := framing.DecodeHex(hx)
+			if err != nil {
+				writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
+				return
+			}
+			v.Custom = &got
+		}
+		writeJSON(w, 200, map[string]any{"ok": true, "data": v})
 	})
 	mux.HandleFunc("/feedback", s.feedbackPage)
 	mux.HandleFunc("/api/feedback", s.apiFeedback)
@@ -102,6 +115,22 @@ func (s *Server) render(w http.ResponseWriter, name string, p page) {
 		log.Println("template", name, err)
 		http.Error(w, err.Error(), 500)
 	}
+}
+
+func (s *Server) framingPage(w http.ResponseWriter, r *http.Request) {
+	v := framing.Demo()
+	p := page{Title: "#234 · Gramlane", Active: "234", Framing: &v}
+	if hx := strings.TrimSpace(r.FormValue("hex")); hx != "" {
+		p.Query = hx
+		got, err := framing.DecodeHex(hx)
+		if err != nil {
+			p.Error = err.Error()
+		} else {
+			v.Custom = &got
+			p.Framing = &v
+		}
+	}
+	s.render(w, "framing.html", p)
 }
 
 func (s *Server) home(w http.ResponseWriter, r *http.Request) {

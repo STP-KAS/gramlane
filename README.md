@@ -34,6 +34,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/job/resolve` | Quote + run a name lookup |
 | `/api/run?job=dag` | HTTP 402 until `X-Work-Credit` |
 | `/honest` | Claims |
+| `/234` | Worked #234: same 42 bytes, amount 1 → vault 264 |
 | `/wallets` | All Kaspa wallets. Inject: Kasware + Kastle. Ledger: KasVault. Log out supported. |
 | `/safety` | This site never DMs you. Never paste a seed. |
 | `/feedback` | Stored on this PC under `Documents\kaspa\feedback\gramlane` |
