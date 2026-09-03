@@ -30,7 +30,7 @@ Health should say product `kns-web4`.
 
 Connect Kasware on `/me` if you want this browser to see your address. Optional.
 
-## 3. Agent path (Web 4.0)
+## 3. Agent path (Web4.0)
 
 ```
 GET  /agent/kns.kas.json

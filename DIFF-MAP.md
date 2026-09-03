@@ -91,7 +91,7 @@ L2 (Igra, bridges, wrapped USDC) is out of scope for both.
 
 ---
 
-## Agents — Web 4.0
+## Agents — Web4.0
 
 | Surface | What it is | Status | This repo |
 | --- | --- | --- | --- |
@@ -177,7 +177,7 @@ Official compiler: kaspanet `v1-rc1` (30 Aug 2026, @OriNewman). RC ≠ tagged `v
 | Path | Role | Status |
 | --- | --- | --- |
 | `/` `/app` `/name/` `/me` `/directory` | Resolve | indexer + local |
-| `/site/` `/web4` `/4` `/agent/` `/mcp` `/api/v1/call/` | Web 4.0 | local |
+| `/site/` `/web4` `/4` `/agent/` `/mcp` `/api/v1/call/` | Web4.0 | local |
 | `/kachat` `/kassword` `/ranks` `/kcc` `/kaposts` | Ecosystem pointers | mixed |
 | `/credits` `/api/v1/credits/quote` | Gram invoices | local |
 | `/silverc` `/api/v1/artifact/` | Compiled scripts | compiled |
