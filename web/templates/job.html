@@ -6,19 +6,66 @@
   <p class="lede">{{.Job.Blurb}}</p>
   {{if .Quote}}
   <table>
-    <tr><th>grams</th><td class="mono">{{.Quote.Grams}}</td></tr>
+    <tr><th>grams this job</th><td class="mono">{{.Quote.Grams}}</td></tr>
+    {{if .Seq}}
+    <tr><th>prepaid remaining</th><td class="mono">{{.Seq.Remaining}} / {{.Seq.Credits}} GRAM</td></tr>
+    <tr><th>voucher UTXO</th><td>{{if .Seq.OnChain}}<span class="ok">on L1</span>{{else}}sale is on L1; consume() later{{end}}</td></tr>
+    {{end}}
     <tr><th>KAS fallback (policy)</th><td class="mono">{{.Quote.KAS}} KAS ({{.Quote.Sompi}} sompi)</td></tr>
-    <tr><th>Send in Kasware</th><td class="mono">{{.Quote.PayKASText}} KAS ({{.Quote.PaySompi}} sompi)</td></tr>
     <tr><th>USD</th><td>{{.Quote.USD}}</td></tr>
     <tr><th>scheme</th><td class="mono">{{.Quote.Scheme}}</td></tr>
   </table>
   {{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+
+  {{if and .Seq (ge .Seq.Remaining .Job.Grams)}}
+  <div class="card" style="margin:18px 0">
+    <h3>Run from prepaid grams</h3>
+    <p class="lede">The 0.5 KAS sale already bought <strong>{{.Seq.Credits}}</strong> grams. This job burns <strong>{{.Job.Grams}}</strong>. No second Kasware send. This is sequencer settlement, not USDT.</p>
+    <form class="row" action="/run" method="post">
+      <input type="hidden" name="job" value="{{.Job.ID}}" />
+      <input type="hidden" name="payment" value="grams" />
+      <input type="hidden" name="payer" value="" />
+      <input type="hidden" name="wallet" value="" />
+      <div>
+        <label>name or query</label>
+        <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+      </div>
+      <button class="btn mint" type="submit">Run — burn {{.Job.Grams}} grams</button>
+    </form>
+  </div>
+  <details>
+    <summary class="tiny">KAS fallback if prepaid is ever empty</summary>
+    <div class="card" style="margin:18px 0">
+      <p class="lede">Only if remaining grams cannot cover this job. Desk address must not be your login.</p>
+      <p class="tiny">Connected: <span class="mono" data-wallet-addr>(connect in the header)</span></p>
+      <label>desk address</label>
+      <input class="mono" id="pay-to" value="{{.PayTo}}" placeholder="kaspa:q… not your Logged in address" />
+      {{if .Quote}}
+      <p>
+        <button class="btn ghost" type="button" data-pay-l1 data-after="run" data-sompi="{{.Quote.PaySompi}}">Pay {{.Quote.PayKASText}} KAS</button>
+      </p>
+      {{end}}
+      <p class="tiny" data-pay-status></p>
+      <form class="row" action="/run" method="post">
+        <input type="hidden" name="job" value="{{.Job.ID}}" />
+        <input type="hidden" name="payer" value="" />
+        <input type="hidden" name="wallet" value="" />
+        <input type="hidden" name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+        <div>
+          <label>paste Kasware txid</label>
+          <input name="payment" placeholder="64-character txid" autocomplete="off" />
+        </div>
+        <button class="btn ghost" type="submit">Run with txid</button>
+      </form>
+    </div>
+  </details>
+  {{else}}
   <p class="tiny">Connected: <span class="mono" data-wallet-addr>(connect in the header)</span></p>
   <p class="tiny" data-origin-note></p>
   <div class="card" style="margin:18px 0">
     <h3>Pay on this page</h3>
-    <p class="lede">Stay here. <strong>Pay 0.5 KAS</strong> asks Kasware to confirm over this tab — do not open the extension Send screen. Desk address must not be your login (Kasware blocks self-send).</p>
+    <p class="lede">Prepaid remaining cannot cover this job. <strong>Pay 0.5 KAS</strong> asks Kasware to confirm over this tab — do not open the extension Send screen. Desk address must not be your login (Kasware blocks self-send).</p>
     <p class="tiny">Your login (do not pay this): <span class="mono" data-wallet-addr></span></p>
     <label>desk address</label>
     <input class="mono" id="pay-to" value="{{.PayTo}}" placeholder="kaspa:q… not your Logged in address" />
@@ -45,8 +92,9 @@
     </div>
     <button class="btn mint" type="submit">Run job</button>
   </form>
+  {{end}}
 
-  <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kns.kas</span> → 402. Retry with header <span class="mono">X-Work-Credit</span>.</p>
+  <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kns.kas</span> burns prepaid grams while remaining covers the bill. 402 only after inventory is spent. Header <span class="mono">X-Work-Credit: grams</span> is also accepted.</p>
   {{end}}
 </main>
 {{template "footer" .}}

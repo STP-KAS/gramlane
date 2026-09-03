@@ -31,10 +31,11 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/idea` | What this URL is |
 | `/why` | Beyond the chain: bill the event, not FX |
 | `/guide` | Step-by-step: what you do with grams |
-| `/genesis` | WorkCredit instance for the 0.5 KAS L1 sale (compiled, UTXO not broadcast) |
+| `/genesis` | WorkCredit instance: 0.5 KAS sale + funded P2SH voucher UTXO |
 | `/desk` | Job catalog in GRAM |
-| `/job/resolve` | Quote + run a name lookup |
-| `/api/run?job=dag` | HTTP 402 until `X-Work-Credit` |
+| `/job/resolve` | Quote + burn prepaid grams |
+| `/api/run?job=dag` | Burns prepaid grams; 402 only after inventory is spent |
+| `/api/seq` | Remaining grams, voucher outpoint |
 | `/honest` | Claims |
 | `/234` | Worked #234: same 42 bytes, amount 1 → vault 264 |
 | `/wallets` | All Kaspa wallets. Inject: Kasware + Kastle. Ledger: KasVault. Log out supported. |

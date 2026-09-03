@@ -7,8 +7,11 @@ func TestLiveKeys(t *testing.T) {
 		t.Fatal("x-only pubkeys")
 	}
 	p := Live()
-	if p.Credits != 500_000 || p.SaleKAS != "0.5" || p.VoucherOnChain {
+	if p.Credits != 500_000 || p.SaleKAS != "0.5" {
 		t.Fatalf("%+v", p)
+	}
+	if p.P2SH == "" || p.P2SH[6] != 'p' {
+		t.Fatalf("p2sh %s", p.P2SH)
 	}
 	if p.Desk == p.Holder {
 		t.Fatal("desk must not equal holder")

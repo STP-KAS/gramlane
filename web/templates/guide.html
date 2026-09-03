@@ -32,24 +32,24 @@
 
   <h2>3. Read the quote</h2>
   <ol>
-    <li>On the job page you see grams, a <strong>KAS fallback</strong> (sompi = grams × 100), and USD = <em>not quoted</em>.</li>
-    <li>Kasware send is <strong>0.5 KAS</strong> to a desk address that is <em>not</em> your login (self-send is blocked). Policy grams stay 5&nbsp;000.</li>
-    <li>Scheme is <span class="mono">kaspa-work-credit</span>. That is the gram voucher, not USDC.</li>
+    <li>On the job page you see grams, prepaid remaining, a <strong>KAS fallback</strong> (sompi = grams × 100), and USD = <em>not quoted</em>.</li>
+    <li>While remaining covers the bill, the primary button is <strong>Run — burn N grams</strong>. No second 0.5 KAS.</li>
+    <li>Scheme is <span class="mono">kaspa-work-credit</span>. That is the gram voucher, not USDT.</li>
   </ol>
 
   <h2>3b. Desk + voucher (after the 0.5 KAS sale)</h2>
   <ol>
     <li>Desk pay-to is <span class="mono">kaspa:qpjm8kz…38atpq</span> — the output of your sale tx. Not your login.</li>
     <li>That 0.5 KAS = 500&nbsp;000 grams at policy. <a href="/genesis">/genesis</a> is the WorkCredit instance: those two keys, 500000 credits, lane SEQ1, compiled with official silverc.</li>
-    <li>P2SH deploy: <a href="/genesis">/genesis</a> → <strong>Pay 0.5 KAS to P2SH</strong>. That funds the WorkCredit redeem script. consume() is a later spend.</li>
+    <li>The P2SH is already funded on L1. Do not deploy again. Jobs burn prepaid grams. consume() is a later 2-sig spend of that UTXO.</li>
   </ol>
 
-  <h2>4. Pay — HTTP or L1</h2>
+  <h2>4. Settle — prepaid grams</h2>
   <ol>
-    <li>Unlock Kasware on this origin (header shows your short address).</li>
-    <li>Click <strong>Pay … KAS on L1</strong>. Kasware pops a send: quoted sompi <em>to your own address</em>, payload <span class="mono">gramlane:job:grams</span>. Approve it.</li>
-    <li>That txid is on <span class="mono">explorer.kaspa.org</span>. The page then runs the job.</li>
-    <li>WorkCredit <span class="mono">consume</span> is still not this. That needs a minted voucher UTXO. KAS fallback is the live L1 path today.</li>
+    <li>Open a job. Click <strong>Run — burn N grams</strong>.</li>
+    <li>The sequencer subtracts N from remaining. That is operator accounting until consume(). Not a dollar. Not a new Kasware send.</li>
+    <li>KAS fallback (Pay 0.5 KAS) is only when remaining cannot cover the job.</li>
+    <li>WorkCredit <span class="mono">consume</span> is still not the job run. The voucher UTXO stays on the P2SH until both keys spend it.</li>
   </ol>
 
   <h2>5. Read the receipt</h2>
@@ -62,11 +62,13 @@
   <h2>6. Same path as an API (optional)</h2>
   <pre>GET  http://127.0.0.1:8081/api/jobs
 GET  http://127.0.0.1:8081/api/quote?job=dag
+GET  http://127.0.0.1:8081/api/seq
 GET  http://127.0.0.1:8081/api/run?job=dag
-     → 402  (grams + KAS fallback)
+     → 200  (burns prepaid grams while remaining covers the bill)
 GET  http://127.0.0.1:8081/api/run?job=dag
-     + header X-Work-Credit: local-demo
-     → 200 receipt</pre>
+     + header X-Work-Credit: grams
+     → 200 receipt
+     → 402 only after inventory is spent</pre>
   <p>Resolve a name: <span class="mono">/api/run?job=resolve&amp;q=kns.kas</span> with the same header.</p>
 
   <h2>What not to do</h2>
