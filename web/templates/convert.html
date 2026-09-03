@@ -1,0 +1,61 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">policy meter · not a token</div>
+  <h1>KAS ↔ grams.</h1>
+  <p class="lede">This is the KIP-21 policy rate: <strong>100 sompi per gram</strong>. 1&nbsp;000&nbsp;000 grams = 1 KAS. It is not a market, not a peg, and not a KCC-20. WorkCredit already is the voucher. A transferable token would be the wrong object.</p>
+  {{if .Seq}}<p class="lede">Prepaid remaining: <span class="mono">{{.Seq.Remaining}}</span> grams ≈ {{if .Seq}}<a href="/convert?from=remaining">convert remaining</a>{{end}}.</p>{{end}}
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+
+  <form class="row" action="/convert" method="get">
+    <div>
+      <label>amount</label>
+      <input name="amount" value="{{.Query}}" placeholder="0.5" />
+    </div>
+    <div>
+      <label>unit</label>
+      <select name="unit">
+        <option value="kas">KAS</option>
+        <option value="grams">grams</option>
+        <option value="sompi">sompi</option>
+      </select>
+    </div>
+    <button class="btn mint" type="submit">Convert</button>
+    <a class="btn ghost" href="/convert?from=remaining">Use remaining</a>
+  </form>
+  <p class="tiny">Examples: <a href="/convert?kas=0.5">0.5 KAS</a> · <a href="/convert?grams=8000">8 000 grams</a> · <a href="/convert?kas=1">1 KAS</a></p>
+
+  {{if .Conv}}
+  <table>
+    <tr><th>grams</th><td class="mono">{{.Conv.Grams}}</td></tr>
+    <tr><th>KAS at policy</th><td class="mono">{{.Conv.KASText}}</td></tr>
+    <tr><th>sompi</th><td class="mono">{{.Conv.Sompi}}</td></tr>
+    {{if .Conv.Dust}}<tr><th>dust (not a whole gram)</th><td class="mono">{{.Conv.Dust}} sompi</td></tr>{{end}}
+    <tr><th>rate</th><td class="mono">{{.Conv.SompiPerGram}} sompi/gram · policy, not consensus</td></tr>
+    <tr><th>USD</th><td>{{.Conv.USD}}</td></tr>
+    <tr><th>KCC-20</th><td>no — a token would invite a DEX listing. This meter is a quote.</td></tr>
+  </table>
+  <p class="lede">{{.Conv.Note}}</p>
+  {{if .Fits}}
+  <h2>Jobs this amount covers</h2>
+  <table>
+    <tr><th>job</th><th>grams</th><th>runs</th></tr>
+    {{range .Fits}}
+    <tr>
+      <td><a href="/job/{{.Job.ID}}">{{.Job.Name}}</a></td>
+      <td class="mono">{{.Job.Grams}}</td>
+      <td class="mono">{{.Runs}}</td>
+    </tr>
+    {{end}}
+  </table>
+  {{else}}
+  <p class="lede">Nothing in the catalog fits this amount.</p>
+  {{end}}
+  {{end}}
+
+  <h2>Why not a KCC-20?</h2>
+  <p class="lede">KCC-20 is a fungible token. Grams are prepaid sequenced work. Listing them on a DEX would fake a dollar. The covenant is WorkCredit (issuer, holder, credits, lane). The converter is the policy arithmetic miners already use for mass. Miners still want KAS.</p>
+  <pre>GET /api/convert?kas=0.5
+GET /api/convert?grams=8000
+GET /api/convert?from=remaining</pre>
+</main>
+{{template "footer" .}}

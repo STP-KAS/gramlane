@@ -80,6 +80,10 @@ details { margin: 18px 0; color: var(--muted); }
 details summary { cursor: pointer; color: var(--mint); }
 .site-av { width: 96px; height: 96px; border-radius: 24px; object-fit: cover; border: 1px solid var(--line); display: block; margin: 0 0 12px; }
 textarea { width: 100%; max-width: 640px; min-height: 96px; }
+select {
+  background: #030605; border: 1px solid var(--line); color: var(--ink);
+  border-radius: 12px; padding: 10px 12px; font: inherit;
+}
 .wmodal {
   position: fixed; inset: 0; z-index: 40;
   background: rgba(4, 10, 8, 0.72);

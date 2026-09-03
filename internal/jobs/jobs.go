@@ -52,6 +52,21 @@ var Catalog = []Job{
 	{ID: "site", Name: ".kas site builder", Blurb: "Generate a web page from a live KNS name. Link-in-bio from indexer texts, not IPFS.", Grams: 15_000, Lane: "KNS1", Kind: "site"},
 }
 
+type Fit struct {
+	Job  Job    `json:"job"`
+	Runs uint64 `json:"runs"`
+}
+
+func Fits(grams uint64) []Fit {
+	var out []Fit
+	for _, j := range Catalog {
+		if j.Grams > 0 && grams >= j.Grams {
+			out = append(out, Fit{Job: j, Runs: grams / j.Grams})
+		}
+	}
+	return out
+}
+
 func Get(id string) (Job, bool) {
 	for _, j := range Catalog {
 		if j.ID == id {

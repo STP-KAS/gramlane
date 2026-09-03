@@ -1,0 +1,132 @@
+package quote
+
+import (
+	"fmt"
+	"math"
+	"strconv"
+	"strings"
+)
+
+// Convert is the KIP-21 policy meter: KAS ↔ sompi ↔ grams.
+// Not a market, not a peg, not a KCC-20.
+type Convert struct {
+	Source       string  `json:"source"`
+	Grams        uint64  `json:"grams"`
+	Sompi        uint64  `json:"sompi"`
+	Dust         uint64  `json:"dustSompi"`
+	KAS          float64 `json:"kas"`
+	KASText      string  `json:"kasText"`
+	SompiPerGram uint64  `json:"sompiPerGram"`
+	SompiPerKAS  uint64  `json:"sompiPerKas"`
+	USD          string  `json:"usd"`
+	KCC20        bool    `json:"kcc20"`
+	Note         string  `json:"note"`
+}
+
+func FromGrams(n uint64) (Convert, error) {
+	if n > math.MaxUint64/SompiPerGram {
+		return Convert{}, fmt.Errorf("overflow")
+	}
+	return pack("grams", n, n*SompiPerGram, 0)
+}
+
+func FromSompi(n uint64) (Convert, error) {
+	return pack("sompi", n/SompiPerGram, n, n%SompiPerGram)
+}
+
+func FromKAS(s string) (Convert, error) {
+	sompi, err := ParseKAS(s)
+	if err != nil {
+		return Convert{}, err
+	}
+	return FromSompi(sompi)
+}
+
+func Parse(kind, amount string) (Convert, error) {
+	kind = strings.ToLower(strings.TrimSpace(kind))
+	amount = strings.TrimSpace(amount)
+	if amount == "" {
+		return Convert{}, fmt.Errorf("amount")
+	}
+	switch kind {
+	case "", "kas", "kaspa":
+		c, err := FromKAS(amount)
+		if err != nil {
+			return Convert{}, err
+		}
+		c.Source = "kas"
+		return c, nil
+	case "gram", "grams", "credit", "credits":
+		n, err := strconv.ParseUint(strings.ReplaceAll(amount, ",", ""), 10, 64)
+		if err != nil {
+			return Convert{}, fmt.Errorf("grams")
+		}
+		return FromGrams(n)
+	case "sompi":
+		n, err := strconv.ParseUint(strings.ReplaceAll(amount, ",", ""), 10, 64)
+		if err != nil {
+			return Convert{}, fmt.Errorf("sompi")
+		}
+		return FromSompi(n)
+	default:
+		return Convert{}, fmt.Errorf("unit: kas, grams, or sompi")
+	}
+}
+
+func ParseKAS(s string) (uint64, error) {
+	s = strings.TrimSpace(s)
+	s = strings.TrimSuffix(s, "KAS")
+	s = strings.TrimSuffix(s, "kas")
+	s = strings.TrimSpace(s)
+	s = strings.ReplaceAll(s, ",", "")
+	if s == "" || strings.HasPrefix(s, "-") {
+		return 0, fmt.Errorf("kas")
+	}
+	parts := strings.SplitN(s, ".", 2)
+	whole := parts[0]
+	if whole == "" {
+		whole = "0"
+	}
+	w, err := strconv.ParseUint(whole, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("kas")
+	}
+	var frac uint64
+	if len(parts) == 2 {
+		f := parts[1]
+		if len(f) > 8 {
+			f = f[:8]
+		}
+		for len(f) < 8 {
+			f += "0"
+		}
+		frac, err = strconv.ParseUint(f, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("kas")
+		}
+	}
+	if w > math.MaxUint64/SompiPerKAS {
+		return 0, fmt.Errorf("overflow")
+	}
+	out := w * SompiPerKAS
+	if out+frac < out {
+		return 0, fmt.Errorf("overflow")
+	}
+	return out + frac, nil
+}
+
+func pack(src string, grams, sompi, dust uint64) (Convert, error) {
+	return Convert{
+		Source:       src,
+		Grams:        grams,
+		Sompi:        sompi,
+		Dust:         dust,
+		KAS:          float64(sompi) / float64(SompiPerKAS),
+		KASText:      kasText(sompi),
+		SompiPerGram: SompiPerGram,
+		SompiPerKAS:  SompiPerKAS,
+		USD:          "not quoted",
+		KCC20:        false,
+		Note:         "Policy rate 100 sompi/gram (KIP-21 min-relay, not consensus). Not a market. Not a KCC-20. Not USD. WorkCredit already is the voucher; a token would be the wrong object.",
+	}, nil
+}
