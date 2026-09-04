@@ -1,9 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">the jar</div>
-  <h1>Fill the spend jar.</h1>
-  <p class="lede">Keep some KAS. Put a share aside as grams. One send, many payments later. Exact grams, not $1.</p>
-  {{if .Seq}}<p class="lede">In the jar: <strong class="mono">{{.Seq.Remaining}}</strong> grams. <a href="/pay">Pay</a></p>{{end}}
+  <h1>Fill the jar</h1>
+  <p class="lede">Keep some KAS. Put a share aside as grams. One send, many payments later.</p>
+  {{if .Seq}}<p class="tiny">In the jar: {{.Seq.Remaining}} grams · <a href="/pay">Pay</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <form class="row" action="/stablegram" method="post">

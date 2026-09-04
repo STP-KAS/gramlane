@@ -1,8 +1,7 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">Kasdomain page · the name lives here</div>
-  <h1>A web page from a name.</h1>
-  <p class="lede">The public shop is <a href="/s/">/s/name</a> — covenant, not KNS. This desk job still burns grams to build a card. Prefer <a href="/shop">Hang a shop</a> if you hold the name.</p>
+  <h1>Site job</h1>
+  <p class="lede">The public shop is <a href="/s/">/s/name</a>. This job burns grams to build a card. Prefer <a href="/shop">Hang a shop</a>.</p>
   {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Run}}<p class="ok">Built. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}

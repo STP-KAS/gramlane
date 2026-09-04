@@ -1,8 +1,7 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">message postage · grams pay the stamp</div>
-  <h1>Stamp the envelope. Not the letter.</h1>
-  <p class="lede">Postage is sequenced inclusion of a short message. Not KaChat. Not broadcast. Not encrypted. Grams pay the stamp. The chat app still owns the plaintext path.</p>
+  <h1>Postage</h1>
+  <p class="lede">Stamp the envelope, not the letter. Grams pay the stamp.</p>
   {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Run}}<p class="ok">Stamped. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}

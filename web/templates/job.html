@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   {{if .Job}}
-  <div class="kicker">{{if .Job.Tag}}{{.Job.Tag}}{{else}}{{.Job.Lane}} · {{.Job.Kind}}{{end}}</div>
+  {{if .Job.Tag}}<p class="tiny">{{.Job.Tag}}</p>{{end}}
   <h1>{{.Job.Name}}</h1>
   <p class="lede">{{.Job.Blurb}}</p>
   {{if .Quote}}

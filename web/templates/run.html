@@ -1,7 +1,6 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">Receipt</div>
-  <h1>Job returned.</h1>
+  <h1>Receipt</h1>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Run}}
   <table>

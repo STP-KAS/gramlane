@@ -1,7 +1,6 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">Feedback</div>
-  <h1>Tell us what broke.</h1>
+  <h1>Feedback</h1>
   <p class="lede">Stored on this PC in <span class="mono">Documents\kaspa\feedback</span>. Not a ticket system. This site never DMs you — even if you leave a handle, we will not message first. Never paste a seed, key, or password.</p>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Query}}<p class="ok">Saved {{.Query}}</p>{{end}}
