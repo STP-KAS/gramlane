@@ -30,6 +30,9 @@ func Dir() string {
 	if d := strings.TrimSpace(os.Getenv("KASPA_FEEDBACK_DIR")); d != "" {
 		return d
 	}
+	if d := strings.TrimSpace(os.Getenv("DATA_DIR")); d != "" {
+		return filepath.Join(d, "feedback")
+	}
 	return DefaultDir
 }
 

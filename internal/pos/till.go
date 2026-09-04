@@ -15,10 +15,11 @@ import (
 	"sync"
 	"time"
 
+	"gramlane/internal/appenv"
 	"gramlane/internal/seq"
 )
 
-var path = "data/pos.json"
+var path = appenv.File("pos.json")
 
 type Invoice struct {
 	ID       string `json:"id"`
@@ -60,7 +61,7 @@ var (
 )
 
 func LoadSign() Sign {
-	b, err := os.ReadFile("data/till-rate.json")
+	b, err := os.ReadFile(appenv.File("till-rate.json"))
 	if err != nil {
 		return Sign{Ccy: "EUR", KasInFiat: "0.10"}
 	}
@@ -74,12 +75,12 @@ func LoadSign() Sign {
 func SaveSign(s Sign) {
 	s.Ccy = strings.ToUpper(strings.TrimSpace(s.Ccy))
 	s.KasInFiat = strings.TrimSpace(s.KasInFiat)
-	_ = os.MkdirAll("data", 0o755)
+	_ = os.MkdirAll(appenv.DataDir(), 0o755)
 	raw, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return
 	}
-	_ = os.WriteFile("data/till-rate.json", raw, 0o644)
+	_ = os.WriteFile(appenv.File("till-rate.json"), raw, 0o644)
 }
 
 func Create(item string, grams uint64, merchant, payTo, place string) (*Invoice, error) {

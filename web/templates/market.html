@@ -1,8 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">Kasdomain market · grams only</div>
+  <div class="kicker">name market · grams only</div>
   <h1>Buy and sell shop signs.</h1>
-  <p class="lede">Price is grams. Not euro, not dollar. You list a Kasdomain you own. Someone pays from their Stablegram jar. Gramlane moves the unique sign to the buyer. The on-chain inscription still needs a name-service transfer to finish — we do not pretend otherwise.</p>
+  <p class="lede">Price is grams. Not euro, not dollar. List a name you own. Someone pays from their jar. Gramlane moves the sign here. The name on the chain still needs a transfer at the official shop — we say so.</p>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> GRAM.</p>{{end}}
 
@@ -11,12 +11,13 @@
       <h3>List a name</h3>
       <form action="/market" method="post">
         <input type="hidden" name="act" value="list" />
-        <label>Kasdomain</label>
-        <input name="name" placeholder="bakery.kas" />
-        <label>price (grams)</label>
-        <input name="grams" placeholder="50000" />
-        <label>your Kaspa address (seller)</label>
-        <input class="mono" name="seller" placeholder="kaspa:q…" />
+        <label for="listName">The name you want to sell</label>
+        <input id="listName" name="name" placeholder="bakery.kas" />
+        <label for="listGrams">Price in grams</label>
+        <input id="listGrams" name="grams" placeholder="50000" inputmode="numeric" />
+        <label for="listSeller">Your Kaspa address</label>
+        <input id="listSeller" class="mono" name="seller" placeholder="filled when you log in" data-wallet-addr />
+        <p class="help">Only list a name you own.</p>
         <p style="margin-top:12px"><button class="btn mint" type="submit">List for grams</button></p>
       </form>
     </article>

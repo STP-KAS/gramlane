@@ -8,10 +8,11 @@ import (
 	"strings"
 	"sync"
 
+	"gramlane/internal/appenv"
 	"gramlane/internal/names"
 )
 
-var path = "data/live-pages.json"
+var path = appenv.File("live-pages.json")
 
 type Page struct {
 	Name     string `json:"name"`

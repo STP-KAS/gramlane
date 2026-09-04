@@ -1,21 +1,21 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">stablegram</div>
-  <h1>Fill the Stablegram jar.</h1>
-  <p class="lede">Keep KAS. Put a share aside as grams. One send, many tills. Exact grams, not $1.</p>
+  <div class="kicker">the jar</div>
+  <h1>Fill the spend jar.</h1>
+  <p class="lede">Keep some KAS. Put a share aside as grams. One send, many payments later. Exact grams, not $1.</p>
   {{if .Seq}}<p class="lede">In the jar: <strong class="mono">{{.Seq.Remaining}}</strong> grams. <a href="/pay">Pay</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <form class="row" action="/stablegram" method="post">
     <div>
-      <label>KAS you hold</label>
-      <input name="total" value="{{if .Query}}{{.Query}}{{else}}1{{end}}" />
+      <label for="totalKas">How much KAS do you have?</label>
+      <input id="totalKas" name="total" value="{{if .Query}}{{.Query}}{{else}}1{{end}}" inputmode="decimal" />
     </div>
     <div>
-      <label>% to spend pile</label>
-      <input name="pct" value="{{if .Aside}}{{.Aside.Percent}}{{else}}50{{end}}" />
+      <label for="pctSpend">How much % goes in the jar?</label>
+      <input id="pctSpend" name="pct" value="{{if .Aside}}{{.Aside.Percent}}{{else}}50{{end}}" inputmode="numeric" />
     </div>
-    <button class="btn ghost" type="submit">Plan split</button>
+    <button class="btn ghost" type="submit">Show the split</button>
     <input type="hidden" name="payment" value="" />
     <input type="hidden" name="payer" value="" />
     <input type="hidden" name="wallet" value="" />
