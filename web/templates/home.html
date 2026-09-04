@@ -3,11 +3,17 @@
   <div class="kicker">Gramlane · the jar · not a coin</div>
   <h1>Keep a jar of spend.</h1>
   <p class="lede">Gramlane is the project. Hold KAS. Put a share aside as Stablegram. Pay — a link or a QR. Chat a .kas name. The jar does not move when the exchange rate does. Not a dollar. Not Tether.</p>
+  {{if .Query}}<p class="lede">Sign: <a class="mono" href="/site/{{.Query}}">{{.Query}}</a></p>{{end}}
   {{if .Seq}}
-  <div class="meter">
+  <a class="meter" href="/jar">
     <div class="till">{{.Seq.Remaining}}</div>
-    <span>grams in the jar</span>
-  </div>
+    <span>grams in the jar · open the book</span>
+  </a>
+  {{if .Seq.Burns}}
+  {{with index (.Seq.LastBurns 1) 0}}
+  <p class="tiny">Last burn: <span class="mono">{{.Job}}</span> · {{.Grams}} GRAM · <a href="/jar">all receipts</a></p>
+  {{end}}
+  {{end}}
   {{end}}
   <div class="grid doors">
     <article class="card">

@@ -11,14 +11,14 @@
   <form class="row" action="/site" method="post">
     <div>
       <label>.kas name</label>
-      <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+      <input name="q" value="{{if .Query}}{{.Query}}{{else}}kaspadao.kas{{end}}" />
     </div>
     <button class="btn mint" type="submit">Build — burn {{.Job.Grams}} grams</button>
   </form>
   {{else}}
   <p class="lede">Prepaid remaining cannot cover a build. <a href="/job/site">KAS fallback</a>.</p>
   {{end}}
-  <p class="tiny">Preview without a new burn: <a href="/site/kns.kas">/site/kns.kas</a></p>
+  <p class="tiny">Preview without a new burn: <a href="/site/kaspadao.kas">/site/kaspadao.kas</a></p>
 
   {{if .Site}}
   <div class="card" style="margin:18px 0">

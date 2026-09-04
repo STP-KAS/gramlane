@@ -48,6 +48,24 @@ func TestMintFromTx(t *testing.T) {
 	}
 }
 
+func TestLastBurnsNewestFirst(t *testing.T) {
+	ResetForTest(t.TempDir())
+	if _, err := BurnGrams("dag", 5_000, "grams"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := BurnGrams("vault", 8_000, "grams"); err != nil {
+		t.Fatal(err)
+	}
+	got := Snap().LastBurns(1)
+	if len(got) != 1 || got[0].Job != "vault" {
+		t.Fatalf("%+v", got)
+	}
+	all := Snap().LastBurns(0)
+	if len(all) != 2 || all[0].Job != "vault" || all[1].Job != "dag" {
+		t.Fatalf("%+v", all)
+	}
+}
+
 func TestAcceptsSaleTx(t *testing.T) {
 	ResetForTest(t.TempDir())
 	if !Accepts("c1799b0de40f71cfd7a153684ef22326ad920d0dca2a8b519ce2c8379c4f7bc2") {

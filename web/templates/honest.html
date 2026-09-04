@@ -12,7 +12,7 @@
     <tr><td>Vault grams are the lock</td><td class="chip bad">wrong</td><td>Vaults lock KAS. Grams pay the action (bump, pin, spend path).</td></tr>
     <tr><td>L2 USDC is in scope</td><td class="chip bad">wrong</td><td>This dApp refuses L2. No Igra, no bridged dollar in the fee path.</td></tr>
     <tr><td>HTTP 402 verifies L1</td><td class="chip">local</td><td>402 only after prepaid grams cannot cover the job. WorkCredit consume() is a later P2SH spend.</td></tr>
-    <tr><td>Jobs burn prepaid grams</td><td class="chip">live</td><td>500000 grams from the 0.5 KAS sale + funded P2SH. Operator ledger until consume().</td></tr>
+    <tr><td>Jobs burn prepaid grams</td><td class="chip">live</td><td>Sale + later fills. <a href="/jar">/jar</a> is the book. Operator ledger until consume().</td></tr>
     <tr><td>Jobs hit live Kaspa data</td><td class="chip">indexer</td><td>Public Kasdomain index + api.kaspa.org. Not consensus uniqueness.</td></tr>
     <tr><td>GRAM needs a KCC-20</td><td class="chip bad">wrong</td><td>A token would look listable. WorkCredit is the voucher. /convert is policy arithmetic (100 sompi/gram), not a mint.</td></tr>
     <tr><td>POS spend pile is $1</td><td class="chip bad">wrong</td><td>You set KAS aside into grams. Those grams stay grams. Merchants can reprice. No Tether, no freeze.</td></tr>

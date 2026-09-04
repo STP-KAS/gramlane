@@ -1,0 +1,58 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">the jar · miller's book</div>
+  <h1>Grams in. Grams out.</h1>
+  <p class="lede">This is the spend pile. Fills are L1 sends to the desk. Burns are sequenced work. They are <strong>operator accounting</strong> until <span class="mono">consume()</span> spends the WorkCredit UTXO. Not a dollar. Not a KCC-20.</p>
+  {{if .Query}}<p class="lede">Shop sign: <a class="mono" href="/site/{{.Query}}">{{.Query}}</a></p>{{end}}
+  {{if .Seq}}
+  <div class="stats">
+    <div><b>{{.Seq.Remaining}}</b><span>grams left</span></div>
+    <div><b>{{.Seq.Credits}}</b><span>grams ever filled</span></div>
+    <div><b>{{len .Seq.Burns}}</b><span>burns</span></div>
+    <div><b>{{if .Seq.OnChain}}L1{{else}}—{{end}}</b><span>voucher UTXO</span></div>
+  </div>
+  <p>
+    <a class="btn mint" href="/pay">Pay</a>
+    <a class="btn ghost" href="/stablegram">Fill</a>
+    <a class="btn ghost" href="/genesis">Voucher</a>
+  </p>
+  {{if .Seq.VoucherTx}}
+  <p class="tiny mono">voucher <a href="https://explorer.kaspa.org/txs/{{.Seq.VoucherTx}}">{{.Seq.VoucherTx}}:{{.Seq.VoucherIdx}}</a></p>
+  {{end}}
+  <p class="tiny">{{.Seq.Note}}</p>
+
+  <h2>Fills</h2>
+  {{if .Seq.Mints}}
+  <table>
+    <tr><th>when</th><th>grams</th><th>tx</th></tr>
+    {{range .Seq.LastMints 20}}
+    <tr>
+      <td class="tiny">{{.When}}</td>
+      <td class="price">{{.Grams}}</td>
+      <td class="mono"><a href="https://explorer.kaspa.org/txs/{{.Tx}}">{{.Tx}}</a></td>
+    </tr>
+    {{end}}
+  </table>
+  {{else}}
+  <p class="lede">No later fills. Origin is the 0.5 KAS sale on <a href="/genesis">genesis</a>.</p>
+  {{end}}
+
+  <h2>Burns</h2>
+  {{if .Seq.Burns}}
+  <table>
+    <tr><th>when</th><th>job</th><th>grams</th><th>left</th></tr>
+    {{range .Seq.LastBurns 40}}
+    <tr>
+      <td class="tiny">{{.When}}</td>
+      <td class="mono">{{.Job}}</td>
+      <td class="price">{{.Grams}}</td>
+      <td class="mono">{{.Left}}</td>
+    </tr>
+    {{end}}
+  </table>
+  {{else}}
+  <p class="lede">No burns yet. <a href="/apps">Run a job</a>.</p>
+  {{end}}
+  {{end}}
+</main>
+{{template "footer" .}}

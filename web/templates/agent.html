@@ -12,7 +12,7 @@
     <div class="row">
       <div>
         <label>.kas name (card)</label>
-        <input name="name" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+        <input name="name" value="{{if .Query}}{{.Query}}{{else}}kaspadao.kas{{end}}" />
       </div>
     </div>
     <label>ask</label>
@@ -42,6 +42,6 @@
     <p><a class="btn ghost" href="/site/{{.Card.Name}}">Open generated site</a> <a class="btn ghost" href="/api/agent?name={{.Card.Name}}">Card JSON</a></p>
   </div>
   {{end}}
-  <p class="tiny">API: <span class="mono">GET /api/agent?name=kns.kas</span> · <span class="mono">GET /api/run?job=agent&amp;q=kns.kas | What is Gramlane?</span></p>
+  <p class="tiny">API: <span class="mono">GET /api/agent?name=kaspadao.kas</span> · <span class="mono">GET /api/run?job=agent&amp;q=kaspadao.kas | What is Gramlane?</span></p>
 </main>
 {{template "footer" .}}

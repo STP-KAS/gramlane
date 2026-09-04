@@ -101,6 +101,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/convert", s.apiConvert)
 	mux.HandleFunc("/spend", s.spendPage)
 	mux.HandleFunc("/stablegram", s.spendPage)
+	mux.HandleFunc("/jar", s.jarPage)
+	mux.HandleFunc("/receipts", s.jarPage)
 	mux.HandleFunc("/pos", s.posPage)
 	mux.HandleFunc("/pay/", s.payPage)
 	mux.HandleFunc("/counter/", s.counterPage)
@@ -166,7 +168,7 @@ func (s *Server) Handler() http.Handler {
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
 			"vision":         "stable work price on L1, not a synthetic dollar",
-			"products":       []string{"spend", "pos", "vault", "postage", "agent", "site", "convert"},
+			"products":       []string{"spend", "pos", "vault", "postage", "agent", "site", "convert", "jar"},
 			"sompiPerGram":   quote.SompiPerGram,
 			"grok":           agent.HasKey(),
 			"gramsRemaining": led.Remaining, "credits": led.Credits,
@@ -215,12 +217,25 @@ func (s *Server) framingPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "framing.html", p)
 }
 
+func seedSign() {
+	livepage.Ensure("kaspadao.kas",
+		"kaspadao.kas",
+		"Shop sign for this Kaspa address on Gramlane. Pay in grams. The long kaspa:q… is the door.",
+		"Open a Pay ticket from the jar. Not a dollar.")
+}
+
 func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
-	s.render(w, "home.html", page{Title: "Gramlane", Active: "home"})
+	seedSign()
+	s.render(w, "home.html", page{Title: "Gramlane", Active: "home", Query: names.Linked(genesis.HolderAddress)})
+}
+
+func (s *Server) jarPage(w http.ResponseWriter, r *http.Request) {
+	seedSign()
+	s.render(w, "jar.html", page{Title: "Jar · Gramlane", Active: "stablegram", Query: names.Linked(genesis.HolderAddress)})
 }
 
 func (s *Server) whyPage(w http.ResponseWriter, r *http.Request) {
@@ -735,7 +750,7 @@ func (s *Server) agentPage(w http.ResponseWriter, r *http.Request) {
 func (s *Server) apiAgent(w http.ResponseWriter, r *http.Request) {
 	name := strings.TrimSpace(r.URL.Query().Get("name"))
 	if name == "" {
-		name = "kns.kas"
+		name = "kaspadao.kas"
 	}
 	if r.Method == http.MethodGet && r.URL.Query().Get("ask") == "" {
 		c, err := agent.CardFor(name)
@@ -763,7 +778,7 @@ func (s *Server) sitePage(w http.ResponseWriter, r *http.Request) {
 	p := page{Title: "Site builder · Gramlane", Active: "apps", Job: &j, PayTo: desk.PayTo(), Query: q}
 	if r.Method == http.MethodPost {
 		if q == "" {
-			q = "kns.kas"
+			q = "kaspadao.kas"
 		}
 		_, rec, err := s.burnJob("site", q, r.FormValue("payer"))
 		p.Run = &rec
@@ -785,6 +800,9 @@ func (s *Server) siteName(w http.ResponseWriter, r *http.Request) {
 	j, _ := jobs.Get("site")
 	site, err := names.Lookup(name)
 	norm := names.Normalize(name)
+	if norm == "kaspadao.kas" {
+		seedSign()
+	}
 	p := page{Title: norm + " · Kasdomain", Active: "kasdomain", Job: &j, Site: site, Query: norm, Live: livepage.Get(norm)}
 	if err != nil {
 		p.Error = err.Error()

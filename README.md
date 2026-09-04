@@ -38,6 +38,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/guide` | Step-by-step: what you do with grams |
 | `/genesis` | WorkCredit instance: 0.5 KAS sale + funded P2SH voucher UTXO |
 | `/stablegram` | Set aside % of KAS into the Stablegram jar |
+| `/jar` | Miller's book: fills and burns. Operator accounting until consume() |
 | `/pay` | Pay hub — EUR/USD ticket, QR, counter |
 | `/pay/{id}` | Pay a ticket from the jar |
 | `/kasdomain` | Your names: one unique sign, living page |

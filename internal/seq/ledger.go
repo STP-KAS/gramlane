@@ -115,6 +115,32 @@ func Snap() Ledger {
 	return cp
 }
 
+// LastBurns is newest first. Burns on disk stay chronological.
+func (l Ledger) LastBurns(n int) []Burn {
+	b := l.Burns
+	if n <= 0 || n > len(b) {
+		n = len(b)
+	}
+	out := make([]Burn, n)
+	for i := 0; i < n; i++ {
+		out[i] = b[len(b)-1-i]
+	}
+	return out
+}
+
+// LastMints is newest first.
+func (l Ledger) LastMints(n int) []Mint {
+	m := l.Mints
+	if n <= 0 || n > len(m) {
+		n = len(m)
+	}
+	out := make([]Mint, n)
+	for i := 0; i < n; i++ {
+		out[i] = m[len(m)-1-i]
+	}
+	return out
+}
+
 func CanBurn(grams uint64) bool {
 	mu.Lock()
 	defer mu.Unlock()

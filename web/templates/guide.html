@@ -24,14 +24,15 @@
   <table>
     <tr><th>Do this</th><th>Job</th><th>Bill</th></tr>
     <tr><td>First try</td><td><a href="/job/dag">BlockDAG heartbeat</a></td><td>5&nbsp;000 GRAM · lane SEQ1</td></tr>
-    <tr><td>Look up a name</td><td><a href="/job/resolve">Resolve a .kas name</a></td><td>12&nbsp;000 GRAM · lane KNS1</td></tr>
+    <tr><td>Look up a name</td><td><a href="/job/resolve">Resolve a Kasdomain</a></td><td>12&nbsp;000 GRAM · lane SIGN1</td></tr>
     <tr><td>Owner + KAS balance</td><td><a href="/job/rank">L1 balance depth</a></td><td>18&nbsp;000 GRAM</td></tr>
-    <tr><td>Profile texts</td><td><a href="/job/profile">Pull KNS profile</a></td><td>22&nbsp;000 GRAM</td></tr>
+    <tr><td>Profile texts</td><td><a href="/job/profile">Pull Kasdomain profile</a></td><td>22&nbsp;000 GRAM</td></tr>
     <tr><td>Three names at once</td><td><a href="/job/batch">Batch three resolves</a></td><td>40&nbsp;000 GRAM</td></tr>
     <tr><td>Vault bump (not the lock)</td><td><a href="/vault">Vault</a></td><td>8&nbsp;000 GRAM · lane SEQ1</td></tr>
     <tr><td>Message postage</td><td><a href="/postage">Postage</a></td><td>9&nbsp;000 GRAM · lane MSG1</td></tr>
     <tr><td>AI agent</td><td><a href="/agent">Agent</a></td><td>25&nbsp;000 GRAM · lane AGENT</td></tr>
-    <tr><td>.kas site builder</td><td><a href="/site">Site</a></td><td>15&nbsp;000 GRAM · lane KNS1</td></tr>
+    <tr><td>.kas site builder</td><td><a href="/site">Site</a></td><td>15&nbsp;000 GRAM · lane SIGN1</td></tr>
+    <tr><td>Jar book</td><td><a href="/jar">Jar</a></td><td>fills and burns · operator accounting</td></tr>
     <tr><td>Stablegram jar</td><td><a href="/stablegram">Stablegram</a></td><td>hold KAS vs spend grams</td></tr>
     <tr><td>Pay</td><td><a href="/pay">Pay</a></td><td>EUR/USD ticket, QR, counter</td></tr>
     <tr><td>KaChat</td><td><a href="/kachat">KaChat</a></td><td>resolve .kas · postage grams</td></tr>
@@ -48,7 +49,7 @@
   <h2>3b. Desk + voucher (after the 0.5 KAS sale)</h2>
   <ol>
     <li>Desk pay-to is <span class="mono">kaspa:qpjm8kz…38atpq</span> — the output of your sale tx. Not your login.</li>
-    <li>That 0.5 KAS = 500&nbsp;000 grams at policy. <a href="/genesis">/genesis</a> is the WorkCredit instance: those two keys, 500000 credits, lane SEQ1, compiled with official silverc.</li>
+    <li>That 0.5 KAS = 500&nbsp;000 grams at policy. Later fills add more. <a href="/jar">/jar</a> is the live book. <a href="/genesis">/genesis</a> is the WorkCredit instance: two keys, lane SEQ1, official silverc.</li>
     <li>The P2SH is already funded on L1. Do not deploy again. Jobs burn prepaid grams. consume() is a later 2-sig spend of that UTXO.</li>
   </ol>
 
@@ -62,8 +63,8 @@
 
   <h2>5. Read the receipt</h2>
   <ol>
-    <li>You land on <span class="mono">/run</span>: job name, grams billed, the receipt id you pasted, live JSON from KNS or api.kaspa.org.</li>
-    <li>That JSON is real indexer/node data. The gram burn is not yet a chain fact.</li>
+    <li>You land on <span class="mono">/run</span>: job name, grams billed, live JSON from the public name index or api.kaspa.org.</li>
+    <li>That JSON is real indexer/node data. The gram burn is not yet a chain fact. The book is <a href="/jar">/jar</a>.</li>
     <li><a href="/desk">Back to desk</a> and run another job if you want.</li>
   </ol>
 
@@ -77,7 +78,7 @@ GET  http://127.0.0.1:8081/api/run?job=dag
      + header X-Work-Credit: grams
      → 200 receipt
      → 402 only after inventory is spent</pre>
-  <p>Resolve a name: <span class="mono">/api/run?job=resolve&amp;q=kns.kas</span> with the same header.</p>
+  <p>Resolve a name: <span class="mono">/api/run?job=resolve&amp;q=kaspadao.kas</span> with the same header. Jar JSON: <span class="mono">/api/seq</span>.</p>
 
   <h2>What not to do</h2>
   <ul>

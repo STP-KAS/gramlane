@@ -41,15 +41,15 @@ type Receipt struct {
 }
 
 var Catalog = []Job{
-	{ID: "resolve", Name: "Resolve a Kasdomain", Blurb: "Look up a .kas name. The gram bill is the sequenced call, not the name.", Grams: 12_000, Lane: "KNS1", Kind: "resolve"},
-	{ID: "rank", Name: "L1 balance depth", Blurb: "Owner from indexer, then api.kaspa.org balance. Still grams, still L1.", Grams: 18_000, Lane: "KNS1", Kind: "rank"},
+	{ID: "resolve", Name: "Resolve a Kasdomain", Blurb: "Look up a .kas name. The gram bill is the sequenced call, not the name.", Grams: 12_000, Lane: "SIGN1", Kind: "resolve"},
+	{ID: "rank", Name: "L1 balance depth", Blurb: "Owner from indexer, then api.kaspa.org balance. Still grams, still L1.", Grams: 18_000, Lane: "SIGN1", Kind: "rank"},
 	{ID: "dag", Name: "BlockDAG heartbeat", Blurb: "Read virtual DAA from api.kaspa.org. Cheap inclusion probe.", Grams: 5_000, Lane: "SEQ1", Kind: "dag"},
-	{ID: "profile", Name: "Pull KNS profile texts", Blurb: "Avatar, x, website if the indexer has them.", Grams: 22_000, Lane: "KNS1", Kind: "profile"},
-	{ID: "batch", Name: "Batch three resolves", Blurb: "kns.kas + kaspa.kas + kachat.kas. One voucher burn.", Grams: 40_000, Lane: "KNS1", Kind: "batch"},
+	{ID: "profile", Name: "Pull Kasdomain profile texts", Blurb: "Avatar, x, website if the public name index has them.", Grams: 22_000, Lane: "SIGN1", Kind: "profile"},
+	{ID: "batch", Name: "Batch three resolves", Blurb: "kaspadao.kas + gramlane.kas + kachat.kas. One voucher burn.", Grams: 40_000, Lane: "SIGN1", Kind: "batch"},
 	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: 8_000, Lane: "SEQ1", Kind: "vault"},
 	{ID: "postage", Name: "KaChat postage", Blurb: "Sequenced stamp to a .kas contact. Not E2E — KaChat seals ciph_msg in the wallet.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
 	{ID: "agent", Name: "AI agent call", Blurb: "HTTP 402 for a machine. Grok if XAI_API_KEY is set; otherwise local tools. Grams pay the call.", Grams: 25_000, Lane: "AGENT", Kind: "agent"},
-	{ID: "site", Name: "Kasdomain page", Blurb: "Hang a living webpage on a name. Prefer /kasdomain to publish headline and about.", Grams: 15_000, Lane: "KNS1", Kind: "site"},
+	{ID: "site", Name: "Kasdomain page", Blurb: "Hang a living webpage on a name. Prefer /kasdomain to publish headline and about.", Grams: 15_000, Lane: "SIGN1", Kind: "site"},
 }
 
 type Fit struct {
@@ -126,7 +126,7 @@ func pretty(b []byte) string {
 func ownerURL(name string) string {
 	name = strings.TrimSuffix(strings.ToLower(strings.TrimSpace(name)), ".kas")
 	if name == "" {
-		name = "kns"
+		name = "kaspadao"
 	}
 	return "https://api.knsdomains.org/mainnet/api/v1/" + name + ".kas/owner"
 }
@@ -134,7 +134,7 @@ func ownerURL(name string) string {
 func profileURL(name string) string {
 	name = strings.TrimSuffix(strings.ToLower(strings.TrimSpace(name)), ".kas")
 	if name == "" {
-		name = "kns"
+		name = "kaspadao"
 	}
 	return "https://api.knsdomains.org/mainnet/api/v1/domain/" + name + ".kas/profile"
 }
@@ -168,7 +168,7 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 	case prepaidToken(paid):
 		r.Settlement = "prepaid-grams"
 		r.TxNote = "prepaid sequencer grams — not a new KAS send"
-		r.Note = "Sequencer inventory from the 0.5 KAS sale + P2SH UTXO. This burn is operator accounting until consume() spends that UTXO."
+		r.Note = "Sequencer inventory (sale + later fills) against the P2SH UTXO. This burn is operator accounting until consume() spends that UTXO. Open /jar for the book."
 	case chain.IsTxID(paid):
 		look := chain.Find(paid)
 		r.Explorer = look.Explorer
@@ -228,7 +228,7 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 		r.Output = pretty(b)
 	case "batch":
 		var parts []string
-		for _, n := range []string{"kns.kas", "kaspa.kas", "kachat.kas"} {
+		for _, n := range []string{"kaspadao.kas", "gramlane.kas", "kachat.kas"} {
 			b, err := getJSON(ownerURL(n))
 			if err != nil {
 				parts = append(parts, n+": "+err.Error())
@@ -239,7 +239,7 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 		r.Output = strings.Join(parts, "\n\n")
 	case "vault":
 		v := framing.Demo()
-		if hx := strings.TrimSpace(q); hx != "" && hx != "kns.kas" {
+		if hx := strings.TrimSpace(q); hx != "" && !strings.HasSuffix(strings.ToLower(hx), ".kas") {
 			got, err := framing.DecodeHex(hx)
 			if err != nil {
 				return r, err
@@ -300,7 +300,7 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 func splitAgentQ(q string) (name, prompt string) {
 	q = strings.TrimSpace(q)
 	if q == "" {
-		return "kns.kas", "What is Gramlane?"
+		return "kaspadao.kas", "What is Gramlane?"
 	}
 	if i := strings.Index(q, " | "); i >= 0 {
 		return strings.TrimSpace(q[:i]), strings.TrimSpace(q[i+3:])
