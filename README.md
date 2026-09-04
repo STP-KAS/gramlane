@@ -28,7 +28,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | Path | What |
 | --- | --- |
-| `/` | Home: name, Stablegram jar, Pay |
+| `/` | Home: name, jar, Pay |
 | `/kasdomain` | Covenant name = P2SH(KasName.sil, label). First UTXO wins. Not KNS. |
 | `/why` | Beyond the chain: household, plant, agent, counter |
 | `/vault` | Vault bump — grams pay the action, KAS stays locked |
@@ -38,7 +38,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/why` | Bill the action, not the exchange rate |
 | `/guide` | Step-by-step: what you do with grams |
 | `/genesis` | WorkCredit instance: 0.5 KAS sale + funded P2SH voucher UTXO |
-| `/stablegram` | Set aside % of KAS into the Stablegram jar |
+| `/spend` | Pay KAS to the desk; grams land in the jar book. `/stablegram` still opens this page. |
 | `/jar` | Miller's book: fills and burns. Operator accounting until consume() |
 | `/pay` | Pay hub — EUR/USD ticket, QR, counter |
 | `/pay/{id}` | Pay a ticket from the jar |

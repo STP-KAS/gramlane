@@ -287,7 +287,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) jarPage(w http.ResponseWriter, r *http.Request) {
 	seedSign()
-	s.render(w, "jar.html", page{Title: "Jar · Gramlane", Active: "stablegram", Query: names.Linked(genesis.HolderAddress)})
+	s.render(w, "jar.html", page{Title: "Jar · Gramlane", Active: "jar", Query: names.Linked(genesis.HolderAddress)})
 }
 
 func (s *Server) whyPage(w http.ResponseWriter, r *http.Request) {
@@ -374,7 +374,7 @@ func (s *Server) spendPage(w http.ResponseWriter, r *http.Request) {
 	if n, err := strconv.ParseUint(r.FormValue("pct"), 10, 64); err == nil {
 		pct = n
 	}
-	p := page{Title: "Stablegram · Gramlane", Active: "stablegram", Query: total, PayTo: desk.PayTo()}
+	p := page{Title: "Fill the jar · Gramlane", Active: "jar", Query: total, PayTo: desk.PayTo()}
 	a, err := quote.SetAside(total, pct)
 	if err != nil {
 		p.Error = err.Error()
@@ -945,7 +945,7 @@ func (s *Server) apiShopPay(w http.ResponseWriter, r *http.Request, name string)
 		w.WriteHeader(http.StatusPaymentRequired)
 		_ = json.NewEncoder(w).Encode(map[string]any{
 			"error":          "Payment Required",
-			"note":           "Jar cannot cover this ticket. Fill Stablegram or send KAS to the shop.",
+			"note":           "Jar cannot cover this ticket. Fill the jar or send KAS to the shop.",
 			"grams":          it.Grams,
 			"gramsRemaining": led.Remaining,
 			"usd":            it.USD,
