@@ -2,7 +2,7 @@
 <main>
   <p class="kicker">kasdomain · compiled · not KNS</p>
   <h1>kasdomain — covenant names on Kaspa L1. Not KNS. Not an inscription.</h1>
-  <p class="lede">A name is an output. The script is determined by this label. First funded UTXO at that P2SH is the name. No yearly bill. No company in the middle. USD not quoted. No L2.</p>
+  <p class="lede">A name is an output. Fund it with a Kaspa transaction — not grams. The dollar figure is the board shelf, settled in KAS. Desk apps that sequence work stay in grams. No yearly bill. No L2.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="q">Name</label>
@@ -23,15 +23,16 @@
     <p>Name output <span class="mono">{{.Result.PayURI}}</span></p>
     {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
     {{if .Result.Owner}}<p class="tiny">outpoint <span class="mono">{{.Result.Owner}}</span></p>{{end}}
-    <p class="price">{{.Result.Quote.Grams}} GRAM to resolve · {{printf "%.3f" .Result.Quote.KAS}} KAS fallback · USD {{.Result.Quote.USD}}</p>
+    <p class="price">Shelf {{.Result.Shelf.USD}} · {{.Result.Shelf.PayKAS}} KAS at this board · 1 KAS = ${{.Result.Shelf.Rate}} USD</p>
     {{if not .Result.Hit}}
     <div class="invoice">
       <div class="invoice-row"><span>Duration</span><strong>Forever</strong></div>
       <div class="invoice-row"><span>Yearly rent</span><strong>None</strong></div>
       <div class="invoice-row"><span>Who is the registry</span><strong>Nobody. The script is.</strong></div>
-      <div class="invoice-row total"><span>Fund once (wallet floor)</span><strong>{{.Result.Quote.PayKASText}} KAS</strong></div>
+      <div class="invoice-row"><span>Shelf (USD)</span><strong>{{.Result.Shelf.USD}}</strong></div>
+      <div class="invoice-row total"><span>You send (KAS)</span><strong>{{.Result.Quote.PayKASText}} KAS</strong></div>
     </div>
-    <p class="help">Send to this P2SH. That is the name. Kasware’s 0.5 KAS floor is a wallet rule, not a kasdomain tax. We do not broadcast for you.</p>
+    <p class="help">Send KAS to this P2SH. That is the name. Not grams — grams are for desk jobs that keep sequencing on L1. Kasware’s 0.5 KAS floor is a wallet rule, not a kasdomain tax. The dollar shelf is a board sign, not a peg. We do not broadcast for you.</p>
     <input class="mono" id="pay-to" value="{{.Result.PayURI}}" readonly />
     <p style="margin-top:12px">
       <button class="btn mint" type="button" data-pay-l1 data-name="{{.Result.Name}}" data-after="/kasdomain?q={{.Query}}&address=" data-sompi="{{.Result.Quote.PaySompi}}">Fund {{.Result.Name}}</button>
@@ -62,46 +63,15 @@
   <div class="card" style="margin:22px 0">
     <div class="kicker">your face</div>
     <h2>{{if .Held.Primary}}{{.Held.Primary}}{{else}}kaspa address{{end}}</h2>
-    <p class="help">One address can hold many kasdomains. Only the <strong>face</strong> replaces the long kaspa:q… when you log in. Default is the <strong>first</strong> you funded. The rest stay in the drawer: custody, sellable, not the login name. We do not mint 100 UTXOs for you — each name is one output (wallet floor 0.5 KAS).</p>
+    <p class="help">This wallet holds {{len .Held.Names}} kasdomain{{if ne (len .Held.Names) 1}}s{{end}}. Only the face replaces kaspa:q… when you log in. Open <a href="/mine?address={{.Held.Address}}">Names</a> to see every domain on this wallet after you buy or fund one.</p>
     {{if .Held.Primary}}<p class="tiny">First registered: {{.Held.First}}</p>{{end}}
-  </div>
-  <h2>Drawer</h2>
-  <p class="help">Filter if you have many. List extras on the market at a suggested gram price (short names cost more, long names stay cheap).</p>
-  <form action="/kasdomain" method="post" style="margin-bottom:12px">
-    <input type="hidden" name="act" value="list-drawer" />
-    <input type="hidden" name="address" value="{{.Held.Address}}" />
-    <button class="btn ghost" type="submit">List all extras at suggested price</button>
-  </form>
-  <p><input id="kasFilter" placeholder="filter names" style="width:100%;max-width:420px" /></p>
-  <div class="grid" id="kasGrid">
-    {{range .Held.Names}}
-    <article class="card kas-card" data-name="{{.Name}}">
-      <h3>{{.Name}}</h3>
-      {{if .Face}}<p class="ok">Face — carries the wallet</p>{{else}}<p class="tiny">Custody — not the login name</p>{{end}}
-      <p class="price">{{.Suggest}} GRAM suggest</p>
-      {{if not .Face}}
-      <form action="/kasdomain" method="post">
-        <input type="hidden" name="act" value="face" />
-        <input type="hidden" name="address" value="{{$.Held.Address}}" />
-        <input type="hidden" name="name" value="{{.Name}}" />
-        <button class="btn mint" type="submit">Use as face</button>
-      </form>
-      <form action="/market" method="post" style="margin-top:8px">
-        <input type="hidden" name="act" value="list" />
-        <input type="hidden" name="name" value="{{.Name}}" />
-        <input type="hidden" name="grams" value="{{.Suggest}}" />
-        <input type="hidden" name="seller" value="{{$.Held.Address}}" />
-        <button class="btn ghost" type="submit">Sell at {{.Suggest}} GRAM</button>
-      </form>
-      {{end}}
-    </article>
-    {{end}}
+    <p style="margin-top:12px"><a class="btn mint" href="/mine?address={{.Held.Address}}">See all names on this wallet</a></p>
   </div>
   {{else}}
-  <p class="help">Log in, fund a name, and it is recorded here. First funded is your face. Fund more only if you want inventory to sell — not to decorate the login.</p>
-  <form class="row" action="/kasdomain" method="get">
+  <p class="help">Log in, fund a name with KAS, and it is recorded on the Names tab. First funded is your face. Fund more only if you want inventory to sell — not to decorate the login.</p>
+  <form class="row" action="/mine" method="get">
     <input class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
-    <button class="btn ghost" type="submit">Show my drawer</button>
+    <button class="btn ghost" type="submit">Show names on this wallet</button>
   </form>
   {{end}}
 </main>
@@ -115,16 +85,6 @@
       return;
     }
   } catch (e) {}
-  var f = document.getElementById("kasFilter");
-  if (f) {
-    f.addEventListener("input", function () {
-      var q = (f.value || "").toLowerCase();
-      document.querySelectorAll(".kas-card").forEach(function (el) {
-        var n = (el.getAttribute("data-name") || "").toLowerCase();
-        el.style.display = !q || n.indexOf(q) !== -1 ? "" : "none";
-      });
-    });
-  }
 })();
 </script>
 {{template "footer" .}}

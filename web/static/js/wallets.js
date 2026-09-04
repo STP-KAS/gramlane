@@ -193,7 +193,7 @@
         return;
       }
       if (id && id.names && id.names.length > 1) {
-        location.href = "/kasdomain?address=" + encodeURIComponent(r.address);
+        location.href = "/mine?address=" + encodeURIComponent(r.address);
       }
     });
     return r;
@@ -232,7 +232,7 @@
         status(current().name);
         return;
       }
-      location.href = "/kasdomain?address=" + encodeURIComponent(current().address);
+      location.href = "/mine?address=" + encodeURIComponent(current().address);
       return;
     }
     const id = preferredWallet();

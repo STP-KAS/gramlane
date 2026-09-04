@@ -1,4 +1,5 @@
-// Package market is the Kasdomain marketplace. Prices are grams only.
+// Package market is the Kasdomain marketplace.
+// Shelf is USD. Settlement is KAS on L1. Not grams — desk jobs keep grams.
 package market
 
 import (
@@ -12,21 +13,25 @@ import (
 
 	"gramlane/internal/appenv"
 	"gramlane/internal/names"
-	"gramlane/internal/seq"
 )
 
 var path = appenv.File("market.json")
 
 type Listing struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Seller string `json:"seller"`
-	Grams  uint64 `json:"grams"`
-	Status string `json:"status"`
-	When   string `json:"when"`
-	Buyer  string `json:"buyer,omitempty"`
-	Sold   string `json:"sold,omitempty"`
-	Note   string `json:"note"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Seller   string `json:"seller"`
+	USDCents uint64 `json:"usdCents"`
+	USD      string `json:"usd"`
+	Sompi    uint64 `json:"sompi"`
+	KAS      string `json:"kas"`
+	Rate     string `json:"rate"`
+	Status   string `json:"status"`
+	When     string `json:"when"`
+	Buyer    string `json:"buyer,omitempty"`
+	Sold     string `json:"sold,omitempty"`
+	Tx       string `json:"tx,omitempty"`
+	Note     string `json:"note"`
 }
 
 type Book struct {
@@ -47,11 +52,11 @@ func List() []Listing {
 	return out
 }
 
-func Open(name, seller string, grams uint64) (*Listing, error) {
+func Open(name, seller string, usdCents uint64) (*Listing, error) {
 	name = names.DisplayName(name)
 	seller = strings.TrimSpace(seller)
-	if grams == 0 {
-		return nil, fmt.Errorf("price in grams")
+	if usdCents == 0 {
+		return nil, fmt.Errorf("price in USD")
 	}
 	if !strings.HasPrefix(seller, "kaspa:") {
 		return nil, fmt.Errorf("seller must be a kaspa address")
@@ -59,6 +64,7 @@ func Open(name, seller string, grams uint64) (*Listing, error) {
 	if !names.Holds(seller, name) {
 		return nil, fmt.Errorf("only a wallet that holds %s can list it", name)
 	}
+	ask := names.Settle(usdCents)
 	mu.Lock()
 	defer mu.Unlock()
 	b := open()
@@ -68,13 +74,17 @@ func Open(name, seller string, grams uint64) (*Listing, error) {
 		}
 	}
 	L := Listing{
-		ID:     fmt.Sprintf("%d", time.Now().UnixNano()),
-		Name:   name,
-		Seller: seller,
-		Grams:  grams,
-		Status: "open",
-		When:   time.Now().UTC().Format(time.RFC3339),
-		Note:   "Price is grams. Sale moves custody here. The name UTXO still needs a KasName transfer spend to finish on L1.",
+		ID:       fmt.Sprintf("%d", time.Now().UnixNano()),
+		Name:     name,
+		Seller:   seller,
+		USDCents: usdCents,
+		USD:      ask.USD,
+		Sompi:    ask.PaySompi,
+		KAS:      ask.PayKAS,
+		Rate:     ask.Rate,
+		Status:   "open",
+		When:     time.Now().UTC().Format(time.RFC3339),
+		Note:     "Shelf is USD. Buyer sends KAS on L1, not grams. Sale moves custody here. The name UTXO still needs a KasName transfer spend to finish on L1.",
 	}
 	b.Listings = append([]Listing{L}, b.Listings...)
 	if err := save(b); err != nil {
@@ -84,9 +94,10 @@ func Open(name, seller string, grams uint64) (*Listing, error) {
 	return &cp, nil
 }
 
-func Buy(id, buyer string) (*Listing, error) {
+func Buy(id, buyer, tx string) (*Listing, error) {
 	id = strings.TrimSpace(id)
 	buyer = strings.TrimSpace(buyer)
+	tx = strings.TrimSpace(tx)
 	if !strings.HasPrefix(buyer, "kaspa:") {
 		return nil, fmt.Errorf("buyer must be a kaspa address")
 	}
@@ -110,11 +121,9 @@ func Buy(id, buyer string) (*Listing, error) {
 	if strings.EqualFold(L.Seller, buyer) {
 		return L, fmt.Errorf("you already own this listing")
 	}
-	if _, err := seq.BurnGrams("market:"+L.Name, L.Grams, "grams"); err != nil {
-		return L, err
-	}
 	L.Status = "sold"
 	L.Buyer = buyer
+	L.Tx = tx
 	L.Sold = time.Now().UTC().Format(time.RFC3339)
 	names.Unhold(L.Seller, L.Name)
 	if err := names.Receive(buyer, L.Name); err != nil {

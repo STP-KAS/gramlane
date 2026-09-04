@@ -1,0 +1,79 @@
+{{template "header" .}}
+<main>
+  <p class="kicker">names on this wallet · USD shelf · KAS settle</p>
+  <h1>Every kasdomain on this wallet.</h1>
+  <p class="lede">Bought or funded names live here. The <strong>face</strong> is the login name. The rest are custody — keep them or sell them in KAS. Desk apps that sequence work stay in grams. A name is a Kaspa output.</p>
+  {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
+
+  {{if .Held}}
+  <div class="card" style="margin:22px 0">
+    <div class="kicker">your face</div>
+    <h2>{{if .Held.Primary}}{{.Held.Primary}}{{else}}kaspa address{{end}}</h2>
+    <p class="help">{{.Held.Address}}</p>
+    <p class="tiny">{{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}} on this wallet{{if .Held.First}} · first funded {{.Held.First}}{{end}}</p>
+  </div>
+  <p class="help">Filter. List extras on the market at the dollar shelf (settled in KAS at this board’s sign).</p>
+  <form action="/mine" method="post" style="margin-bottom:12px">
+    <input type="hidden" name="act" value="list-drawer" />
+    <input type="hidden" name="address" value="{{.Held.Address}}" />
+    <button class="btn ghost" type="submit">List all extras at suggested USD</button>
+  </form>
+  <p><input id="kasFilter" placeholder="filter names" style="width:100%;max-width:420px" /></p>
+  <div class="grid" id="kasGrid">
+    {{range .Held.Names}}
+    <article class="card kas-card" data-name="{{.Name}}">
+      <h3>{{.Name}}</h3>
+      {{if .Face}}<p class="ok">Face — carries the wallet</p>{{else}}<p class="tiny">Custody — not the login name</p>{{end}}
+      <p class="price">{{.USD}} · {{.KAS}} KAS</p>
+      <p class="tiny">{{.When}}{{if .Tx}} · <span class="mono">{{.Tx}}</span>{{end}}</p>
+      {{if not .Face}}
+      <form action="/mine" method="post">
+        <input type="hidden" name="act" value="face" />
+        <input type="hidden" name="address" value="{{$.Held.Address}}" />
+        <input type="hidden" name="name" value="{{.Name}}" />
+        <button class="btn mint" type="submit">Use as face</button>
+      </form>
+      <form action="/market" method="post" style="margin-top:8px">
+        <input type="hidden" name="act" value="list" />
+        <input type="hidden" name="name" value="{{.Name}}" />
+        <input type="hidden" name="cents" value="{{.USDCents}}" />
+        <input type="hidden" name="seller" value="{{$.Held.Address}}" />
+        <button class="btn ghost" type="submit">Sell at {{.USD}}</button>
+      </form>
+      {{end}}
+    </article>
+    {{end}}
+  </div>
+  <p style="margin-top:18px"><a class="btn ghost" href="/kasdomain">Fund another name</a> <a class="btn ghost" href="/market">Open market</a></p>
+  {{else}}
+  <p class="help">Log in to see every kasdomain this wallet has funded or bought. Empty until you acquire one — that is a Kaspa transaction, not grams.</p>
+  <form class="row" action="/mine" method="get">
+    <input class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
+    <button class="btn ghost" type="submit">Show names on this wallet</button>
+  </form>
+  <p style="margin-top:12px"><a class="btn mint" href="/kasdomain">Get a name</a></p>
+  {{end}}
+</main>
+<script>
+(function () {
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (!qs.get("address") && sessionStorage.getItem("kaspaAddress")) {
+      qs.set("address", sessionStorage.getItem("kaspaAddress"));
+      location.replace("/mine?" + qs.toString());
+      return;
+    }
+  } catch (e) {}
+  var f = document.getElementById("kasFilter");
+  if (f) {
+    f.addEventListener("input", function () {
+      var q = (f.value || "").toLowerCase();
+      document.querySelectorAll(".kas-card").forEach(function (el) {
+        var n = (el.getAttribute("data-name") || "").toLowerCase();
+        el.style.display = !q || n.indexOf(q) !== -1 ? "" : "none";
+      });
+    });
+  }
+})();
+</script>
+{{template "footer" .}}

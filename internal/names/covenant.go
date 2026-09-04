@@ -34,6 +34,7 @@ type Result struct {
 	Evidence   string          `json:"evidence"`
 	Warning    string          `json:"warning"`
 	Quote      quote.Quote     `json:"quote"`
+	Shelf      Ask             `json:"shelf"`
 	Raw        json.RawMessage `json:"raw,omitempty"`
 	ScriptHash string          `json:"scriptHash,omitempty"`
 	Hex        string          `json:"hex,omitempty"`
@@ -134,15 +135,12 @@ func P2SHFor(name string) (addr, hashHex string, redeem []byte, err error) {
 func ResolveCovenant(raw string) *Result {
 	raw = strings.TrimSpace(raw)
 	disp := DisplayName(raw)
-	qq, err := quote.Grams(ResolveGrams, "SIGN1")
-	if err != nil {
-		qq = quote.Quote{Grams: ResolveGrams, KAS: 0.012, USD: "not quoted"}
-	}
 	out := &Result{
 		Query:    raw,
 		Name:     disp,
 		Evidence: "compiled",
-		Quote:    qq,
+		Quote:    FundQuote(),
+		Shelf:    AskFor(disp),
 		Layout:   "KasName { label, claimed, owner } — own UTXO only",
 	}
 	if disp == "" {

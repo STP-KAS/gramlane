@@ -67,7 +67,7 @@
     ev.stopPropagation();
     var btn = ev.currentTarget;
     if (btn.dataset.busy === "1") return;
-    var to = ($("#pay-to") && $("#pay-to").value.trim()) || "";
+    var to = (btn.getAttribute("data-to") || "").trim() || (($("#pay-to") && $("#pay-to").value.trim()) || "");
     var sompi = Number(btn.getAttribute("data-sompi") || "0");
     var me = loginAddr();
     if (!to || to.indexOf("kaspa:") !== 0) {
@@ -106,6 +106,15 @@
         link.textContent = "explorer.kaspa.org";
       }
       say("On L1. Txid " + txid);
+      var buyId = btn.getAttribute("data-buy-id");
+      if (buyId && acc[0]) {
+        var buyBody = "act=buy&id=" + encodeURIComponent(buyId) + "&buyer=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
+        fetch("/market", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: buyBody })
+          .finally(function () {
+            location.href = "/mine?address=" + encodeURIComponent(acc[0]);
+          });
+        return;
+      }
       var nm = btn.getAttribute("data-name");
       if (nm && acc[0]) {
         var body = "act=held&name=" + encodeURIComponent(nm) + "&address=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
@@ -135,8 +144,9 @@
   function bind() {
     var host = $("[data-origin-note]");
     if (host) host.textContent = "Stay on " + location.origin + ".";
-    var payBtn = $("[data-pay-l1]");
-    if (payBtn) payBtn.addEventListener("click", payL1);
+    document.querySelectorAll("[data-pay-l1]").forEach(function (payBtn) {
+      payBtn.addEventListener("click", payL1);
+    });
     document.querySelectorAll("[data-copy], [data-copy-text]").forEach(function (btn) {
       btn.addEventListener("click", function (ev) {
         ev.preventDefault();

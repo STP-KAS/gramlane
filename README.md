@@ -42,8 +42,9 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/jar` | Miller's book: fills and burns. Operator accounting until consume() |
 | `/pay` | Pay hub — EUR/USD ticket, QR, counter |
 | `/pay/{id}` | Pay a ticket from the jar |
-| `/kasdomain` | Get a name (check + official shop) · hang one sign · living page |
-| `/market` | Buy/sell Kasdomains for grams only |
+| `/kasdomain` | Get a name (KAS to the P2SH). Dollar shelf. Not KNS. |
+| `/mine` | All kasdomains on a wallet after fund or buy |
+| `/market` | Buy/sell Kasdomains: USD shelf, settle in KAS |
 | `/kachat` | KaChat: resolve a name, postage, pay that wallet |
 | `/apps` | Apps: KaChat, vault, agent, site, jobs |
 | `/convert` | KAS ↔ grams at policy 100 sompi/gram. Not a KCC-20 |

@@ -208,6 +208,43 @@ func FromFiat(amount, ccy, kasInFiat string) (FiatBill, error) {
 	}, nil
 }
 
+// FromUSD is a board shelf in dollars that settles in KAS on L1.
+// Not a peg. Not grams. Desk jobs that sequence work stay in grams.
+func FromUSD(amount, kasInUSD string) (FiatBill, error) {
+	b, err := FromFiat(amount, "USD", kasInUSD)
+	if err != nil {
+		return FiatBill{}, err
+	}
+	b.Note = "Shelf in USD. Settlement is KAS on L1. 1 KAS = " + strings.TrimSpace(kasInUSD) + " USD on this board. Sign, not an oracle. Not a dollar peg. Desk jobs stay in grams."
+	return b, nil
+}
+
+// USDCents parses a dollar string ("1", "1.00", "$0.50") into cents.
+func USDCents(amount string) (uint64, error) {
+	amount = strings.TrimSpace(amount)
+	amount = strings.TrimPrefix(amount, "$")
+	n, err := parseDec(amount, 2)
+	if err != nil || n == 0 {
+		return 0, fmt.Errorf("usd")
+	}
+	return n, nil
+}
+
+func FormatUSD(cents uint64) string {
+	return fmt.Sprintf("$%d.%02d", cents/100, cents%100)
+}
+
+func FormatUSDAmount(cents uint64) string {
+	return fmt.Sprintf("%d.%02d", cents/100, cents%100)
+}
+
+func FloorPay(sompi uint64) uint64 {
+	if sompi < KaswareMinSompi {
+		return KaswareMinSompi
+	}
+	return sompi
+}
+
 func parseDec(s string, scale int) (uint64, error) {
 	s = strings.TrimSpace(s)
 	s = strings.ReplaceAll(s, ",", "")
