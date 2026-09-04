@@ -1,13 +1,13 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">apps · Gramlane</div>
-  <h1>Apps in grams.</h1>
-  <p class="lede">KaChat, vault, agent, site, lookups. Same Stablegram jar. Pay is the till.</p>
+  <div class="kicker">desk · grams</div>
+  <h1>Jobs in grams.</h1>
+  <p class="lede">Lookups on this desk that hit the public name index are <strong>indexer · not kasdomain</strong>. kasdomain is a covenant name, not an inscription.</p>
   {{if .Seq}}<p class="lede">Jar: <strong class="mono">{{.Seq.Remaining}}</strong> GRAM.</p>{{end}}
   <div class="grid">
     <article class="card">
-      <h3>Kasdomain</h3>
-      <p>Your names, one sign, living page, grams market.</p>
+      <h3>kasdomain</h3>
+      <p>Covenant names on L1. Not KNS. Not live. Quote in grams.</p>
       <a class="btn mint" href="/kasdomain">Open</a>
     </article>
     <article class="card">
@@ -37,10 +37,11 @@
     </article>
   </div>
   <table>
-    <tr><th>Job</th><th>Grams</th><th></th></tr>
+    <tr><th>Job</th><th>Tag</th><th>Grams</th><th></th></tr>
     {{range .Jobs}}
     <tr>
-      <td><strong>{{.Name}}</strong></td>
+      <td><strong>{{.Name}}</strong><br /><span class="tiny">{{.Blurb}}</span></td>
+      <td>{{if .Tag}}<span class="chip indexer">{{.Tag}}</span>{{end}}</td>
       <td class="price">{{.Grams}}</td>
       <td><a href="/job/{{.ID}}">run</a></td>
     </tr>

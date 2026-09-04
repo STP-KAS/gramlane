@@ -628,64 +628,15 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
-	p := page{Title: "Kasdomain · Gramlane", Active: "kasdomain", Listings: market.List()}
-	addr := strings.TrimSpace(r.FormValue("address"))
-	if addr == "" {
-		addr = strings.TrimSpace(r.URL.Query().Get("address"))
-	}
+	p := page{Title: "kasdomain · Gramlane", Active: "kasdomain"}
 	q := strings.TrimSpace(r.FormValue("q"))
 	if q == "" {
 		q = strings.TrimSpace(r.URL.Query().Get("q"))
 	}
 	p.Inspect = r.URL.Query().Get("inspect") != "" || r.FormValue("inspect") == "1"
+	p.Query = q
 	if q != "" {
-		res, err := names.Resolve(q)
-		p.Result = res
-		p.Query = q
-		if err != nil && p.Error == "" {
-			p.Error = err.Error()
-		}
-		if res != nil && res.Name != "" && !strings.HasPrefix(strings.ToLower(q), "kaspa:") {
-			if want, werr := names.Check(q, addr); werr == nil {
-				p.Want = want
-			} else if res.Available {
-				w := names.ParseWant(q)
-				w.Available = true
-				p.Want = w
-			}
-		}
-	}
-	if r.Method == http.MethodPost {
-		switch r.FormValue("act") {
-		case "pin":
-			name := r.FormValue("name")
-			if err := names.Link(addr, name); err != nil {
-				p.Error = err.Error()
-			} else {
-				livepage.Ensure(name, name, "This name is hosted on Gramlane. Pay in grams. The long kaspa:q… is the door.", "Open a Pay ticket from the jar.")
-				http.Redirect(w, r, "/site/"+names.Normalize(name), http.StatusSeeOther)
-				return
-			}
-		case "live":
-			name := r.FormValue("name")
-			lp := livepage.Save(name, r.FormValue("headline"), r.FormValue("about"), r.FormValue("payNote"))
-			p.Live = &lp
-			http.Redirect(w, r, "/site/"+names.Normalize(name), http.StatusSeeOther)
-			return
-		}
-	}
-	if strings.HasPrefix(addr, "kaspa:") {
-		if id, err := names.ForAddress(addr); err == nil {
-			p.ID = id
-			if id.Linked != "" {
-				p.Live = livepage.Get(id.Linked)
-				if p.Query == "" {
-					p.Query = id.Linked
-				}
-			}
-		} else if p.Error == "" {
-			p.Error = err.Error()
-		}
+		p.Result = names.ResolveCovenant(q)
 	}
 	s.render(w, "kasdomain.html", p)
 }
@@ -696,15 +647,11 @@ func (s *Server) apiName(w http.ResponseWriter, r *http.Request) {
 		q = strings.TrimSpace(r.FormValue("q"))
 	}
 	if q == "" {
-		writeJSON(w, 400, map[string]any{"ok": false, "error": "type a word"})
+		writeJSON(w, 400, map[string]any{"ok": false, "error": "type a name", "usd": "not quoted"})
 		return
 	}
-	res, err := names.Resolve(q)
-	if err != nil {
-		writeJSON(w, 502, map[string]any{"ok": false, "error": err.Error(), "result": res})
-		return
-	}
-	writeJSON(w, 200, map[string]any{"ok": true, "result": res, "usd": "not quoted"})
+	res := names.ResolveCovenant(q)
+	writeJSON(w, 200, map[string]any{"ok": true, "result": res, "usd": "not quoted", "kns": false})
 }
 
 func (s *Server) marketPage(w http.ResponseWriter, r *http.Request) {

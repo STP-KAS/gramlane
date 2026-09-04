@@ -1,149 +1,41 @@
 {{template "header" .}}
 <main>
-  <p class="kicker">kasdomain · your name on Kaspa</p>
-  <h1>Your Web4 username.</h1>
-  <p class="lede">One name for your Kaspa address, your pay button, your agent, and your hosted site. Paid once. No yearly bill. We do not mint the inscription — we resolve it, quote the call in grams, and host the page.</p>
+  <p class="kicker">kasdomain · compiled · not live</p>
+  <h1>kasdomain — covenant names on Kaspa L1. Not KNS. Not an inscription.</h1>
+  <p class="lede">A name is an output. This app does not register names yet. It will resolve a name UTXO and quote the call in grams. USD not quoted. No yearly bill. No L2.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
-    {{if .ID}}<input type="hidden" name="address" value="{{.ID.Address}}" />{{end}}
-    <label class="sr" for="q">Pick a word</label>
-    <input id="q" name="q" value="{{if .Want}}{{.Want.Label}}{{else}}{{.Query}}{{end}}" placeholder="bakery" autocomplete="off" spellcheck="false" />
-    <span class="tld" aria-hidden="true">.kas</span>
-    <button class="btn mint" type="submit">Check</button>
+    <label class="sr" for="q">Name</label>
+    <input id="q" name="q" value="{{.Query}}" placeholder="a name" autocomplete="off" spellcheck="false" />
+    <button class="btn mint" type="submit">Resolve</button>
+    <button class="btn ghost" type="submit" name="inspect" value="1">Inspect</button>
   </form>
-  <p class="help">Letters and numbers. One word. Free names you can get. Taken names you can pay or inspect.</p>
+  <p class="help">Empty is correct. Inscriptions and KNS are out of scope here. Desk jobs that hit the indexer are labeled indexer · not kasdomain.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
-  {{if .Want}}
-  {{if not .Want.Valid}}
-  <div class="card want-card">
-    <h2>That word will not work</h2>
-    <p class="warn">{{.Want.Why}}</p>
-  </div>
-  {{else if .Want.Available}}
-  <div class="card want-card register">
-    <p><span class="chip indexer">indexer</span> <span class="ok">available</span></p>
-    <h2>{{.Want.Name}}</h2>
-    <p class="lede">Your username, your pay address, your hosted site. Forever after one payment.</p>
-    <div class="invoice">
-      <div class="invoice-row"><span>Duration</span><strong>Forever</strong></div>
-      <div class="invoice-row"><span>Yearly rent</span><strong>None</strong></div>
-      <div class="invoice-row"><span>Hosted site</span><strong class="mono">/site/{{.Want.Name}}</strong></div>
-      <div class="invoice-row"><span>Inscription (once)</span><strong>{{.Want.PriceKAS}} KAS</strong></div>
-      <div class="invoice-row total"><span>You pay today</span><strong>{{.Want.PriceKAS}} KAS</strong></div>
-    </div>
-    <p class="help">{{.Want.PriceNote}} Gramlane is not the registry. The official name shop writes the inscription. Then this site hosts {{.Want.Name}}.</p>
-    <p>
-      <a class="btn mint" href="{{.Want.InscribeURL}}" target="_blank" rel="noopener">Get {{.Want.Name}}</a>
-    </p>
-    <ol class="plain">
-      <li>The green button opens the official name shop.</li>
-      <li>Log in with Kasware. Type <strong>{{.Want.Label}}</strong>. Pay once.</li>
-      <li>Come back, log in here, Check again, hang it — your site goes live.</li>
-    </ol>
-    <details>
-      <summary>Envelope (optional)</summary>
-      <pre>{{.Want.Payload}}</pre>
-      <p><button class="btn ghost" type="button" data-copy="{{.Want.Payload}}">Copy envelope</button></p>
-    </details>
-  </div>
-  {{else if .Want.Mine}}
-  <div class="card want-card">
-    <p><span class="chip indexer">indexer</span> <span class="ok">you own this</span></p>
-    <h2>{{.Want.Name}}</h2>
-    <p>Hang it as your Gramlane face. We host the page. Pay and agents use this name.</p>
-    <form action="/kasdomain" method="post">
-      <input type="hidden" name="address" value="{{if .ID}}{{.ID.Address}}{{end}}" data-wallet-addr />
-      <input type="hidden" name="act" value="pin" />
-      <input type="hidden" name="name" value="{{.Want.Name}}" />
-      <button class="btn mint" type="submit">Host {{.Want.Name}} now</button>
-    </form>
-    <p><a class="btn ghost" href="/site/{{.Want.Name}}">Open hosted site</a></p>
-  </div>
-  {{end}}
-  {{end}}
-
-  {{if .Result}}{{if .Result.Owner}}{{if not .Want.Mine}}
+  {{if .Result}}
   <div class="card want-card">
     <p><span class="chip {{.Result.Evidence}}">{{.Result.Evidence}}</span></p>
     <h2>{{.Result.Name}}</h2>
-    <p>Owner <span class="mono">{{.Result.Owner}}</span></p>
-    {{if .Result.PayURI}}<p>Pay URI <span class="mono">{{.Result.PayURI}}</span></p>{{end}}
-    <p class="price">{{.Result.Quote.Grams}} GRAM to resolve · {{printf "%.3f" .Result.Quote.KAS}} KAS fallback · USD {{.Result.Quote.USD}}</p>
     <p class="help">{{.Result.Warning}}</p>
-    <p>
-      <a class="btn mint" href="/pay?merchant={{.Result.Name}}{{if .Result.PayURI}}&amp;payTo={{.Result.PayURI}}{{end}}">Pay {{.Result.Name}}</a>
-      <a class="btn ghost" href="/site/{{.Result.Name}}">Hosted site</a>
-      <a class="btn ghost" href="/kasdomain?q={{.Query}}&amp;inspect=1">Inspect</a>
-    </p>
+    {{if .Result.Hit}}
+    <p>Owner pubkey <span class="mono">{{.Result.Owner}}</span></p>
+    {{if .Result.PayURI}}<p>Pay URI <span class="mono">{{.Result.PayURI}}</span></p>{{end}}
+    {{if .Result.Layout}}<p>Record layout <span class="mono">{{.Result.Layout}}</span></p>{{end}}
+    {{if .Result.ScriptHash}}<p>Script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
+    {{end}}
+    <p class="price">{{.Result.Quote.Grams}} GRAM · {{printf "%.3f" .Result.Quote.KAS}} KAS fallback · USD {{.Result.Quote.USD}}</p>
     {{if .Inspect}}
     <h3>Inspect</h3>
-    <pre>{{printf "%s" .Result.Raw}}</pre>
+    {{if .Result.Hex}}
+    <p class="tiny">Raw bytes / hex. Local fixture only.</p>
+    <pre>{{.Result.Hex}}</pre>
+    {{if .Result.Raw}}<pre>{{printf "%s" .Result.Raw}}</pre>{{end}}
+    {{else}}
+    <p class="tiny">No covenant UTXO bytes. Nothing to inspect on L1 yet.</p>
+    {{end}}
     {{end}}
   </div>
-  {{end}}{{end}}{{end}}
-
-  {{if .ID}}
-  {{if .ID.Linked}}
-  <div class="card" style="margin:22px 0">
-    <div class="kicker">hosted on Gramlane</div>
-    <h2>{{.ID.Linked}}</h2>
-    <p>This is your Web4 username here. Site, pay, agent — one name.</p>
-    <p>
-      <a class="btn mint" href="/site/{{.ID.Linked}}">Open {{.ID.Linked}}</a>
-      <a class="btn ghost" href="/pay?merchant={{.ID.Linked}}">New Pay ticket</a>
-    </p>
-    <form action="/kasdomain" method="post" style="margin-top:16px">
-      <input type="hidden" name="address" value="{{.ID.Address}}" />
-      <input type="hidden" name="act" value="live" />
-      <input type="hidden" name="name" value="{{.ID.Linked}}" />
-      <label for="headline">Headline on the site</label>
-      <input id="headline" name="headline" value="{{if .Live}}{{.Live.Headline}}{{end}}" placeholder="The bakery on the corner" />
-      <label for="about">About</label>
-      <textarea id="about" name="about" rows="4" placeholder="We sell bread. Pay in grams.">{{if .Live}}{{.Live.About}}{{end}}</textarea>
-      <p style="margin-top:12px"><button class="btn mint" type="submit">Publish</button></p>
-    </form>
-  </div>
-  {{end}}
-  <h2>Names in this wallet</h2>
-  <p class="help">{{.ID.Total}} on the indexer. Hang one. The rest stay in the wallet.</p>
-  <p><input id="kasFilter" placeholder="filter" style="width:100%;max-width:420px" /></p>
-  <div class="grid" id="kasGrid">
-    {{range .ID.Names}}
-    <article class="card kas-card" data-name="{{.}}">
-      <h3>{{.}}</h3>
-      {{if eq . $.ID.Linked}}<p class="ok">Hosted</p>{{else}}
-      <form action="/kasdomain" method="post">
-        <input type="hidden" name="address" value="{{$.ID.Address}}" />
-        <input type="hidden" name="act" value="pin" />
-        <input type="hidden" name="name" value="{{.}}" />
-        <button class="btn mint" type="submit">Host this</button>
-      </form>
-      {{end}}
-      <p><a class="btn ghost" href="/site/{{.}}">View</a></p>
-    </article>
-    {{end}}
-  </div>
-  {{else}}
-  <p class="help">Log in to list names you already own, then host one.</p>
-  <form class="row" action="/kasdomain" method="get">
-    <input class="mono" name="address" placeholder="or paste kaspa:q…" data-wallet-addr />
-    <button class="btn ghost" type="submit">Show my names</button>
-  </form>
   {{end}}
 </main>
-<script>
-(function () {
-  var f = document.getElementById("kasFilter");
-  if (f) {
-    f.addEventListener("input", function () {
-      var q = (f.value || "").toLowerCase();
-      document.querySelectorAll(".kas-card").forEach(function (el) {
-        var n = (el.getAttribute("data-name") || "").toLowerCase();
-        el.style.display = !q || n.indexOf(q) !== -1 ? "" : "none";
-      });
-    });
-  }
-})();
-</script>
 {{template "footer" .}}

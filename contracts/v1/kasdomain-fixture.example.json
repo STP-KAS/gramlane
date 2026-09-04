@@ -1,0 +1,13 @@
+{
+  "note": "Optional. Copy to DATA_DIR/kasdomain-fixture.json. Tagged local, not indexer, not live. One operator-created name UTXO for Inspect. Not a taken-names registry.",
+  "names": [
+    {
+      "name": "demo",
+      "ownerPub": "replace-with-x-only-pubkey-hex",
+      "payUri": "kaspa:q…",
+      "scriptHash": "replace-with-p2sh-script-hash-hex",
+      "hex": "deadbeef",
+      "layout": "State { label, owner } — own UTXO only; no readInputState of a sibling"
+    }
+  ]
+}
