@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
   <h1>Get a name.</h1>
-  <p class="lede">One KAS payment. Forever. Then it is a shop.</p>
+  <p class="lede">One KAS. Half funds the name. Half supports Kaspa growth. Forever. Then it is a shop.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="q">Name</label>
@@ -25,12 +25,15 @@
       <div class="invoice-row"><span>Yours for</span><strong>Forever</strong></div>
       <div class="invoice-row"><span>Yearly rent</span><strong>None</strong></div>
       <div class="invoice-row"><span>Registry</span><strong>The script</strong></div>
+      <div class="invoice-row"><span>This name</span><strong>{{.Result.Mint.NameKAS}} KAS</strong></div>
+      <div class="invoice-row"><span>Kaspa growth (50%)</span><strong>{{.Result.Mint.VaultKAS}} KAS</strong></div>
       <div class="invoice-row"><span>Shelf</span><strong>{{.Result.Shelf.USD}}</strong></div>
-      <div class="invoice-row total"><span>You send</span><strong>{{.Result.Quote.PayKASText}} KAS</strong></div>
+      <div class="invoice-row total"><span>You send</span><strong>{{.Result.Mint.TotalKAS}} KAS</strong></div>
     </div>
     <input class="mono" id="pay-to" value="{{.Result.PayURI}}" readonly />
+    <p class="tiny">Growth vault <span class="mono">{{.Result.Mint.Vault}}</span></p>
     <p class="actions">
-      <button class="btn mint" type="button" data-pay-l1 data-name="{{.Result.Name}}" data-after="/kasdomain?q={{.Query}}&address=" data-sompi="{{.Result.Quote.PaySompi}}">Fund {{.Result.Name}}</button>
+      <button class="btn mint" type="button" data-pay-l1 data-name="{{.Result.Name}}" data-after="/kasdomain?q={{.Query}}&address=" data-sompi="{{.Result.Mint.NameSompi}}" data-vault="{{.Result.Mint.Vault}}" data-vault-sompi="{{.Result.Mint.VaultSompi}}">Fund {{.Result.Name}}</button>
     </p>
     <p class="tiny" data-pay-status></p>
     <form id="heldForm" action="/kasdomain" method="post" hidden>
@@ -41,7 +44,7 @@
     </form>
     <details>
       <summary>What you are paying</summary>
-      <p class="help">A Kaspa output at this script is the name. Not grams — grams are for the till later. Kasware’s 0.5 KAS floor is a wallet rule. USD is a board sign, not a peg. Not KNS. We do not broadcast for you.</p>
+      <p class="help">{{.Result.Mint.Note}} Kasware’s 0.5 KAS floor applies to each output, so the mint is 1 KAS. USD is a board sign, not a peg. Not KNS. We do not broadcast for you.</p>
       {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
     </details>
     {{else}}

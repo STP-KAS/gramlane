@@ -62,6 +62,33 @@
     return w.requestAccounts();
   }
 
+  async function sendKaspaMaybePair(nameTo, nameSompi, vaultTo, vaultSompi) {
+    try {
+      return await window.kasware.sendKaspa(
+        [
+          { address: nameTo, amount: nameSompi },
+          { address: vaultTo, amount: vaultSompi },
+        ],
+        { priorityFee: 10000 }
+      );
+    } catch (_) {}
+    try {
+      return await window.kasware.sendKaspa(nameTo, nameSompi, {
+        priorityFee: 10000,
+        outputs: [{ address: vaultTo, amount: vaultSompi }],
+      });
+    } catch (_) {}
+    say("Name first (0.5 KAS). Then confirm the Kaspa growth share.");
+    var nameTx = await window.kasware.sendKaspa(nameTo, nameSompi, { priorityFee: 10000 });
+    say("Name on L1. Confirm 0.5 KAS to the growth vault.");
+    try {
+      await window.kasware.sendKaspa(vaultTo, vaultSompi, { priorityFee: 10000 });
+    } catch (e) {
+      say("Name is funded. Growth share failed — send 0.5 KAS to the vault when you can. " + (e && e.message ? e.message : ""));
+    }
+    return nameTx;
+  }
+
   async function payL1(ev) {
     ev.preventDefault();
     ev.stopPropagation();
@@ -94,7 +121,18 @@
       var wallet = $('input[name="wallet"]');
       if (payer) payer.value = acc[0];
       if (wallet) wallet.value = "kasware";
-      var raw = await window.kasware.sendKaspa(to, sompi, { priorityFee: 10000 });
+      var vault = (btn.getAttribute("data-vault") || "").trim();
+      var vaultSompi = Number(btn.getAttribute("data-vault-sompi") || "0");
+      var raw;
+      if (vault && vault.indexOf("kaspa:") === 0 && vaultSompi > 0) {
+        if (me && vault === me) {
+          say("Growth vault is your login. Kasware will block it.");
+          return;
+        }
+        raw = await sendKaspaMaybePair(to, sompi, vault, vaultSompi);
+      } else {
+        raw = await window.kasware.sendKaspa(to, sompi, { priorityFee: 10000 });
+      }
       var txid = parseTxid(raw);
       if (!txid) throw new Error("Kasware returned no txid.");
       var pay = $('input[name="payment"]');

@@ -3,6 +3,8 @@ package names
 import (
 	"strings"
 	"testing"
+
+	"gramlane/internal/quote"
 )
 
 func TestSuggestUSDAffordableLong(t *testing.T) {
@@ -24,5 +26,22 @@ func TestSuggestUSDAffordableLong(t *testing.T) {
 	}
 	if strings.Contains(a.Note, "grams at 100") {
 		t.Fatal("name settlement is KAS, not grams")
+	}
+}
+
+func TestFundMintHalfToVault(t *testing.T) {
+	m := FundMint()
+	if m.SharePct != 50 || m.NameSompi != m.VaultSompi || m.TotalSompi != m.NameSompi*2 {
+		t.Fatalf("%+v", m)
+	}
+	if m.NameSompi != quote.KaswareMinSompi || m.TotalKAS != "1" {
+		t.Fatalf("wallet floor %+v", m)
+	}
+	if m.Vault != AdoptionVault || !strings.HasPrefix(m.Vault, "kaspa:q") {
+		t.Fatalf("vault %s", m.Vault)
+	}
+	q := FundQuote()
+	if q.PaySompi != m.NameSompi || q.PayKASText != "1" {
+		t.Fatalf("quote %+v mint %+v", q, m)
 	}
 }
