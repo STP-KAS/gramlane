@@ -1,48 +1,81 @@
 {{template "header" .}}
-<main>
-  <h1>KaChat</h1>
-  <p class="lede">Resolve a name, stamp postage, open a ticket. Encryption stays in the wallet.</p>
-  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} grams</p>{{end}}
-  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
-  {{if .Run}}<p class="ok">Stamped. Remaining {{.Run.Remaining}} grams.</p>{{end}}
+<main id="main">
+  <h1>Chat</h1>
+  <p class="lede">Find a .kas. Open KaChat. This page does not encrypt. The wallet does.</p>
+  {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
+  {{if .Run}}<p class="ok">Postage stamped. Remaining {{.Run.Remaining}} grams.</p>{{end}}
 
-  <form class="row" action="/kachat" method="get">
+  <div class="chat-desk">
     <div>
-      <label>.kas name</label>
-      <input name="q" value="{{if .Query}}{{.Query}}{{else}}kaspadao.kas{{end}}" />
+      <form class="search" action="/kachat" method="get" role="search">
+        <label class="sr" for="chatQ">Name</label>
+        <input id="chatQ" name="q" value="{{.Query}}" placeholder="bakery" autocomplete="off" spellcheck="false" />
+        <span class="tld" aria-hidden="true">.kas</span>
+        <button class="btn mint" type="submit">Find</button>
+      </form>
+      {{if .Choices}}
+      <p class="tiny">Your names</p>
+      <p class="picks">
+        {{range .Choices}}
+        <a class="btn ghost" href="/kachat?q={{.Name}}{{if $.Address}}&amp;address={{$.Address}}{{end}}">{{.Name}}</a>
+        {{end}}
+      </p>
+      {{end}}
+      <p class="tiny"><a href="https://www.kachat.org/">kachat.org</a> · <a href="https://apps.apple.com/us/app/kachat/id6759102359">iOS</a> · <a href="https://play.google.com/store/apps/details?id=com.kachat.app">Android</a></p>
     </div>
-    <button class="btn mint" type="submit">Resolve</button>
-  </form>
 
-  {{if .Contact}}
-  <div class="card" style="margin:18px 0">
-    <h3>{{.Contact.Name}}</h3>
-    <p class="mono">{{.Contact.Address}}</p>
-    <p>{{.Contact.Note}}</p>
-    <p>
-      {{if .Contact.PayURI}}<button class="btn ghost" type="button" data-copy-text="{{.Contact.PayURI}}">Copy pay URI</button>{{end}}
-      <a class="btn mint" href="/pay?merchant={{.Contact.Name}}&amp;payTo={{.Contact.PayURI}}">Pay them</a>
-      <a class="btn ghost" href="{{if .Contact.Address}}https://www.kachat.org/?to={{.Contact.Address}}{{else}}https://linktr.ee/KaChat_{{end}}">Open KaChat</a>
-    </p>
+    <div>
+      {{if .Contact}}
+      <div class="card">
+        <p class="kicker">{{.Contact.Name}}</p>
+        <h2>{{.Contact.Name}}</h2>
+        {{if .Contact.Address}}
+        <p class="mono">{{.Contact.Address}}</p>
+        <p>
+          <button type="button" class="btn ghost" data-copy-text="{{.Contact.Address}}">Copy address</button>
+        </p>
+        {{end}}
+        <p class="help">{{.Contact.Note}}</p>
+        <p class="actions">
+          <a class="btn mint" href="{{if .Contact.Address}}https://www.kachat.org/?to={{.Contact.Address}}{{else}}https://www.kachat.org/{{end}}">Open KaChat</a>
+          {{if .Contact.PayURI}}<a class="btn ghost" href="/{{.Contact.Name}}">Shop</a>{{end}}
+        </p>
+      </div>
+      {{if and .Job .Seq (ge .Seq.Remaining .Job.Grams)}}
+      <form action="/kachat" method="post" style="margin-top:16px">
+        <input type="hidden" name="q" value="{{.Contact.Name}}" />
+        <input type="hidden" name="address" value="{{.Address}}" data-wallet-addr />
+        <label for="chatText">Postage (not the letter — {{.Job.Grams}} grams)</label>
+        <textarea id="chatText" name="text" rows="3" maxlength="280" placeholder="hello"></textarea>
+        <p class="actions"><button class="btn ghost" type="submit">Stamp postage</button></p>
+      </form>
+      {{else if .Job}}
+      <p class="tiny">Jar cannot cover postage. <a href="/spend">Fill the jar</a>.</p>
+      {{end}}
+      {{else}}
+      <p class="help">Type a name. Find. Open KaChat with their Kaspa address.</p>
+      {{end}}
+    </div>
   </div>
-  {{if and .Job .Seq (ge .Seq.Remaining .Job.Grams)}}
-  <form action="/kachat" method="post">
-    <input type="hidden" name="q" value="{{.Contact.Name}}" />
-    <label>postage (not E2E — sequenced stamp only)</label>
-    <textarea name="text" rows="3" maxlength="280" placeholder="hello"></textarea>
-    <p style="margin-top:12px"><button class="btn mint" type="submit">Stamp {{.Job.Grams}} grams</button></p>
-  </form>
-  {{end}}
-  {{end}}
 
-  <h2>Envelope shapes</h2>
-  {{range .Envelopes}}
-  <div class="card" style="margin-top:12px">
-    <div class="kicker">{{.Kind}}</div>
+  <details>
+    <summary>Envelope shapes (for the KaChat app, not this page)</summary>
+    {{range .Envelopes}}
+    <p class="tiny"><strong>{{.Kind}}</strong></p>
     <pre>{{.Template}}</pre>
-    <p>{{.Fill}}</p>
-  </div>
-  {{end}}
-  <p class="tiny"><a href="https://www.kachat.org/">kachat.org</a> · <a href="https://x.com/KaChat_">@KaChat_</a> · postage board: <a href="/postage">/postage</a></p>
+    <p class="help">{{.Fill}}</p>
+    {{end}}
+  </details>
 </main>
+<script>
+(function () {
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (!qs.get("address") && sessionStorage.getItem("kaspaAddress")) {
+      qs.set("address", sessionStorage.getItem("kaspaAddress"));
+      location.replace("/kachat?" + qs.toString());
+    }
+  } catch (e) {}
+})();
+</script>
 {{template "footer" .}}
