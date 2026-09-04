@@ -1,11 +1,11 @@
 {{template "header" .}}
 <main>
   {{if .Invoice}}
-  <div class="kicker">{{.Invoice.Place}} · {{.Invoice.Merchant}}</div>
+  <p class="kicker">{{.Invoice.Merchant}}</p>
   <h1>{{.Invoice.Item}}</h1>
   {{if .Invoice.Shelf}}<p class="lede">{{.Invoice.Shelf}}</p>{{end}}
-  <p class="till">{{.Invoice.Grams}} GRAM</p>
-  {{if .Seq}}<p class="lede">Stablegram jar: <span class="mono">{{.Seq.Remaining}}</span> grams.</p>{{end}}
+  <p class="price">{{.Invoice.Grams}} grams</p>
+  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} grams</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if eq .Invoice.Status "paid"}}
   <p class="ok">Paid. Sequenced gram burn. Not a dollar. Merchant tab updated on this rail.</p>

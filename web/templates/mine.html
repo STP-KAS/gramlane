@@ -1,58 +1,51 @@
 {{template "header" .}}
-<main>
-  <p class="kicker">names on this wallet · USD shelf · KAS settle</p>
-  <h1>Every kasdomain on this wallet.</h1>
-  <p class="lede">Bought or funded names live here. The <strong>face</strong> is the login name. Hang a shop on any of them — a page and a till for the many, not only a nicer kaspa:q…. Desk sequencing stays in grams. The name itself is KAS on L1.</p>
+<main id="main">
+  <h1>My names</h1>
+  <p class="lede">The face is how you log in. The rest you can sell or hang as shops.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Held}}
-  <div class="card" style="margin:22px 0">
-    <div class="kicker">your face</div>
-    <h2>{{if .Held.Primary}}{{.Held.Primary}}{{else}}kaspa address{{end}}</h2>
-    <p class="help">{{.Held.Address}}</p>
-    <p class="tiny">{{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}} on this wallet{{if .Held.First}} · first funded {{.Held.First}}{{end}}</p>
-  </div>
-  <p class="help">Filter. List extras on the market at the dollar shelf (settled in KAS at this board’s sign).</p>
-  <form action="/mine" method="post" style="margin-bottom:12px">
-    <input type="hidden" name="act" value="list-drawer" />
-    <input type="hidden" name="address" value="{{.Held.Address}}" />
-    <button class="btn ghost" type="submit">List all extras at suggested USD</button>
-  </form>
-  <p><input id="kasFilter" placeholder="filter names" style="width:100%;max-width:420px" /></p>
+  <p class="help">{{if .Held.Primary}}<strong>{{.Held.Primary}}</strong> · {{end}}{{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}</p>
+  <p><input id="kasFilter" placeholder="Filter" style="width:100%;max-width:420px" /></p>
   <div class="grid" id="kasGrid">
     {{range .Held.Names}}
     <article class="card kas-card" data-name="{{.Name}}">
       <h3>{{.Name}}</h3>
-      {{if .Face}}<p class="ok">Face — carries the wallet</p>{{else}}<p class="tiny">Custody — not the login name</p>{{end}}
-      <p class="price">{{.USD}} · {{.KAS}} KAS</p>
-      <p class="tiny">{{.When}}{{if .Tx}} · <span class="mono">{{.Tx}}</span>{{end}}</p>
-      <p style="margin-top:8px"><a class="btn mint" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Open as a shop</a> <a class="btn ghost" href="/s/{{.Name}}">Public page</a></p>
+      {{if .Face}}<p class="ok">Face</p>{{else}}<p class="tiny">Extra</p>{{end}}
+      <p class="price">{{.USD}}</p>
+      <p class="actions">
+        <a class="btn mint" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Shop</a>
+        <a class="btn ghost" href="/s/{{.Name}}">Page</a>
+      </p>
       {{if not .Face}}
       <form action="/mine" method="post">
         <input type="hidden" name="act" value="face" />
         <input type="hidden" name="address" value="{{$.Held.Address}}" />
         <input type="hidden" name="name" value="{{.Name}}" />
-        <button class="btn mint" type="submit">Use as face</button>
+        <button class="btn ghost" type="submit">Use as face</button>
       </form>
-      <form action="/market" method="post" style="margin-top:8px">
+      <form action="/market" method="post">
         <input type="hidden" name="act" value="list" />
         <input type="hidden" name="name" value="{{.Name}}" />
         <input type="hidden" name="cents" value="{{.USDCents}}" />
         <input type="hidden" name="seller" value="{{$.Held.Address}}" />
-        <button class="btn ghost" type="submit">Sell at {{.USD}}</button>
+        <button class="btn ghost" type="submit">Sell {{.USD}}</button>
       </form>
       {{end}}
     </article>
     {{end}}
   </div>
-  <p style="margin-top:18px"><a class="btn ghost" href="/kasdomain">Fund another name</a> <a class="btn ghost" href="/market">Open market</a></p>
+  <p class="actions">
+    <a class="btn ghost" href="/kasdomain">Get another</a>
+    <a class="btn ghost" href="/market">Market</a>
+  </p>
   {{else}}
-  <p class="help">Log in to see every kasdomain this wallet has funded or bought. Empty until you acquire one — that is a Kaspa transaction, not grams.</p>
+  <p class="help">Log in to see names on this wallet.</p>
   <form class="row" action="/mine" method="get">
     <input class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
-    <button class="btn ghost" type="submit">Show names on this wallet</button>
+    <button class="btn ghost" type="submit">Show</button>
   </form>
-  <p style="margin-top:12px"><a class="btn mint" href="/kasdomain">Get a name</a></p>
+  <p class="actions"><a class="btn mint" href="/kasdomain">Get a name</a></p>
   {{end}}
 </main>
 <script>
