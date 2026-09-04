@@ -1,6 +1,9 @@
 package genesis
 
-import "testing"
+import (
+	"encoding/hex"
+	"testing"
+)
 
 func TestLiveKeys(t *testing.T) {
 	if len(MustHex(IssuerPubHex)) != 32 || len(MustHex(HolderPubHex)) != 32 {
@@ -34,5 +37,21 @@ func TestP2SHAddress(t *testing.T) {
 	}
 	if addr == DeskAddress || addr == HolderAddress {
 		t.Fatal("p2sh collided with p2pk")
+	}
+}
+
+func TestRedeemFromSilAbiArray(t *testing.T) {
+	live, err := RedeemScript()
+	if err != nil || len(live) < 100 {
+		t.Fatalf("live: %v n=%d", err, len(live))
+	}
+	// silverscript#232 example shape: contracts is an array, bytecode may be hex.
+	art := []byte(`{"schema_version":1,"contracts":[{"name":"WorkCredit","compiled":{"script_hex":"` + hex.EncodeToString(live[:32]) + `"}}]}`)
+	got, err := redeemFromArtifact(art)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 32 || got[0] != live[0] || got[31] != live[31] {
+		t.Fatalf("array/hex ABI: n=%d", len(got))
 	}
 }

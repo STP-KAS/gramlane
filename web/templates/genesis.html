@@ -24,6 +24,7 @@
     <tr><th>artifact</th><td class="mono">{{.Genesis.Artifact}}</td></tr>
   </table>
   <p class="lede">{{.Genesis.Note}}</p>
+  <p class="tiny">Pinned silverc <span class="mono">v1-rc1</span>. Portable ABI <a href="https://github.com/kaspanet/silverscript/pull/232">#232</a> is the JSON shape. <a href="https://github.com/kaspanet/silverscript/pull/234">#234</a> stays closed — this voucher never reads another input’s state. <span class="mono">consume()</span> still has no compute-budget in the artifact (<a href="https://github.com/kaspanet/silverscript/issues/243">#243</a>).</p>
   {{if .Genesis.P2SH}}
   {{if .Genesis.VoucherOnChain}}
   <div class="card" style="margin:18px 0">
