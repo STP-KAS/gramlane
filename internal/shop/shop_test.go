@@ -52,7 +52,7 @@ func TestMenuGramsNotKNS(t *testing.T) {
 	if it.USD != "$3.00" || it.Grams == 0 {
 		t.Fatalf("USD shelf + grams till %+v", it)
 	}
-	inv, err := Ticket("bakery", it.ID, "both")
+	inv, err := Ticket("bakery", "coffee", "both")
 	if err != nil || inv.Merchant != "bakery.kas" || inv.Grams != it.Grams {
 		t.Fatalf("%v %+v", err, inv)
 	}

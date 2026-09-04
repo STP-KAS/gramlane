@@ -46,7 +46,8 @@
     </form>
     {{else}}
     <p>
-      <a class="btn mint" href="/pay?merchant={{.Result.Name}}&amp;payTo={{.Result.PayURI}}">Pay this name</a>
+      <a class="btn mint" href="/s/{{.Result.Name}}">Open the shop</a>
+      {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Hang a shop on this name</a>{{end}}
     </p>
     {{end}}
     {{if .Inspect}}
@@ -65,7 +66,10 @@
     <h2>{{if .Held.Primary}}{{.Held.Primary}}{{else}}kaspa address{{end}}</h2>
     <p class="help">This wallet holds {{len .Held.Names}} kasdomain{{if ne (len .Held.Names) 1}}s{{end}}. Only the face replaces kaspa:q… when you log in. Open <a href="/mine?address={{.Held.Address}}">Names</a> to see every domain on this wallet after you buy or fund one.</p>
     {{if .Held.Primary}}<p class="tiny">First registered: {{.Held.First}}</p>{{end}}
-    <p style="margin-top:12px"><a class="btn mint" href="/mine?address={{.Held.Address}}">See all names on this wallet</a></p>
+    <p style="margin-top:12px">
+      <a class="btn mint" href="/mine?address={{.Held.Address}}">See all names on this wallet</a>
+      {{if .Held.Primary}}<a class="btn ghost" href="/shop?name={{.Held.Primary}}&amp;address={{.Held.Address}}">Hang a shop</a>{{end}}
+    </p>
   </div>
   {{else}}
   <p class="help">Log in, fund a name with KAS, and it is recorded on the Names tab. First funded is your face. Fund more only if you want inventory to sell — not to decorate the login.</p>

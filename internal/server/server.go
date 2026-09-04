@@ -809,12 +809,84 @@ func (s *Server) apiShop(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]any{
 			"ok": true, "shops": shop.List(), "settle": map[string]string{"name": "kas", "till": "grams"},
 			"shelf": "USD", "kns": false,
-			"note": "Authless shop cards. Name is L1. Menu is this desk. Till is grams.",
+			"note": "Authless shop cards. POST /api/shop/{name} with item + X-Work-Credit to pay. Till is grams.",
 		})
+		return
+	}
+	if r.Method == http.MethodPost {
+		s.apiShopPay(w, r, name)
 		return
 	}
 	v := shop.View(name)
 	writeJSON(w, 200, map[string]any{"ok": true, "store": v, "kns": false})
+}
+
+func (s *Server) apiShopPay(w http.ResponseWriter, r *http.Request, name string) {
+	body, _ := io.ReadAll(io.LimitReader(r.Body, 1<<16))
+	var req struct{ Item, Payer, Payment string }
+	_ = json.Unmarshal(body, &req)
+	if req.Item == "" {
+		req.Item = strings.TrimSpace(r.FormValue("item"))
+	}
+	if req.Payer == "" {
+		req.Payer = strings.TrimSpace(r.Header.Get("X-Kaspa-Payer"))
+	}
+	paid := strings.TrimSpace(r.Header.Get("X-Work-Credit"))
+	if paid == "" {
+		paid = strings.TrimSpace(req.Payment)
+	}
+	sh := shop.Get(name)
+	it := shop.FindItem(sh, req.Item)
+	if sh == nil || it == nil {
+		writeJSON(w, 404, map[string]any{"ok": false, "error": "unknown shop or item", "store": shop.View(name), "kns": false})
+		return
+	}
+	led := seq.Snap()
+	if paid == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusPaymentRequired)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"error":          "Payment Required",
+			"note":           "HTTP 402. Send header X-Work-Credit. Till is grams. USD is the shelf, not a peg. No L1 consume verify.",
+			"shop":           sh.Name,
+			"item":           it.Label,
+			"usd":            it.USD,
+			"grams":          it.Grams,
+			"gramsRemaining": led.Remaining,
+			"accepts": []map[string]any{
+				{"scheme": "kaspa-work-credit", "asset": "GRAM", "grams": it.Grams},
+				{"scheme": "kaspa", "asset": "KAS", "sompi": it.PaySompi, "to": sh.PayTo},
+			},
+		})
+		return
+	}
+	if led.Remaining < it.Grams {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusPaymentRequired)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"error":          "Payment Required",
+			"note":           "Jar cannot cover this ticket. Fill Stablegram or send KAS to the shop.",
+			"grams":          it.Grams,
+			"gramsRemaining": led.Remaining,
+			"usd":            it.USD,
+		})
+		return
+	}
+	inv, err := shop.Ticket(name, req.Item, "digital")
+	if err != nil {
+		writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
+		return
+	}
+	paidInv, err := pos.Pay(inv.ID, req.Payer)
+	if err != nil {
+		writeJSON(w, 402, map[string]any{"ok": false, "error": err.Error(), "invoice": inv})
+		return
+	}
+	writeJSON(w, 200, map[string]any{
+		"ok": true, "invoice": paidInv, "pay": pos.PayURL(origin(r), paidInv.ID),
+		"seq": seq.Snap(), "kns": false,
+		"note": "Till receipt. Grams burned on this desk. Not an L1 consume().",
+	})
 }
 
 func (s *Server) wellKnownKasdomain(w http.ResponseWriter, r *http.Request) {
@@ -835,6 +907,7 @@ func (s *Server) wellKnownKasdomain(w http.ResponseWriter, r *http.Request) {
 		"names":       "/mine",
 		"shops":       "/s/",
 		"api":         "/api/shop/",
+		"pay":         "POST /api/shop/{name} with item and X-Work-Credit",
 		"explained":   "https://remote-mcp-server-authless.parker2017.workers.dev/mcp",
 		"claims":      "https://kaspaexplained.com/toccata-status",
 		"note":        "The calling agent supplies the model. This desk only hangs signs on covenant names.",
