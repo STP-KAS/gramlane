@@ -1,23 +1,18 @@
 {{template "header" .}}
 <main>
-  <h1>Desk</h1>
-  <p class="lede">Jobs cost grams. Name lookups here that hit the public index are not kasdomain.</p>
+  <h1>Apps</h1>
+  <p class="lede">Paid in grams from the jar. Not shop KAS. Not KaChat.</p>
   {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} grams</p>{{end}}
   <div class="grid">
-    <article class="card">
-      <h3>kasdomain</h3>
-      <p>Covenant names on L1. Acquire in KAS. Dollar shelf. Jobs on this desk stay in grams.</p>
-      <a class="btn mint" href="/kasdomain">Open</a>
-    </article>
-    <article class="card">
-      <h3>KaChat</h3>
-      <p>Resolve a .kas name. Stamp postage. Pay them from the jar. E2E stays in KaChat.</p>
-      <a class="btn mint" href="/kachat">Open</a>
-    </article>
     <article class="card">
       <h3>Telegram</h3>
       <p>Encrypted notes in the browser. Grams pay. Shared secret. Not Telegram Inc.</p>
       <a class="btn mint" href="/telegram">Open</a>
+    </article>
+    <article class="card">
+      <h3>kasdomain</h3>
+      <p>Covenant names on L1. Acquire in KAS. Jobs on this desk stay in grams.</p>
+      <a class="btn ghost" href="/kasdomain">Open</a>
     </article>
     <article class="card">
       <h3>Prior art</h3>

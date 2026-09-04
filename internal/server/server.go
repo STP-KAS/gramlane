@@ -658,7 +658,7 @@ func (s *Server) postagePage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) priorPage(w http.ResponseWriter, r *http.Request) {
 	j, _ := jobs.Get("prior")
-	p := page{Title: "Prior art · Gramlane", Active: "prior", Job: &j, PayTo: desk.PayTo()}
+	p := page{Title: "Prior art · Gramlane", Active: "apps", Job: &j, PayTo: desk.PayTo()}
 	hash := strings.TrimSpace(r.FormValue("hash"))
 	if hash == "" {
 		hash = strings.TrimSpace(r.URL.Query().Get("q"))
