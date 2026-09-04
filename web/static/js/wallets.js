@@ -85,10 +85,12 @@
     const c = current();
     document.querySelectorAll("[data-wallet-connect]").forEach(function (btn) {
       if (c.address) {
+        btn.hidden = true;
         btn.textContent = display(c);
         btn.title = c.name ? c.name + " · " + c.address : c.address;
         btn.dataset.connected = c.id;
       } else {
+        btn.hidden = false;
         btn.textContent = btn.getAttribute("data-idle-label") || "Log in";
         btn.removeAttribute("title");
         delete btn.dataset.connected;
@@ -101,16 +103,29 @@
     document.querySelectorAll("[data-wallet-logout]").forEach(function (btn) {
       btn.hidden = !c.address;
     });
+    var who = document.querySelector("[data-who]");
+    if (who) {
+      who.hidden = !c.address;
+      var nm = who.querySelector("[data-copy-who='name']");
+      var ad = who.querySelector("[data-copy-who='addr']");
+      if (nm) {
+        nm.textContent = c.name || "no kasname";
+        nm.title = c.name ? "Copy " + c.name : "No kasname yet — Change name";
+      }
+      if (ad) {
+        ad.textContent = shortAddr(c.address);
+        ad.title = c.address ? "Copy " + c.address : "";
+      }
+    }
     const addrInput = document.querySelector('input[name="address"]');
     if (c.address && addrInput && !addrInput.value) addrInput.value = c.address;
     const payer = document.querySelector('input[name="payer"]');
     if (payer) payer.value = c.address || "";
     const wallet = document.querySelector('input[name="wallet"]');
     if (wallet) wallet.value = c.id || "";
-    if (c.address && c.name) status(c.name + " · change");
-    else if (c.address) status("");
+    if (!c.address) status("");
     document.querySelectorAll("[data-wallet-status]").forEach(function (el) {
-      if (c.address && c.name) el.setAttribute("data-wallet-change-name", "1");
+      if (c.address) el.setAttribute("data-wallet-change-name", "1");
       else el.removeAttribute("data-wallet-change-name");
     });
     refreshBalances();
@@ -231,13 +246,7 @@
     paintButtons();
     status("Logged in");
     loadIdentity(r.address).then(function (id) {
-      if (id && id.linked) {
-        status(id.linked);
-        return;
-      }
-      if (id && id.names && id.names.length > 1) {
-        location.href = "/mine?address=" + encodeURIComponent(r.address);
-      }
+      if (id && id.linked) status(id.linked);
     });
     return r;
   }
@@ -341,10 +350,25 @@
         pickName(pin && pin.value ? pin.value : "kdao");
         return;
       }
-      if (e.target.closest("[data-wallet-change-name]")) {
+      if (e.target.closest("[data-wallet-change-name]") || e.target.closest("[data-change-name]")) {
         loadIdentity(current().address).then(function (id) {
-          if (id) openNameModal(id);
+          openNameModal(id || { names: [] });
         });
+        return;
+      }
+      var copyWho = e.target.closest("[data-copy-who]");
+      if (copyWho) {
+        e.preventDefault();
+        var kind = copyWho.getAttribute("data-copy-who");
+        var c = current();
+        if (kind === "name" && !c.name) {
+          loadIdentity(c.address).then(function (id) {
+            openNameModal(id || { names: [] });
+          });
+          return;
+        }
+        var text = kind === "name" ? c.name : c.address;
+        if (text) copyText(text, copyWho);
         return;
       }
       var kns = e.target.closest("[data-kns-pick]");
@@ -388,19 +412,45 @@
     }
   }
 
+  function copyText(text, btn) {
+    text = String(text || "");
+    if (!text) return;
+    function ok() {
+      status("Copied");
+      if (!btn) return;
+      var old = btn.textContent;
+      btn.textContent = "Copied";
+      setTimeout(function () {
+        if (btn.textContent === "Copied") btn.textContent = old;
+      }, 1200);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(ok, function () {});
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        ok();
+      } catch (_) {}
+      document.body.removeChild(ta);
+    }
+  }
+
   function openNameModal(id) {
     var m = document.getElementById("knsModal");
     if (!m) {
       var wrap = document.createElement("div");
       wrap.innerHTML =
         '<div id="knsModal" class="wmodal" hidden><div class="wmodal-card">' +
-        '<div class="wmodal-head"><strong>Link a .kas name</strong>' +
+        '<div class="wmodal-head"><strong>Change name</strong>' +
         '<button type="button" class="btn ghost" data-kns-close>Close</button></div>' +
-        '<p class="tiny">Pick one .kas name for this Kaspa address. Once is enough — Gramlane keeps it. Type kdao if you do not see it.</p>' +
-        '<div class="row"><input id="knsPin" placeholder="kdao or kdao.kas" /><button type="button" class="btn mint" data-kns-pin>Pin once</button></div>' +
-        '<input id="knsFilter" placeholder="filter the list" style="width:100%;margin:10px 0" />' +
+        '<p class="tiny">Same wallet. Pick which .kas is your face — that is the shop you are using.</p>' +
+        '<input id="knsFilter" placeholder="filter" style="width:100%;margin:10px 0" />' +
         '<div id="knsList" class="kns-list"></div>' +
-        '<p style="margin-top:12px"><button type="button" class="btn ghost" data-kns-clear>Show kaspa address</button></p>' +
+        '<p style="margin-top:12px"><a class="btn ghost" href="/kasdomain">Get a name</a> <button type="button" class="btn ghost" data-kns-clear>Show kaspa address only</button></p>' +
         "</div></div>";
       document.body.appendChild(wrap.firstElementChild);
       m = document.getElementById("knsModal");
@@ -431,6 +481,10 @@
   function pickName(name) {
     var c = current();
     if (!c.address) return;
+    if (name) {
+      var body = "act=face&address=" + encodeURIComponent(c.address) + "&name=" + encodeURIComponent(name);
+      fetch("/kasdomain", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body }).catch(function () {});
+    }
     fetch("/api/id", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -453,12 +507,12 @@
           }
           return;
         }
-        var linked = j && j.id && j.id.linked ? j.id.linked : name || "";
+        var linked = name ? (j && j.id && j.id.linked ? j.id.linked : name) : "";
         persist(c.id, c.address, linked);
         paintButtons();
         var m = document.getElementById("knsModal");
         if (m) m.hidden = true;
-        status(linked ? linked + " pinned" : "Showing kaspa address");
+        status(linked ? linked + " is your shop" : "Showing Kaspa address");
       })
       .catch(function (err) {
         status(err.message || String(err));
@@ -471,25 +525,15 @@
     var main = document.querySelector("main");
     if (main && !main.id) main.id = "main";
     document.addEventListener("click", function (e) {
-      var b = e.target.closest("[data-copy]");
-      if (!b) return;
-      var text = b.getAttribute("data-copy") || "";
+      var b = e.target.closest("[data-copy], [data-copy-text]");
+      if (!b || b.closest("[data-copy-who]")) return;
+      var direct = b.getAttribute("data-copy-text");
+      var sel = b.getAttribute("data-copy");
+      var el = sel ? document.querySelector(sel) : null;
+      var text = direct || (el ? el.value || el.textContent : "");
       if (!text) return;
-      function ok() {
-        var old = b.textContent;
-        b.textContent = "Copied";
-        setTimeout(function () { b.textContent = old; }, 1500);
-      }
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text).then(ok, function () {});
-      } else {
-        var ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand("copy"); ok(); } catch (_) {}
-        document.body.removeChild(ta);
-      }
+      e.preventDefault();
+      copyText(text, b);
     });
   }
 

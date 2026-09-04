@@ -29,6 +29,16 @@ func TestSuggestUSDAffordableLong(t *testing.T) {
 	}
 }
 
+func TestIsVault(t *testing.T) {
+	want := "kaspa:qzpvdakagvwfm95g8pv9ndpupjtndgjfhmve08cg3tv5wgfytjzf7e6t4puat"
+	if AdoptionVault != want || !IsVault(want) || !IsVault(strings.ToUpper(want[:6])+want[6:]) {
+		t.Fatal("vault")
+	}
+	if IsVault("kaspa:qother") || IsVault("") {
+		t.Fatal("not vault")
+	}
+}
+
 func TestFundMintHalfToVault(t *testing.T) {
 	m := FundMint()
 	if m.SharePct != 50 || m.NameSompi != m.VaultSompi || m.TotalSompi != m.NameSompi*2 {

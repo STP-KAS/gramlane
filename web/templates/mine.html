@@ -5,12 +5,12 @@
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Held}}
-  <p class="help">{{if .Held.Primary}}<strong>{{.Held.Primary}}</strong> · {{end}}{{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}</p>
+  <p class="help">{{if .Held.Primary}}<strong>{{.Held.Primary}}</strong> <button type="button" class="btn ghost" data-copy-text="{{.Held.Primary}}">Copy name</button> · {{end}}<span class="mono">{{.Held.Address}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Held.Address}}">Copy address</button> · {{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}</p>
   <p><input id="kasFilter" placeholder="Filter" style="width:100%;max-width:420px" /></p>
   <div class="grid" id="kasGrid">
     {{range .Choices}}
     <article class="card kas-card" data-name="{{.Name}}">
-      <h3>{{.Name}}</h3>
+      <h3>{{.Name}} <button type="button" class="btn ghost" data-copy-text="{{.Name}}">Copy</button></h3>
       {{if .Face}}<p class="ok">Face</p>{{else}}<p class="tiny">Extra</p>{{end}}
       {{if .HasShop}}<p class="ok">Shop open</p>{{else}}<p class="tiny">No shop yet</p>{{end}}
       <p class="price">{{.USD}}</p>
@@ -45,6 +45,7 @@
     <a class="btn ghost" href="/market">Market</a>
   </p>
   {{else}}
+  {{if .Address}}<p class="help"><span class="mono">{{.Address}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Address}}">Copy address</button></p>{{end}}
   <p class="help">Log in to see names on this wallet.</p>
   <form class="row" action="/mine" method="get">
     <input class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />

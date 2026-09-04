@@ -39,3 +39,44 @@ func TestFirstRegisteredIsFace(t *testing.T) {
 		t.Fatalf("face=%d drawer=%d", face, drawer)
 	}
 }
+
+func TestVaultFreeMintAndSwitchFace(t *testing.T) {
+	dir := t.TempDir()
+	ResetCovenantForTest()
+	ResetBookForTest(dir)
+	ResetReserveForTest(dir)
+	ResetSignForTest(dir)
+	if err := SeedVault(); err != nil {
+		t.Fatal(err)
+	}
+	other := "kaspa:qbuyer000000000000000000000000000000000000000000000000000000000000"
+	if _, err := Record(other, "google", "tx"); err == nil {
+		t.Fatal("retailer")
+	}
+	if _, err := Record(other, "zz", "tx"); err == nil {
+		t.Fatal("sale reserved")
+	}
+	if _, err := Record(AdoptionVault, "google", "test-free"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Record(AdoptionVault, "zz", "test-free"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Record(AdoptionVault, "bakery", "test-free"); err != nil {
+		t.Fatal(err)
+	}
+	b := Book(AdoptionVault)
+	if b == nil || len(b.Names) != 3 || b.Primary != "google.kas" {
+		t.Fatalf("%+v", b)
+	}
+	if err := Pin(AdoptionVault, "bakery"); err != nil {
+		t.Fatal(err)
+	}
+	id := Face(AdoptionVault)
+	if id.Linked != "bakery.kas" || len(id.Names) != 3 || id.Address != AdoptionVault {
+		t.Fatalf("%+v", id)
+	}
+	if err := Pin(other, "bakery"); err == nil {
+		t.Fatal("other wallet")
+	}
+}

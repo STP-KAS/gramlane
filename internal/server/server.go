@@ -85,6 +85,9 @@ type page struct {
 	DraftAbout    string
 	DraftLabel    string
 	DraftUSD      string
+	Vault         string
+	TestMint      bool
+	Address       string
 }
 
 func New(addr string) (*Server, error) {
@@ -232,6 +235,9 @@ func (s *Server) Handler() http.Handler {
 
 func (s *Server) render(w http.ResponseWriter, name string, p page) {
 	p.Public = appenv.PublicHost()
+	if p.Vault == "" {
+		p.Vault = names.VaultAddress()
+	}
 	if p.Seq == nil {
 		snap := seq.Snap()
 		p.Seq = &snap
@@ -694,6 +700,15 @@ func (s *Server) applyNameActs(w http.ResponseWriter, r *http.Request, p *page, 
 		if _, err := names.Record(addr, r.FormValue("name"), r.FormValue("tx")); err != nil {
 			p.Error = err.Error()
 		}
+	case "test-mint":
+		if !names.IsVault(addr) {
+			p.Error = "free test mint is only for the growth vault"
+		} else if _, err := names.Record(addr, r.FormValue("name"), "test-free"); err != nil {
+			p.Error = err.Error()
+		} else {
+			http.Redirect(w, r, "/mine?address="+addr, http.StatusSeeOther)
+			return true
+		}
 	case "buy-reserve":
 		if _, err := names.BuyReserved(r.FormValue("name"), addr, r.FormValue("tx")); err != nil {
 			p.Error = err.Error()
@@ -728,6 +743,7 @@ func (s *Server) applyNameActs(w http.ResponseWriter, r *http.Request, p *page, 
 func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 	p := page{Title: "kasdomain · Gramlane", Active: "kasdomain"}
 	addr := walletAddr(r)
+	p.Address = addr
 	q := strings.TrimSpace(r.FormValue("q"))
 	if q == "" {
 		q = strings.TrimSpace(r.URL.Query().Get("q"))
@@ -742,6 +758,7 @@ func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 	}
 	if strings.HasPrefix(addr, "kaspa:") {
 		p.Held = names.Book(addr)
+		p.TestMint = names.IsVault(addr)
 	}
 	s.render(w, "kasdomain.html", p)
 }
@@ -749,6 +766,7 @@ func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 func (s *Server) minePage(w http.ResponseWriter, r *http.Request) {
 	p := page{Title: "Your names · Gramlane", Active: "mine"}
 	addr := walletAddr(r)
+	p.Address = addr
 	if s.applyNameActs(w, r, &p, addr) {
 		return
 	}
@@ -1362,17 +1380,17 @@ func (s *Server) apiID(w http.ResponseWriter, r *http.Request) {
 			req.Address = r.FormValue("address")
 			req.Name = r.FormValue("name")
 		}
-		if err := names.Link(req.Address, req.Name); err != nil {
-			_, hits, _ := names.PickOwned(req.Address, req.Name)
-			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error(), "suggestions": hits})
+		if err := names.Pin(req.Address, req.Name); err != nil {
+			id := names.Face(req.Address)
+			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error(), "suggestions": id.Names})
 			return
 		}
-		id, err := names.ForAddress(req.Address)
-		if err != nil {
-			writeJSON(w, 200, map[string]any{"ok": true, "linked": names.Linked(req.Address)})
-			return
+		id := names.Face(req.Address)
+		if strings.TrimSpace(req.Name) == "" {
+			id.Linked = ""
+			id.Display = id.Address
 		}
-		writeJSON(w, 200, map[string]any{"ok": true, "id": id})
+		writeJSON(w, 200, map[string]any{"ok": true, "id": id, "names": id.Names})
 		return
 	}
 	addr := strings.TrimSpace(r.URL.Query().Get("address"))
@@ -1380,30 +1398,13 @@ func (s *Server) apiID(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 400, map[string]any{"ok": false, "error": "address"})
 		return
 	}
-	b := names.Book(addr)
-	var list []string
-	if b != nil {
-		for _, h := range b.Names {
-			list = append(list, h.Name)
-		}
-	}
-	if face := names.Primary(addr); face != "" {
-		writeJSON(w, 200, map[string]any{
-			"ok":    true,
-			"names": list,
-			"held":  b,
-			"id": map[string]any{
-				"address": addr, "linked": face, "display": face,
-				"names": list,
-				"note":  "kasdomain face. First registered is the default. Other names on this wallet are custody.",
-			},
-		})
-		return
-	}
-	writeJSON(w, 200, map[string]any{"ok": true, "names": list, "held": b, "id": map[string]any{
-		"address": addr, "display": addr, "names": list,
-		"note": "No kasdomain face yet. Fund a name. The kaspa address stays the door.",
-	}})
+	id := names.Face(addr)
+	writeJSON(w, 200, map[string]any{
+		"ok":    true,
+		"names": id.Names,
+		"held":  names.Book(addr),
+		"id":    id,
+	})
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {

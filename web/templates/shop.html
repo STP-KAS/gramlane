@@ -4,7 +4,10 @@
   <p class="lede">A shop is a name with a page. Get names under Name. Then pick one here.</p>
 
   {{if .Shop}}
-  <p class="tiny">Page: <a href="{{printf "/%s" .Shop.Name}}">{{.Shop.Name}}</a></p>
+  <p class="tiny">Page: <a href="{{printf "/%s" .Shop.Name}}">{{.Shop.Name}}</a>
+    <button type="button" class="btn ghost" data-copy-text="{{.Shop.Name}}">Copy name</button>
+    {{if .Shop.PayTo}}<button type="button" class="btn ghost" data-copy-text="{{.Shop.PayTo}}">Copy address</button>{{end}}
+  </p>
   <div class="card">
     <h2>{{.Shop.Headline}}</h2>
     <p class="lede">{{.Shop.About}}</p>

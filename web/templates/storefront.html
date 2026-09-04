@@ -2,9 +2,10 @@
 <main id="main">
   {{if .Store}}
   {{if .Store.Shop}}
-  <p class="kicker">{{.Store.Name}}</p>
+  <p class="kicker">{{.Store.Name}} <button type="button" class="btn ghost" data-copy-text="{{.Store.Name}}">Copy name</button>{{if .Store.Shop.PayTo}} · <button type="button" class="btn ghost" data-copy-text="{{.Store.Shop.PayTo}}">Copy address</button>{{end}}</p>
   <h1>{{if .Store.Shop.Headline}}{{.Store.Shop.Headline}}{{else}}{{.Store.Name}}{{end}}</h1>
   {{if .Store.Shop.About}}<p class="lede">{{.Store.Shop.About}}</p>{{end}}
+  {{if .Store.Shop.PayTo}}<p class="tiny"><span class="mono">{{.Store.Shop.PayTo}}</span></p>{{end}}
   {{else}}
   <h1>{{.Store.Name}}</h1>
   <p class="lede">{{if .Store.Hit}}This name exists. No shop on this page yet.{{else}}This name is not funded yet.{{end}}</p>

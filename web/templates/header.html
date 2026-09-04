@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/app.css" />
 </head>
-<body>
+<body data-vault="{{.Vault}}">
   <a class="skip" href="#main">Skip to content</a>
   <header class="nav">
     <a class="brand" href="/" title="Home">Gramlane</a>
@@ -25,6 +25,11 @@
       <span data-kas-balance>KAS 0.0</span>
       <span data-gram-balance>0 g</span>
     </a>
+    <div class="who" data-who hidden>
+      <button type="button" class="who-name" data-copy-who="name" title="Copy kasname">—</button>
+      <button type="button" class="who-addr" data-copy-who="addr" title="Copy Kaspa address">—</button>
+      <button type="button" class="btn ghost" data-change-name title="Same wallet. Pick another .kas shop.">Change name</button>
+    </div>
     <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
   </header>
