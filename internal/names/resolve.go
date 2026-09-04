@@ -26,6 +26,14 @@ type Result struct {
 	Total     int             `json:"total,omitempty"`
 }
 
+func isFreeOnIndex(err error) bool {
+	if err == nil {
+		return false
+	}
+	s := strings.ToLower(err.Error())
+	return strings.Contains(s, "no owner") || strings.Contains(s, "404") || strings.Contains(s, "not found")
+}
+
 func looksAddr(s string) bool {
 	s = strings.ToLower(strings.TrimSpace(s))
 	return strings.HasPrefix(s, "kaspa:") || strings.HasPrefix(s, "kaspatest:")
@@ -74,9 +82,9 @@ func Resolve(raw string) (*Result, error) {
 		}
 	}
 	if err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "no owner") {
+		if isFreeOnIndex(err) {
 			out.Available = true
-			out.Warning = "No owner on the indexer. We do not mint it. Official inscription is elsewhere."
+			out.Warning = "No owner on the indexer. Get it once at the official shop. We host the site. No yearly rent."
 			return out, nil
 		}
 		return out, err

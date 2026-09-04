@@ -17,7 +17,7 @@
     <tr><td>GRAM needs a KCC-20</td><td class="chip bad">wrong</td><td>A token would look listable. WorkCredit is the voucher. /convert is policy arithmetic (100 sompi/gram), not a mint.</td></tr>
     <tr><td>POS spend pile is $1</td><td class="chip bad">wrong</td><td>You set KAS aside into grams. Those grams stay grams. Merchants can reprice. No Tether, no freeze.</td></tr>
     <tr><td>Pay + KaChat</td><td class="chip">live</td><td>/pay is the till. /kachat resolves a name, stamps postage, can invoice that wallet. E2E stays in KaChat.</td></tr>
-    <tr><td>kasdomain resolve</td><td class="chip indexer">indexer</td><td>Search box. Owner + pay URI from api.knsdomains.org. Quote 12000 GRAM · 0.012 KAS fallback · USD not quoted. We do not register the name.</td></tr>
+    <tr><td>kasdomain</td><td class="chip indexer">indexer</td><td>Check a word. If free: one-time KAS at the official shop, no yearly rent, then we host /site/name. If taken: owner, pay URI, 12000 GRAM quote. We do not mint the inscription.</td></tr>
     <tr><td>Gramlane mints .kas names</td><td class="chip bad">wrong</td><td>Indexer FCFS. Not consensus-unique. Official inscription is elsewhere.</td></tr>
     <tr><td>API job without X-Work-Credit</td><td class="chip">local</td><td>HTTP 402. Header present → HTTP receipt only. No L1 consume verify.</td></tr>
     <tr><td>KCC-20 is the gram token</td><td class="chip bad">wrong</td><td>KCC-0020 is Draft. Vectors sit in <a href="https://github.com/kaspanet/kccs/pull/20">kccs#20</a> (open). WorkCredit is the voucher.</td></tr>

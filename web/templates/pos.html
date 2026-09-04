@@ -9,12 +9,12 @@
   <form action="/pay" method="post">
     <div class="row">
       <div>
-        <label>item</label>
-        <input name="item" placeholder="coffee" required />
+        <label for="payItem">What is it?</label>
+        <input id="payItem" name="item" placeholder="coffee" required />
       </div>
       <div>
-        <label>price</label>
-        <input name="fiat" placeholder="3" />
+        <label for="payFiat">Shelf price</label>
+        <input id="payFiat" name="fiat" placeholder="3" inputmode="decimal" />
       </div>
       <div>
         <label>currency</label>
