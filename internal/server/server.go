@@ -24,6 +24,7 @@ import (
 	"gramlane/internal/names"
 	"gramlane/internal/pos"
 	"gramlane/internal/post"
+	"gramlane/internal/prior"
 	"gramlane/internal/quote"
 	"gramlane/internal/seq"
 	"gramlane/internal/shop"
@@ -88,6 +89,8 @@ type page struct {
 	Vault         string
 	TestMint      bool
 	Address       string
+	Prior         *prior.Record
+	Priors        []prior.Record
 }
 
 func New(addr string) (*Server, error) {
@@ -177,6 +180,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/vault", s.vaultPage)
 	mux.HandleFunc("/postage", s.postagePage)
 	mux.HandleFunc("/post", s.postagePage)
+	mux.HandleFunc("/prior", s.priorPage)
+	mux.HandleFunc("/ip", s.priorPage)
 	mux.HandleFunc("/agent", s.agentPage)
 	mux.HandleFunc("/api/agent", s.apiAgent)
 	mux.HandleFunc("/site/", s.siteName)
@@ -647,6 +652,42 @@ func (s *Server) postagePage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "postage.html", p)
 }
 
+func (s *Server) priorPage(w http.ResponseWriter, r *http.Request) {
+	j, _ := jobs.Get("prior")
+	p := page{Title: "Prior art · Gramlane", Active: "apps", Job: &j, PayTo: desk.PayTo()}
+	hash := strings.TrimSpace(r.FormValue("hash"))
+	if hash == "" {
+		hash = strings.TrimSpace(r.URL.Query().Get("q"))
+	}
+	body := strings.TrimSpace(r.FormValue("body"))
+	if hash == "" && body != "" {
+		hash = prior.HashOf(body)
+	}
+	p.Query = hash
+	if r.Method == http.MethodPost && r.FormValue("act") == "stamp" {
+		_, rec, err := s.burnJob("prior", hash, walletAddr(r))
+		p.Run = &rec
+		if err != nil {
+			p.Error = err.Error()
+		} else {
+			excerpt := ""
+			if r.FormValue("public") == "1" {
+				excerpt = body
+			}
+			got, ferr := prior.File(hash, r.FormValue("title"), walletAddr(r), r.FormValue("name"), r.FormValue("tx"), excerpt, j.Grams)
+			if ferr != nil {
+				p.Error = ferr.Error()
+			} else {
+				p.Prior = got
+			}
+		}
+	} else if hash != "" {
+		p.Prior = prior.Lookup(hash)
+	}
+	p.Priors = prior.List()
+	s.render(w, "prior.html", p)
+}
+
 func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 	j, _ := jobs.Get("postage")
 	q := strings.TrimSpace(r.FormValue("q"))
@@ -872,12 +913,10 @@ func (s *Server) shopsIndex(w http.ResponseWriter, r *http.Request) {
 func (s *Server) showStorefront(w http.ResponseWriter, r *http.Request, disp string) {
 	disp = names.DisplayName(disp)
 	if r.Method == http.MethodPost && r.FormValue("act") == "buy" {
-		inv, err := shop.Ticket(disp, r.FormValue("item"), "both")
-		if err != nil {
-			s.render(w, "storefront.html", page{Title: disp, Active: "shop", Store: shop.View(disp), Error: err.Error()})
-			return
-		}
-		http.Redirect(w, r, "/pay/"+inv.ID, http.StatusSeeOther)
+		s.render(w, "storefront.html", page{
+			Title: disp, Active: "shop", Store: shop.View(disp),
+			Error: "This shop takes KAS to the shop address. Grams are for apps, not the drawer.",
+		})
 		return
 	}
 	s.render(w, "storefront.html", page{Title: disp, Active: "shop", Store: shop.View(disp), Query: disp})
@@ -887,9 +926,9 @@ func (s *Server) apiShop(w http.ResponseWriter, r *http.Request) {
 	name := strings.TrimPrefix(r.URL.Path, "/api/shop/")
 	if name == "" || name == "shop" || r.URL.Path == "/api/shop" {
 		writeJSON(w, 200, map[string]any{
-			"ok": true, "shops": shop.List(), "settle": map[string]string{"name": "kas", "till": "grams"},
+			"ok": true, "shops": shop.List(), "settle": map[string]string{"name": "kas", "till": "kas"},
 			"shelf": "USD", "kns": false,
-			"note": "Authless shop cards. POST /api/shop/{name} with item + X-Work-Credit to pay. Till is grams.",
+			"note": "Authless shop cards. Till is KAS to PayTo. Grams are for /agent /postage /prior /vault, not the shop drawer.",
 		})
 		return
 	}
@@ -911,61 +950,23 @@ func (s *Server) apiShopPay(w http.ResponseWriter, r *http.Request, name string)
 	if req.Payer == "" {
 		req.Payer = strings.TrimSpace(r.Header.Get("X-Kaspa-Payer"))
 	}
-	paid := strings.TrimSpace(r.Header.Get("X-Work-Credit"))
-	if paid == "" {
-		paid = strings.TrimSpace(req.Payment)
-	}
 	sh := shop.Get(name)
 	it := shop.FindItem(sh, req.Item)
 	if sh == nil || it == nil {
 		writeJSON(w, 404, map[string]any{"ok": false, "error": "unknown shop or item", "store": shop.View(name), "kns": false})
 		return
 	}
-	led := seq.Snap()
-	if paid == "" {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusPaymentRequired)
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"error":          "Payment Required",
-			"note":           "HTTP 402. Send header X-Work-Credit. Till is grams. USD is the shelf, not a peg. No L1 consume verify.",
-			"shop":           sh.Name,
-			"item":           it.Label,
-			"usd":            it.USD,
-			"grams":          it.Grams,
-			"gramsRemaining": led.Remaining,
-			"accepts": []map[string]any{
-				{"scheme": "kaspa-work-credit", "asset": "GRAM", "grams": it.Grams},
-				{"scheme": "kaspa", "asset": "KAS", "sompi": it.PaySompi, "to": sh.PayTo},
-			},
-		})
-		return
-	}
-	if led.Remaining < it.Grams {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusPaymentRequired)
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"error":          "Payment Required",
-			"note":           "Jar cannot cover this ticket. Fill the jar or send KAS to the shop.",
-			"grams":          it.Grams,
-			"gramsRemaining": led.Remaining,
-			"usd":            it.USD,
-		})
-		return
-	}
-	inv, err := shop.Ticket(name, req.Item, "digital")
-	if err != nil {
-		writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
-		return
-	}
-	paidInv, err := pos.Pay(inv.ID, req.Payer)
-	if err != nil {
-		writeJSON(w, 402, map[string]any{"ok": false, "error": err.Error(), "invoice": inv})
-		return
-	}
-	writeJSON(w, 200, map[string]any{
-		"ok": true, "invoice": paidInv, "pay": pos.PayURL(origin(r), paidInv.ID),
-		"seq": seq.Snap(), "kns": false,
-		"note": "Till receipt. Grams burned on this desk. Not an L1 consume().",
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusPaymentRequired)
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"error": "Payment Required",
+		"note":  "This shop takes KAS. Send to PayTo. Grams are for apps (agent, postage, prior, vault), not the shop drawer.",
+		"shop":  sh.Name,
+		"item":  it.Label,
+		"usd":   it.USD,
+		"accepts": []map[string]any{
+			{"scheme": "kaspa", "asset": "KAS", "sompi": it.PaySompi, "to": sh.PayTo},
+		},
 	})
 }
 

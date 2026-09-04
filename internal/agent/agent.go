@@ -103,7 +103,7 @@ func Ask(prompt, name string) (*Reply, error) {
 }
 
 func grok(prompt, name string) (*Reply, error) {
-	sys := "You are Gramlane's agent on Kaspa L1. Fees are grams (KIP-21 mass), not USD. Gramlane does not replace USDT. Vaults lock KAS; grams pay the action. Be concise and literal. Do not invent a dollar peg or an L2."
+	sys := "You are Gramlane's agent on Kaspa L1. Shops take KAS. Grams pay apps (agent, postage, prior-art stamp, vault bump), not the shop drawer. Prior art is a hash timestamp, not a patent. Vaults lock KAS; grams pay the action. No dollar peg. No L2. Be concise and literal."
 	if name != "" {
 		if c, err := CardFor(name); err == nil {
 			b, _ := json.Marshal(c)
@@ -184,6 +184,8 @@ func local(prompt, name string) *Reply {
 		}
 	}
 	switch {
+	case strings.Contains(low, "prior") || strings.Contains(low, "patent") || strings.Contains(low, "copyright"):
+		fmt.Fprintf(&b, "Prior art: hash the work (sha256), stamp on /prior with grams, optionally fund the kaspa:p lock with 0.5 KAS. First UTXO is first-to-file on this template. Not a USPTO filing. Not Instant IP.\n")
 	case strings.Contains(low, "vault") || strings.Contains(low, "234"):
 		v := framing.Demo()
 		fmt.Fprintf(&b, "Vault bump: real amount %d, hostile packing reads %d. Same 42 bytes. Vaults still lock KAS. Grams pay this framing action.\n", v.Canonical.RealAmount, v.Attack.VaultAmount)

@@ -1,0 +1,85 @@
+{{template "header" .}}
+<main id="main">
+  <h1>Prior art</h1>
+  <p class="lede">Stamp a hash of your work. That is first-use evidence on this ledger, not a patent and not a copyright office. <a href="https://www.youtube.com/watch?v=pA19Tf5wFEA">TEDx idea</a>: timestamp, public, cheap. On Kaspa the lock is a <span class="mono">kaspa:p…</span> from the hash. First UTXO wins.</p>
+  {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
+  {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
+  {{if .Run}}<p class="ok">Stamped on this desk. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}
+
+  <form action="/prior" method="post">
+    <input type="hidden" name="act" value="stamp" />
+    <input type="hidden" name="address" data-wallet-addr />
+    <label for="priorBody">Work (hashed here; leave blank if you already have a sha256)</label>
+    <textarea id="priorBody" name="body" rows="6" placeholder="Paste text, lyrics, a spec, a talk. We hash it. We do not keep the manuscript unless you tick public."></textarea>
+    <label for="priorHash">sha256 hex</label>
+    <input id="priorHash" class="mono" name="hash" value="{{.Query}}" spellcheck="false" placeholder="64 hex chars" />
+    <label for="priorTitle">Title (public)</label>
+    <input id="priorTitle" name="title" placeholder="bakery recipe v1" />
+    <label for="priorName">Optional .kas</label>
+    <input id="priorName" name="name" placeholder="bakery.kas" />
+    <p><label><input type="checkbox" name="public" value="1" style="min-height:auto" /> Store a short public excerpt (optional)</label></p>
+    {{if and .Seq .Job (ge .Seq.Remaining .Job.Grams)}}
+    <p class="actions"><button class="btn mint" type="submit">Stamp — burn {{.Job.Grams}} grams</button></p>
+    {{else}}
+    <p class="lede">Jar cannot cover this stamp. <a href="/spend">Fill the jar</a> or <a href="/job/prior">KAS fallback</a>.</p>
+    {{end}}
+  </form>
+  <p class="tiny">Hash in the browser if you do not want the text on the wire: the sha256 field is enough.</p>
+
+  {{if .Prior}}
+  <div class="card" style="margin-top:24px">
+    <h2>{{if .Prior.Title}}{{.Prior.Title}}{{else}}This hash{{end}}</h2>
+    {{if .Prior.Hit}}<p class="ok">Funded on L1</p>{{else}}<p class="tiny">Desk stamp{{if .Prior.When}} · {{.Prior.When}}{{end}}. Fund the lock for first UTXO.</p>{{end}}
+    <p class="tiny">sha256 <span class="mono">{{.Prior.Hash}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Prior.Hash}}">Copy hash</button></p>
+    {{if .Prior.Owner}}<p>Minter <span class="mono">{{.Prior.Owner}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Prior.Owner}}">Copy minter address</button></p>{{end}}
+    {{if .Prior.Name}}<p><a href="/{{.Prior.Name}}">{{.Prior.Name}}</a></p>{{end}}
+    <p class="tiny">Name lock <span class="mono">{{.Prior.Lock}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Prior.Lock}}">Copy lock</button></p>
+    <input class="mono" id="pay-to" value="{{.Prior.Lock}}" readonly />
+    <p>
+      <button class="btn mint" type="button" data-pay-l1 data-to="{{.Prior.Lock}}" data-sompi="50000000">Fund lock 0.5 KAS</button>
+    </p>
+    <p class="tiny" data-pay-status></p>
+    <p class="help">{{.Prior.Note}}</p>
+    {{if .Prior.Excerpt}}<pre>{{.Prior.Excerpt}}</pre>{{end}}
+  </div>
+  {{end}}
+
+  <h2>Use with the other gram apps</h2>
+  <ul class="plain">
+    <li><a href="/vault">Vault</a> — lock KAS for a deal. Grams pay the bump, not the lock.</li>
+    <li><a href="/postage">Postage</a> — stamp a short envelope to a .kas. Not the chat app.</li>
+    <li><a href="/agent">Agent</a> — a machine asks from a name. Grams pay the call.</li>
+  </ul>
+
+  {{if .Priors}}
+  <h2>On this desk</h2>
+  <table>
+    <tr><th>when</th><th>title</th><th>hash</th></tr>
+    {{range .Priors}}
+    <tr>
+      <td class="tiny">{{.When}}</td>
+      <td>{{if .Title}}{{.Title}}{{else}}—{{end}}{{if .Hit}} <span class="ok">L1</span>{{end}}</td>
+      <td class="mono"><a href="/prior?q={{.Hash}}">{{printf "%.12s" .Hash}}…</a></td>
+    </tr>
+    {{end}}
+  </table>
+  {{end}}
+</main>
+<script>
+(function () {
+  var body = document.getElementById("priorBody");
+  var hash = document.getElementById("priorHash");
+  if (!body || !hash || !window.crypto || !window.crypto.subtle) return;
+  body.addEventListener("input", function () {
+    var t = body.value || "";
+    if (!t) return;
+    window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)).then(function (buf) {
+      var b = new Uint8Array(buf);
+      var hex = "";
+      for (var i = 0; i < b.length; i++) hex += b[i].toString(16).padStart(2, "0");
+      hash.value = hex;
+    });
+  });
+})();
+</script>
+{{template "footer" .}}

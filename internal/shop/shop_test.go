@@ -49,18 +49,18 @@ func TestMenuGramsNotKNS(t *testing.T) {
 		t.Fatalf("%v %+v", err, sh)
 	}
 	it := sh.Items[0]
-	if it.USD != "$3.00" || it.Grams == 0 {
-		t.Fatalf("USD shelf + grams till %+v", it)
+	if it.USD != "$3.00" || it.KAS == "" {
+		t.Fatalf("USD shelf + KAS till %+v", it)
 	}
 	inv, err := Ticket("bakery", "coffee", "both")
-	if err != nil || inv.Merchant != "bakery.kas" || inv.Grams != it.Grams {
+	if err != nil || inv.Merchant != "bakery.kas" {
 		t.Fatalf("%v %+v", err, inv)
 	}
 	v := View("bakery")
 	if v.Evidence == "indexer" || v.Evidence != "live" {
 		t.Fatalf("want live covenant: %s", v.Evidence)
 	}
-	if v.Shop == nil || v.NameSettle != "kas" || v.TillUnit != "gram" {
+	if v.Shop == nil || v.NameSettle != "kas" || v.TillUnit != "kas" {
 		t.Fatalf("%+v", v)
 	}
 	if v.Web4["kns"] != false || v.Web4["vprogs"] != "roadmap" {

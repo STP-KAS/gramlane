@@ -20,15 +20,13 @@
     <article class="card">
       <h3>{{.Label}}</h3>
       <p class="price">{{.USD}}</p>
-      <form action="/{{$.Store.Name}}" method="post">
-        <input type="hidden" name="act" value="buy" />
-        <input type="hidden" name="item" value="{{.ID}}" />
-        <button class="btn mint" type="submit">Pay {{.USD}}</button>
-      </form>
       {{if $.Store.Shop.PayTo}}
-      <p style="margin-top:8px">
-        <button class="btn ghost" type="button" data-pay-l1 data-to="{{$.Store.Shop.PayTo}}" data-sompi="{{.PaySompi}}">Send {{.KAS}} KAS</button>
+      <p class="tiny">{{.KAS}} KAS to the shop. Not grams.</p>
+      <p>
+        <button class="btn mint" type="button" data-pay-l1 data-to="{{$.Store.Shop.PayTo}}" data-sompi="{{.PaySompi}}">Send {{.KAS}} KAS</button>
       </p>
+      {{else}}
+      <p class="tiny">This shop has no Kaspa pay-to yet.</p>
       {{end}}
     </article>
     {{end}}
