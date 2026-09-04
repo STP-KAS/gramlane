@@ -7,7 +7,7 @@
   {{if .Store.Shop.About}}<p class="lede">{{.Store.Shop.About}}</p>{{end}}
   {{else}}
   <h1>{{.Store.Name}}</h1>
-  <p class="lede">{{if .Store.Hit}}Funded. No shop on this desk yet.{{else}}This name is not funded yet.{{end}}</p>
+  <p class="lede">{{if .Store.Hit}}This name exists. No shop on this page yet.{{else}}This name is not funded yet.{{end}}</p>
   {{end}}
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
   <p class="tiny" data-pay-status></p>
@@ -19,7 +19,7 @@
     <article class="card">
       <h3>{{.Label}}</h3>
       <p class="price">{{.USD}}</p>
-      <form action="/s/{{$.Store.Name}}" method="post">
+      <form action="/{{$.Store.Name}}" method="post">
         <input type="hidden" name="act" value="buy" />
         <input type="hidden" name="item" value="{{.ID}}" />
         <button class="btn mint" type="submit">Pay {{.USD}}</button>
@@ -38,27 +38,67 @@
 
   <p class="actions">
     {{if not .Store.Hit}}<a class="btn mint" href="/kasdomain?q={{.Store.Name}}">Get this name</a>{{end}}
+    {{if and .Store.Hit (not .Store.Shop)}}<a class="btn mint" href="/shop?name={{.Store.Name}}">Open as a shop</a>{{end}}
   </p>
   {{if .Store.Shop}}
-  <p><img alt="QR for this shop" width="180" height="180" src="/qr/s/{{.Store.Name}}.png" /></p>
+  <p><img alt="QR for {{.Store.Name}}" width="180" height="180" src="/qr/{{.Store.Name}}.png" /></p>
   {{end}}
   {{else}}
   <h1>Shops</h1>
-  <p class="lede">A name, a page, a till. No yearly rent.</p>
+  <p class="lede">A shop is a name with a page at <span class="mono">bakery.kas</span>. Get the name first. Then open it as a shop.</p>
+  <p class="help">Prefer a <strong>separate Kaspa address for each shop</strong>. Several names on one address is allowed — if that address is sold or leaked, every shop on it moves.</p>
+
+  {{if .Choices}}
+  <h2>Your names</h2>
+  <div class="grid">
+    {{range .Choices}}
+    <article class="card">
+      <h3>{{.Name}}</h3>
+      {{if .HasShop}}<p class="ok">Shop open{{if .Headline}} · {{.Headline}}{{end}}</p>
+      {{else}}<p class="tiny">No shop yet</p>{{end}}
+      <p class="actions">
+        {{if .HasShop}}
+        <a class="btn mint" href="/{{.Name}}">See page</a>
+        <a class="btn ghost" href="/shop?name={{.Name}}{{if $.Held}}&amp;address={{$.Held.Address}}{{end}}">Edit</a>
+        {{else}}
+        <a class="btn mint" href="/shop?name={{.Name}}{{if $.Held}}&amp;address={{$.Held.Address}}{{end}}">Open as shop</a>
+        {{end}}
+      </p>
+    </article>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="help">Log in to see names on this wallet. Need one? <a href="/kasdomain">Get a name</a>.</p>
+  <form class="row" action="/s/" method="get">
+    <input class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
+    <button class="btn ghost" type="submit">Show my names</button>
+  </form>
+  {{end}}
+
   {{if .Shops}}
+  <h2>Open on this desk</h2>
   <div class="grid">
     {{range .Shops}}
     <article class="card">
       <h3>{{.Name}}</h3>
       <p>{{if .Headline}}{{.Headline}}{{else}}Shop{{end}}</p>
-      <a class="btn mint" href="/s/{{.Name}}">Open</a>
+      <a class="btn mint" href="/{{.Name}}">Open</a>
     </article>
     {{end}}
   </div>
-  {{else}}
-  <p class="help">None on this desk yet.</p>
   {{end}}
-  <p class="actions"><a class="btn mint" href="/kasdomain">Get a name</a></p>
+  <p class="actions"><a class="btn ghost" href="/kasdomain">Get a name</a></p>
   {{end}}
 </main>
+<script>
+(function () {
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (!qs.get("address") && sessionStorage.getItem("kaspaAddress") && (location.pathname === "/s/" || location.pathname === "/s" || location.pathname === "/shops")) {
+      qs.set("address", sessionStorage.getItem("kaspaAddress"));
+      location.replace("/s/?" + qs.toString());
+    }
+  } catch (e) {}
+})();
+</script>
 {{template "footer" .}}

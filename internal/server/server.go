@@ -39,46 +39,52 @@ type Server struct {
 }
 
 type page struct {
-	Title     string
-	Active    string
-	Query     string
-	Error     string
-	Jobs      []jobs.Job
-	Job       *jobs.Job
-	Quote     *quote.Quote
-	Run       *jobs.Receipt
-	Wallets   []wallets.Wallet
-	Framing   *framing.View
-	PayTo     string
-	Genesis   *genesis.Plan
-	Seq       *seq.Ledger
-	Stamps    []post.Stamp
-	Site      *names.Page
-	Card      *agent.Card
-	Reply     *agent.Reply
-	HasGrok   bool
-	Conv      *quote.Convert
-	Fits      []jobs.Fit
-	Aside     *quote.Aside
-	Invoice   *pos.Invoice
-	Invoices  []pos.Invoice
-	Merchants []pos.Merchant
-	PayURL    string
-	Sign      *pos.Sign
-	To        string
-	Contact   *kachat.Contact
-	Envelopes []kachat.Envelope
-	ID        *names.Identity
-	Listings  []market.Listing
-	Live      *livepage.Page
-	Want      *names.Want
-	Result    *names.Result
-	Inspect   bool
-	Public    bool
-	Held      *names.WalletBook
-	Store     *shop.Storefront
-	Shop      *shop.Shop
-	Shops     []shop.Shop
+	Title         string
+	Active        string
+	Query         string
+	Error         string
+	Jobs          []jobs.Job
+	Job           *jobs.Job
+	Quote         *quote.Quote
+	Run           *jobs.Receipt
+	Wallets       []wallets.Wallet
+	Framing       *framing.View
+	PayTo         string
+	Genesis       *genesis.Plan
+	Seq           *seq.Ledger
+	Stamps        []post.Stamp
+	Site          *names.Page
+	Card          *agent.Card
+	Reply         *agent.Reply
+	HasGrok       bool
+	Conv          *quote.Convert
+	Fits          []jobs.Fit
+	Aside         *quote.Aside
+	Invoice       *pos.Invoice
+	Invoices      []pos.Invoice
+	Merchants     []pos.Merchant
+	PayURL        string
+	Sign          *pos.Sign
+	To            string
+	Contact       *kachat.Contact
+	Envelopes     []kachat.Envelope
+	ID            *names.Identity
+	Listings      []market.Listing
+	Live          *livepage.Page
+	Want          *names.Want
+	Result        *names.Result
+	Inspect       bool
+	Public        bool
+	Held          *names.WalletBook
+	Store         *shop.Storefront
+	Shop          *shop.Shop
+	Shops         []shop.Shop
+	Choices       []shop.Choice
+	Field         string
+	DraftHeadline string
+	DraftAbout    string
+	DraftLabel    string
+	DraftUSD      string
 }
 
 func New(addr string) (*Server, error) {
@@ -108,6 +114,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/mine", s.minePage)
 	mux.HandleFunc("/names", s.minePage)
 	mux.HandleFunc("/shop", s.shopEdit)
+	mux.HandleFunc("/shops", s.storefront)
 	mux.HandleFunc("/s/", s.storefront)
 	mux.HandleFunc("/s", s.storefront)
 	mux.HandleFunc("/api/name", s.apiName)
@@ -210,6 +217,10 @@ func (s *Server) Handler() http.Handler {
 		if !strings.HasPrefix(r.URL.Path, "/static/") {
 			log.Printf("%s %s", r.Method, r.URL.Path)
 		}
+		if n := shop.FromHost(r.Host); n != "" && (r.URL.Path == "/" || r.URL.Path == "") {
+			s.showStorefront(w, r, n)
+			return
+		}
 		mux.ServeHTTP(w, r)
 	})
 }
@@ -251,6 +262,10 @@ func seedSign() {
 }
 
 func (s *Server) home(w http.ResponseWriter, r *http.Request) {
+	if n := shop.FromPath(r.URL.Path); n != "" {
+		s.showStorefront(w, r, n)
+		return
+	}
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -466,13 +481,14 @@ func (s *Server) qrPNG(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/qr/")
 	id = strings.TrimSuffix(id, ".png")
 	var u string
-	if strings.HasPrefix(id, "s/") {
-		name := names.DisplayName(strings.TrimPrefix(id, "s/"))
+	if strings.HasPrefix(id, "s/") || strings.HasSuffix(id, ".kas") {
+		raw := strings.TrimPrefix(id, "s/")
+		name := names.DisplayName(raw)
 		if name == "" {
 			http.NotFound(w, r)
 			return
 		}
-		u = strings.TrimRight(origin(r), "/") + "/s/" + name
+		u = strings.TrimRight(origin(r), "/") + shop.PagePath(name)
 	} else {
 		inv, ok := pos.Get(id)
 		if !ok {
@@ -726,6 +742,7 @@ func (s *Server) minePage(w http.ResponseWriter, r *http.Request) {
 	}
 	if strings.HasPrefix(addr, "kaspa:") {
 		p.Held = names.Book(addr)
+		p.Choices = shop.Choices(addr)
 	}
 	s.render(w, "mine.html", p)
 }
@@ -744,33 +761,51 @@ func (s *Server) apiMine(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) shopEdit(w http.ResponseWriter, r *http.Request) {
-	p := page{Title: "Hang a shop · Gramlane", Active: "mine"}
+	p := page{Title: "Open a shop · Gramlane", Active: "shop"}
 	addr := walletAddr(r)
 	name := strings.TrimSpace(r.FormValue("name"))
 	if name == "" {
 		name = strings.TrimSpace(r.URL.Query().Get("name"))
 	}
 	p.Query = names.DisplayName(name)
+	p.DraftHeadline = strings.TrimSpace(r.FormValue("headline"))
+	p.DraftAbout = strings.TrimSpace(r.FormValue("about"))
+	p.DraftLabel = strings.TrimSpace(r.FormValue("label"))
+	p.DraftUSD = strings.TrimSpace(r.FormValue("usd"))
+	if strings.HasPrefix(addr, "kaspa:") {
+		p.Held = names.Book(addr)
+		p.Choices = shop.Choices(addr)
+	}
 	if r.Method == http.MethodPost {
 		switch r.FormValue("act") {
 		case "hang":
-			sh, err := shop.Hang(name, addr, r.FormValue("payTo"), r.FormValue("headline"), r.FormValue("about"))
+			sh, err := shop.Hang(name, addr, r.FormValue("payTo"), p.DraftHeadline, p.DraftAbout)
 			if err != nil {
 				p.Error = err.Error()
+				if fe, ok := shop.AsField(err); ok {
+					p.Field = fe.Field
+				}
 			} else {
 				livepage.Save(sh.Name, sh.Headline, sh.About, sh.PayNote)
 				p.Shop = sh
+				p.Query = sh.Name
 			}
 		case "item":
-			cents, _ := quote.USDCents(r.FormValue("usd"))
+			cents, _ := quote.USDCents(p.DraftUSD)
 			if cents == 0 {
 				cents, _ = strconv.ParseUint(strings.ReplaceAll(r.FormValue("cents"), ",", ""), 10, 64)
 			}
-			sh, err := shop.AddItem(name, addr, r.FormValue("label"), cents)
+			sh, err := shop.AddItem(name, addr, p.DraftLabel, cents)
 			if err != nil {
 				p.Error = err.Error()
+				if fe, ok := shop.AsField(err); ok {
+					p.Field = fe.Field
+				}
+				p.Shop = shop.Get(name)
 			} else {
 				p.Shop = sh
+				p.DraftLabel = ""
+				p.DraftUSD = ""
 			}
 		}
 	}
@@ -781,26 +816,41 @@ func (s *Server) shopEdit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) storefront(w http.ResponseWriter, r *http.Request) {
-	name := ""
-	if r.URL.Path != "/s" && r.URL.Path != "/s/" {
-		name = strings.TrimPrefix(r.URL.Path, "/s/")
-	}
-	if name == "" {
-		s.render(w, "storefront.html", page{Title: "Shops · Gramlane", Active: "shop", Shops: shop.List()})
+	if r.URL.Path == "/s" || r.URL.Path == "/s/" || r.URL.Path == "/shops" {
+		s.shopsIndex(w, r)
 		return
 	}
+	name := strings.TrimPrefix(r.URL.Path, "/s/")
 	disp := names.DisplayName(name)
+	if r.Method != http.MethodPost && disp != "" && r.URL.Path != shop.PagePath(disp) {
+		http.Redirect(w, r, shop.PagePath(disp), http.StatusSeeOther)
+		return
+	}
+	s.showStorefront(w, r, disp)
+}
+
+func (s *Server) shopsIndex(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "Shops · Gramlane", Active: "shop", Shops: shop.List()}
+	addr := walletAddr(r)
+	if strings.HasPrefix(addr, "kaspa:") {
+		p.Held = names.Book(addr)
+		p.Choices = shop.Choices(addr)
+	}
+	s.render(w, "storefront.html", p)
+}
+
+func (s *Server) showStorefront(w http.ResponseWriter, r *http.Request, disp string) {
+	disp = names.DisplayName(disp)
 	if r.Method == http.MethodPost && r.FormValue("act") == "buy" {
 		inv, err := shop.Ticket(disp, r.FormValue("item"), "both")
 		if err != nil {
-			p := page{Title: disp + " · shop", Active: "shop", Store: shop.View(disp), Error: err.Error()}
-			s.render(w, "storefront.html", p)
+			s.render(w, "storefront.html", page{Title: disp, Active: "shop", Store: shop.View(disp), Error: err.Error()})
 			return
 		}
 		http.Redirect(w, r, "/pay/"+inv.ID, http.StatusSeeOther)
 		return
 	}
-	s.render(w, "storefront.html", page{Title: disp + " · shop", Active: "shop", Store: shop.View(disp), Query: disp})
+	s.render(w, "storefront.html", page{Title: disp, Active: "shop", Store: shop.View(disp), Query: disp})
 }
 
 func (s *Server) apiShop(w http.ResponseWriter, r *http.Request) {
@@ -906,6 +956,7 @@ func (s *Server) wellKnownKasdomain(w http.ResponseWriter, r *http.Request) {
 		"acquire":     "/kasdomain",
 		"names":       "/mine",
 		"shops":       "/s/",
+		"page":        "/{name}.kas",
 		"api":         "/api/shop/",
 		"pay":         "POST /api/shop/{name} with item and X-Work-Credit",
 		"explained":   "https://remote-mcp-server-authless.parker2017.workers.dev/mcp",
@@ -1096,7 +1147,7 @@ func (s *Server) siteName(w http.ResponseWriter, r *http.Request) {
 		s.sitePage(w, r)
 		return
 	}
-	http.Redirect(w, r, "/s/"+names.DisplayName(name), http.StatusSeeOther)
+	http.Redirect(w, r, shop.PagePath(name), http.StatusSeeOther)
 }
 
 func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {

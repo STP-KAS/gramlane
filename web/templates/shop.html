@@ -1,32 +1,37 @@
 {{template "header" .}}
 <main id="main">
-  <h1>{{if .Query}}{{.Query}}{{else}}Hang a shop{{end}}</h1>
-  <p class="lede">Headline, a few words, a menu. Customers open the page and pay.</p>
-  {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
+  <h1>{{if .Shop}}{{.Shop.Name}}{{else}}Open a shop{{end}}</h1>
+  <p class="lede">A shop is a name with a page. Get names under Name. Then pick one here.</p>
 
   {{if .Shop}}
+  <p class="tiny">Page: <a href="{{printf "/%s" .Shop.Name}}">{{.Shop.Name}}</a></p>
   <div class="card">
     <h2>{{.Shop.Headline}}</h2>
     <p class="lede">{{.Shop.About}}</p>
     <p class="actions">
-      <a class="btn mint" href="/s/{{.Shop.Name}}">See it</a>
+      <a class="btn mint" href="/{{.Shop.Name}}">See {{.Shop.Name}}</a>
     </p>
   </div>
-  <h2>Add to the menu</h2>
+  <h2>Menu</h2>
   <form action="/shop" method="post">
     <input type="hidden" name="act" value="item" />
     <input type="hidden" name="name" value="{{.Shop.Name}}" />
     <input type="hidden" name="address" value="{{.Shop.Owner}}" />
+    <input type="hidden" name="headline" value="{{.Shop.Headline}}" />
+    <input type="hidden" name="about" value="{{.Shop.About}}" />
     <div class="row">
       <div>
         <label for="itemLabel">Item</label>
-        <input id="itemLabel" name="label" placeholder="coffee" required />
+        <input id="itemLabel" name="label" value="{{if ne .Field "label"}}{{.DraftLabel}}{{end}}" placeholder="coffee" class="{{if eq .Field "label"}}bad{{end}}" />
+        {{if eq .Field "label"}}<p class="bad">{{.Error}}</p>{{end}}
       </div>
       <div>
         <label for="itemUSD">Price in USD</label>
-        <input id="itemUSD" name="usd" placeholder="3.00" inputmode="decimal" required />
+        <input id="itemUSD" name="usd" value="{{if ne .Field "usd"}}{{.DraftUSD}}{{end}}" placeholder="3.00" inputmode="decimal" class="{{if eq .Field "usd"}}bad{{end}}" />
+        {{if eq .Field "usd"}}<p class="bad">{{.Error}}</p>{{end}}
       </div>
     </div>
+    {{if and .Error (not .Field)}}<p class="bad">{{.Error}}</p>{{end}}
     <p class="actions"><button class="btn mint" type="submit">Add</button></p>
   </form>
   {{if .Shop.Items}}
@@ -38,19 +43,56 @@
   </table>
   {{end}}
   {{else}}
+  {{if .Error}}{{if not .Field}}<p class="bad" role="alert">{{.Error}}</p>{{end}}{{end}}
+  <p class="help">Cleaner: one Kaspa address per shop. You can still keep several names on one address — a leak or a sale then moves all of them.</p>
+  {{if .Choices}}
   <form action="/shop" method="post">
     <input type="hidden" name="act" value="hang" />
-    <label for="shopName">Name you hold</label>
-    <input id="shopName" name="name" value="{{.Query}}" placeholder="bakery.kas" />
-    <label for="shopAddr">Your address</label>
-    <input id="shopAddr" class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
+    <input type="hidden" name="address" value="{{if .Held}}{{.Held.Address}}{{end}}" data-wallet-addr />
+    <p><strong>Names on this wallet</strong></p>
+    <div class="choices">
+      {{range .Choices}}
+      <label class="choice">
+        <input type="radio" name="name" value="{{.Name}}" {{if and (eq $.Query .Name) (ne $.Field "name")}}checked{{end}} />
+        <span>
+          <strong>{{.Name}}</strong>
+          {{if .HasShop}}<span class="ok">shop open</span>{{else}}<span class="tiny">no shop yet</span>{{end}}
+          {{if .Face}}<span class="tiny">face</span>{{end}}
+          {{if .Headline}}<span class="tiny">{{.Headline}}</span>{{end}}
+        </span>
+      </label>
+      {{end}}
+    </div>
+    {{if eq .Field "name"}}<p class="bad">{{.Error}}</p>{{end}}
     <label for="shopHead">Headline</label>
-    <input id="shopHead" name="headline" placeholder="The bakery" />
+    <input id="shopHead" name="headline" value="{{.DraftHeadline}}" placeholder="The bakery" class="{{if eq .Field "headline"}}bad{{end}}" />
+    {{if eq .Field "headline"}}<p class="bad">{{.Error}}</p>{{end}}
     <label for="shopAbout">About</label>
-    <input id="shopAbout" name="about" placeholder="Bread and coffee." />
-    <p class="actions"><button class="btn mint" type="submit">Hang shop</button></p>
+    <input id="shopAbout" name="about" value="{{.DraftAbout}}" placeholder="Bread and coffee." class="{{if eq .Field "about"}}bad{{end}}" />
+    {{if eq .Field "about"}}<p class="bad">{{.Error}}</p>{{end}}
+    {{if eq .Field "address"}}<p class="bad">{{.Error}}</p>{{end}}
+    <p class="actions"><button class="btn mint" type="submit">Open shop</button></p>
+  </form>
+  {{else}}
+  <p class="help">No names on this wallet yet.</p>
+  <p class="actions"><a class="btn mint" href="/kasdomain">Get a name</a></p>
+  <form class="row" action="/shop" method="get">
+    <input class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
+    <button class="btn ghost" type="submit">Show names</button>
   </form>
   {{end}}
-  <p class="actions"><a class="btn ghost" href="/mine">My names</a></p>
+  {{end}}
+  <p class="actions"><a class="btn ghost" href="/s/">Shops</a> <a class="btn ghost" href="/kasdomain">Get a name</a></p>
 </main>
+<script>
+(function () {
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (!qs.get("address") && sessionStorage.getItem("kaspaAddress")) {
+      qs.set("address", sessionStorage.getItem("kaspaAddress"));
+      location.replace("/shop?" + qs.toString());
+    }
+  } catch (e) {}
+})();
+</script>
 {{template "footer" .}}

@@ -45,10 +45,10 @@
       {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
     </details>
     {{else}}
-    <p class="help">This name is funded. Open the shop, or hang one if you hold it.</p>
+    <p class="help">This name is funded. A shop is this same name with a page.</p>
     <p class="actions">
-      <a class="btn mint" href="/s/{{.Result.Name}}">Open shop</a>
-      {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Hang a shop</a>{{end}}
+      <a class="btn mint" href="/{{.Result.Name}}">See {{.Result.Name}}</a>
+      {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Open as a shop</a>{{end}}
     </p>
     {{end}}
     {{if .Inspect}}
@@ -65,8 +65,8 @@
   {{if .Held}}
   <p class="help" style="margin-top:28px">Signed in as {{if .Held.Primary}}<strong>{{.Held.Primary}}</strong>{{else}}this wallet{{end}}. {{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}.</p>
   <p class="actions">
-    <a class="btn mint" href="/mine?address={{.Held.Address}}">My names</a>
-    {{if .Held.Primary}}<a class="btn ghost" href="/shop?name={{.Held.Primary}}&amp;address={{.Held.Address}}">Hang a shop</a>{{end}}
+    <a class="btn mint" href="/s/?address={{.Held.Address}}">Open a shop</a>
+    <a class="btn ghost" href="/mine?address={{.Held.Address}}">My names</a>
   </p>
   {{end}}
 </main>

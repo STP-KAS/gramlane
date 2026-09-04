@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
   <h1>A name people can say.</h1>
-  <p class="lede">Get a shop on Kaspa. No company in the middle. No yearly rent.</p>
+  <p class="lede">Get a name. Open it as a shop. Same word — <span class="mono">bakery.kas</span> is the page.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="homeQ">Name</label>
@@ -11,10 +11,10 @@
   </form>
 
   <ol class="steps">
-    <li><strong>1 · Name</strong>Pay once in KAS. Yours forever.</li>
-    <li><strong>2 · Shop</strong>A page and a menu. Share the link.</li>
+    <li><strong>1 · Name</strong>Create it here. Pay once in KAS.</li>
+    <li><strong>2 · Shop</strong>Pick that name. Share bakery.kas.</li>
     <li><strong>3 · Pay</strong>Customer taps. Grams at the till.</li>
   </ol>
-  {{if .Query}}<p class="tiny">Your sign: <a href="/s/{{.Query}}">{{.Query}}</a></p>{{end}}
+  {{if .Query}}<p class="tiny">Your sign: <a href="/{{.Query}}">{{.Query}}</a></p>{{end}}
 </main>
 {{template "footer" .}}

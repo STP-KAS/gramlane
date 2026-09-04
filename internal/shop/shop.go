@@ -42,6 +42,86 @@ type Shop struct {
 	When     string `json:"when"`
 }
 
+// FieldErr is a hang/item error that names one form field so the rest can stay.
+type FieldErr struct {
+	Field string
+	Msg   string
+}
+
+func (e FieldErr) Error() string { return e.Msg }
+
+func Field(field, msg string) FieldErr { return FieldErr{Field: field, Msg: msg} }
+
+func AsField(err error) (FieldErr, bool) {
+	if err == nil {
+		return FieldErr{}, false
+	}
+	e, ok := err.(FieldErr)
+	return e, ok
+}
+
+type Choice struct {
+	Name     string `json:"name"`
+	Headline string `json:"headline,omitempty"`
+	USD      string `json:"usd,omitempty"`
+	USDCents uint64 `json:"usdCents,omitempty"`
+	Face     bool   `json:"face"`
+	HasShop  bool   `json:"hasShop"`
+}
+
+func Choices(addr string) []Choice {
+	b := names.Book(addr)
+	if b == nil {
+		return nil
+	}
+	out := make([]Choice, 0, len(b.Names))
+	for _, h := range b.Names {
+		c := Choice{Name: h.Name, USD: h.USD, USDCents: h.USDCents, Face: h.Face}
+		if sh := Get(h.Name); sh != nil {
+			c.HasShop = true
+			c.Headline = sh.Headline
+		}
+		out = append(out, c)
+	}
+	return out
+}
+
+func PagePath(name string) string {
+	n := names.DisplayName(name)
+	if n == "" {
+		return "/"
+	}
+	return "/" + n
+}
+
+func FromPath(p string) string {
+	p = strings.TrimSpace(p)
+	p = strings.Trim(p, "/")
+	p = strings.TrimPrefix(p, "s/")
+	if i := strings.IndexByte(p, '/'); i >= 0 {
+		p = p[:i]
+	}
+	if !strings.HasSuffix(strings.ToLower(p), ".kas") {
+		return ""
+	}
+	return names.DisplayName(p)
+}
+
+func FromHost(host string) string {
+	h := strings.ToLower(strings.TrimSpace(host))
+	if i := strings.IndexByte(h, ':'); i >= 0 {
+		h = h[:i]
+	}
+	if !strings.HasSuffix(h, ".kas") {
+		return ""
+	}
+	parts := strings.Split(h, ".")
+	if len(parts) < 2 {
+		return ""
+	}
+	return names.DisplayName(parts[len(parts)-2] + ".kas")
+}
+
 type Storefront struct {
 	Name       string         `json:"name"`
 	P2SH       string         `json:"p2sh,omitempty"`
@@ -73,13 +153,13 @@ func Hang(name, owner, payTo, headline, about string) (*Shop, error) {
 	owner = strings.TrimSpace(owner)
 	payTo = strings.TrimSpace(payTo)
 	if disp == "" {
-		return nil, fmt.Errorf("name")
+		return nil, Field("name", "Pick a name you hold.")
 	}
 	if !strings.HasPrefix(owner, "kaspa:") {
-		return nil, fmt.Errorf("kaspa address")
+		return nil, Field("address", "Log in or paste a kaspa: address.")
 	}
 	if !names.Holds(owner, disp) {
-		return nil, fmt.Errorf("only the wallet that holds %s can hang a shop on it", disp)
+		return nil, Field("name", disp+" is not on this wallet. Get it under Name first.")
 	}
 	if payTo == "" {
 		payTo = owner
@@ -122,13 +202,13 @@ func AddItem(name, owner, label string, cents uint64) (*Shop, error) {
 	owner = strings.TrimSpace(owner)
 	label = strings.TrimSpace(label)
 	if label == "" {
-		return nil, fmt.Errorf("what is it?")
+		return nil, Field("label", "Say what the item is.")
 	}
 	if cents == 0 {
-		return nil, fmt.Errorf("price in USD")
+		return nil, Field("usd", "Put a dollar price on the shelf.")
 	}
 	if !names.Holds(owner, disp) {
-		return nil, fmt.Errorf("only the wallet that holds %s can price it", disp)
+		return nil, Field("name", disp+" is not on this wallet.")
 	}
 	mu.Lock()
 	sh := peekLocked(disp)
@@ -262,7 +342,7 @@ func View(raw string) *Storefront {
 		return v
 	}
 	if v.Hit {
-		v.Warning = disp + " is funded on L1. No shop hung on this desk yet. The holder opens one from Names."
+		v.Warning = disp + " is funded on L1. No shop on this page yet. Open it under Shops."
 	} else {
 		v.Warning = "No kasdomain output yet. Fund " + disp + " with KAS. Then hang a shop. Not KNS."
 	}
