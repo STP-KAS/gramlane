@@ -1,0 +1,59 @@
+{{template "header" .}}
+<main>
+  <p class="kicker">hang a shop · USD shelf · grams at the till</p>
+  <h1>{{if .Query}}{{.Query}}{{else}}Open a kasdomain as a shop{{end}}</h1>
+  <p class="lede">A name is for the many: a sign they can say, a page they can open, a till they can pay. Acquiring the name is KAS. The till — coffee, bread, a ticket — is grams, because it keeps sequencing. Not DNS. Not KNS. vProgs are still roadmap; this desk holds the words.</p>
+  {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
+
+  {{if .Shop}}
+  <div class="card">
+    <h2>{{.Shop.Headline}}</h2>
+    <p class="lede">{{.Shop.About}}</p>
+    <p class="tiny mono">Pay to {{.Shop.PayTo}}</p>
+    <p><a class="btn mint" href="/s/{{.Shop.Name}}">Public shop</a> <a class="btn ghost" href="/qr/s/{{.Shop.Name}}.png">Door QR</a></p>
+  </div>
+  <h2>Add an item</h2>
+  <form action="/shop" method="post">
+    <input type="hidden" name="act" value="item" />
+    <input type="hidden" name="name" value="{{.Shop.Name}}" />
+    <input type="hidden" name="address" value="{{.Shop.Owner}}" />
+    <div class="row">
+      <div>
+        <label for="itemLabel">What is it?</label>
+        <input id="itemLabel" name="label" placeholder="coffee" required />
+      </div>
+      <div>
+        <label for="itemUSD">USD shelf</label>
+        <input id="itemUSD" name="usd" placeholder="3.00" inputmode="decimal" required />
+      </div>
+    </div>
+    <p class="help">Customer pays grams at this board’s USD sign. Walk-up can send KAS instead.</p>
+    <p><button class="btn mint" type="submit">Put on the menu</button></p>
+  </form>
+  {{if .Shop.Items}}
+  <h2>Menu</h2>
+  <table>
+    <tr><th>item</th><th>USD</th><th>grams</th></tr>
+    {{range .Shop.Items}}
+    <tr><td>{{.Label}}</td><td class="price">{{.USD}}</td><td class="mono">{{.Grams}}</td></tr>
+    {{end}}
+  </table>
+  {{end}}
+  {{else}}
+  <form action="/shop" method="post">
+    <input type="hidden" name="act" value="hang" />
+    <label for="shopName">kasdomain you hold</label>
+    <input id="shopName" name="name" value="{{.Query}}" placeholder="bakery.kas" />
+    <label for="shopAddr">Your Kaspa address</label>
+    <input id="shopAddr" class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
+    <label for="shopHead">Headline</label>
+    <input id="shopHead" name="headline" placeholder="The bakery" />
+    <label for="shopAbout">About</label>
+    <input id="shopAbout" name="about" placeholder="Bread, coffee, open mornings." />
+    <p class="help">Only a wallet that holds the name can hang the shop. We do not host the world’s websites. We hang a sign on the covenant.</p>
+    <p><button class="btn mint" type="submit">Hang shop</button></p>
+  </form>
+  {{end}}
+  <p style="margin-top:18px"><a class="btn ghost" href="/mine">Back to names</a></p>
+</main>
+{{template "footer" .}}

@@ -26,6 +26,7 @@ import (
 	"gramlane/internal/post"
 	"gramlane/internal/quote"
 	"gramlane/internal/seq"
+	"gramlane/internal/shop"
 	"gramlane/internal/wallets"
 	"gramlane/web"
 
@@ -75,6 +76,9 @@ type page struct {
 	Inspect   bool
 	Public    bool
 	Held      *names.WalletBook
+	Store     *shop.Storefront
+	Shop      *shop.Shop
+	Shops     []shop.Shop
 }
 
 func New(addr string) (*Server, error) {
@@ -103,8 +107,14 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/kns", s.kasdomainPage)
 	mux.HandleFunc("/mine", s.minePage)
 	mux.HandleFunc("/names", s.minePage)
+	mux.HandleFunc("/shop", s.shopEdit)
+	mux.HandleFunc("/s/", s.storefront)
+	mux.HandleFunc("/s", s.storefront)
 	mux.HandleFunc("/api/name", s.apiName)
 	mux.HandleFunc("/api/mine", s.apiMine)
+	mux.HandleFunc("/api/shop/", s.apiShop)
+	mux.HandleFunc("/api/shop", s.apiShop)
+	mux.HandleFunc("/.well-known/kasdomain.json", s.wellKnownKasdomain)
 	mux.HandleFunc("/market", s.marketPage)
 	mux.HandleFunc("/api/market", s.apiMarket)
 	mux.HandleFunc("/convert", s.convertPage)
@@ -178,7 +188,12 @@ func (s *Server) Handler() http.Handler {
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
 			"vision":         "stable work price on L1, not a synthetic dollar",
-			"products":       []string{"spend", "pos", "vault", "postage", "agent", "site", "convert", "jar"},
+			"products":       []string{"kasdomain", "shop", "spend", "pos", "vault", "postage", "agent", "site", "convert", "jar"},
+			"nameSettle":     "kas",
+			"tillUnit":       "gram",
+			"shelf":          "USD",
+			"kns":            false,
+			"explained":      "https://remote-mcp-server-authless.parker2017.workers.dev/mcp",
 			"sompiPerGram":   quote.SompiPerGram,
 			"grok":           agent.HasKey(),
 			"gramsRemaining": led.Remaining, "credits": led.Credits,
@@ -450,12 +465,22 @@ func (s *Server) counterPage(w http.ResponseWriter, r *http.Request) {
 func (s *Server) qrPNG(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/qr/")
 	id = strings.TrimSuffix(id, ".png")
-	inv, ok := pos.Get(id)
-	if !ok {
-		http.NotFound(w, r)
-		return
+	var u string
+	if strings.HasPrefix(id, "s/") {
+		name := names.DisplayName(strings.TrimPrefix(id, "s/"))
+		if name == "" {
+			http.NotFound(w, r)
+			return
+		}
+		u = strings.TrimRight(origin(r), "/") + "/s/" + name
+	} else {
+		inv, ok := pos.Get(id)
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		u = pos.PayURL(origin(r), inv.ID)
 	}
-	u := pos.PayURL(origin(r), inv.ID)
 	png, err := qrcode.Encode(u, qrcode.Medium, 256)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -718,6 +743,104 @@ func (s *Server) apiMine(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (s *Server) shopEdit(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "Hang a shop · Gramlane", Active: "mine"}
+	addr := walletAddr(r)
+	name := strings.TrimSpace(r.FormValue("name"))
+	if name == "" {
+		name = strings.TrimSpace(r.URL.Query().Get("name"))
+	}
+	p.Query = names.DisplayName(name)
+	if r.Method == http.MethodPost {
+		switch r.FormValue("act") {
+		case "hang":
+			sh, err := shop.Hang(name, addr, r.FormValue("payTo"), r.FormValue("headline"), r.FormValue("about"))
+			if err != nil {
+				p.Error = err.Error()
+			} else {
+				livepage.Save(sh.Name, sh.Headline, sh.About, sh.PayNote)
+				p.Shop = sh
+			}
+		case "item":
+			cents, _ := quote.USDCents(r.FormValue("usd"))
+			if cents == 0 {
+				cents, _ = strconv.ParseUint(strings.ReplaceAll(r.FormValue("cents"), ",", ""), 10, 64)
+			}
+			sh, err := shop.AddItem(name, addr, r.FormValue("label"), cents)
+			if err != nil {
+				p.Error = err.Error()
+			} else {
+				p.Shop = sh
+			}
+		}
+	}
+	if p.Shop == nil && p.Query != "" {
+		p.Shop = shop.Get(p.Query)
+	}
+	s.render(w, "shop.html", p)
+}
+
+func (s *Server) storefront(w http.ResponseWriter, r *http.Request) {
+	name := ""
+	if r.URL.Path != "/s" && r.URL.Path != "/s/" {
+		name = strings.TrimPrefix(r.URL.Path, "/s/")
+	}
+	if name == "" {
+		s.render(w, "storefront.html", page{Title: "Shops · Gramlane", Active: "shop", Shops: shop.List()})
+		return
+	}
+	disp := names.DisplayName(name)
+	if r.Method == http.MethodPost && r.FormValue("act") == "buy" {
+		inv, err := shop.Ticket(disp, r.FormValue("item"), "both")
+		if err != nil {
+			p := page{Title: disp + " · shop", Active: "shop", Store: shop.View(disp), Error: err.Error()}
+			s.render(w, "storefront.html", p)
+			return
+		}
+		http.Redirect(w, r, "/pay/"+inv.ID, http.StatusSeeOther)
+		return
+	}
+	s.render(w, "storefront.html", page{Title: disp + " · shop", Active: "shop", Store: shop.View(disp), Query: disp})
+}
+
+func (s *Server) apiShop(w http.ResponseWriter, r *http.Request) {
+	name := strings.TrimPrefix(r.URL.Path, "/api/shop/")
+	if name == "" || name == "shop" || r.URL.Path == "/api/shop" {
+		writeJSON(w, 200, map[string]any{
+			"ok": true, "shops": shop.List(), "settle": map[string]string{"name": "kas", "till": "grams"},
+			"shelf": "USD", "kns": false,
+			"note": "Authless shop cards. Name is L1. Menu is this desk. Till is grams.",
+		})
+		return
+	}
+	v := shop.View(name)
+	writeJSON(w, 200, map[string]any{"ok": true, "store": v, "kns": false})
+}
+
+func (s *Server) wellKnownKasdomain(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, 200, map[string]any{
+		"name":        "gramlane-kasdomain",
+		"title":       "kasdomain shops",
+		"description": "Covenant names on Kaspa L1. A name is a shop: a page and a till. Not KNS. Not DNS.",
+		"ethos":       "decentralisation",
+		"layer":       "kaspa-l1",
+		"toccata":     "live",
+		"vprogs":      "roadmap",
+		"kns":         false,
+		"l2":          false,
+		"nameSettle":  "kas",
+		"tillUnit":    "gram",
+		"shelf":       "USD",
+		"acquire":     "/kasdomain",
+		"names":       "/mine",
+		"shops":       "/s/",
+		"api":         "/api/shop/",
+		"explained":   "https://remote-mcp-server-authless.parker2017.workers.dev/mcp",
+		"claims":      "https://kaspaexplained.com/toccata-status",
+		"note":        "The calling agent supplies the model. This desk only hangs signs on covenant names.",
+	})
+}
+
 func (s *Server) apiName(w http.ResponseWriter, r *http.Request) {
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	if q == "" {
@@ -900,17 +1023,7 @@ func (s *Server) siteName(w http.ResponseWriter, r *http.Request) {
 		s.sitePage(w, r)
 		return
 	}
-	j, _ := jobs.Get("site")
-	site, err := names.Lookup(name)
-	norm := names.Normalize(name)
-	if norm == "kaspadao.kas" {
-		seedSign()
-	}
-	p := page{Title: norm + " · Kasdomain", Active: "kasdomain", Job: &j, Site: site, Query: norm, Live: livepage.Get(norm)}
-	if err != nil {
-		p.Error = err.Error()
-	}
-	s.render(w, "domain.html", p)
+	http.Redirect(w, r, "/s/"+names.DisplayName(name), http.StatusSeeOther)
 }
 
 func (s *Server) runPage(w http.ResponseWriter, r *http.Request) {
