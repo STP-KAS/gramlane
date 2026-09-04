@@ -113,6 +113,49 @@
       if (c.address && c.name) el.setAttribute("data-wallet-change-name", "1");
       else el.removeAttribute("data-wallet-change-name");
     });
+    refreshBalances();
+  }
+
+  function fmtKas1(sompi) {
+    var n = Number(sompi);
+    if (!isFinite(n) || n < 0) n = 0;
+    return (n / 100000000).toFixed(1);
+  }
+
+  function sompiFromBalance(b) {
+    if (b == null) return 0;
+    if (typeof b === "number") return b;
+    if (typeof b === "string") return Number(b) || 0;
+    return Number(b.total || b.confirmed || b.balance || b.amount || 0) || 0;
+  }
+
+  async function refreshBalances() {
+    var box = document.querySelector("[data-balances]");
+    if (!box) return;
+    var c = current();
+    if (!c.address) {
+      box.hidden = true;
+      return;
+    }
+    box.hidden = false;
+    var kasEl = box.querySelector("[data-kas-balance]");
+    var gEl = box.querySelector("[data-gram-balance]");
+    try {
+      var seq = await fetch("/api/seq").then(function (r) { return r.json(); });
+      var left = seq && seq.data && seq.data.remaining;
+      if (gEl && left != null) gEl.textContent = Number(left).toLocaleString("en-US") + " g";
+    } catch (_) {}
+    try {
+      var sompi = 0;
+      if (c.id === "kasware" && window.kasware && typeof window.kasware.getBalance === "function") {
+        sompi = sompiFromBalance(await window.kasware.getBalance());
+      } else if (window.kastle && typeof window.kastle.getBalance === "function") {
+        sompi = sompiFromBalance(await window.kastle.getBalance());
+      }
+      if (kasEl) kasEl.textContent = fmtKas1(sompi) + " KAS";
+    } catch (_) {
+      if (kasEl) kasEl.textContent = "KAS —";
+    }
   }
 
   async function kaswareAccountsQuiet() {

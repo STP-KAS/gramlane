@@ -1,60 +1,69 @@
 {{template "header" .}}
-<main>
+<main id="main">
   <h1>Convert</h1>
-  <p class="lede">100 sompi per gram. Policy arithmetic, not a token and not a peg.</p>
-  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} grams · <a href="/convert?from=remaining">convert remaining</a></p>{{end}}
+  <p class="lede">KAS to grams at a fixed rate. Not Tether. Not a dollar. dApps bill work in grams today.</p>
+
+  <div class="split">
+    <article class="card">
+      <label for="cKas">KAS</label>
+      <input id="cKas" inputmode="decimal" placeholder="1.0" value="1.0" />
+    </article>
+    <article class="card">
+      <label for="cGrams">grams</label>
+      <input id="cGrams" inputmode="numeric" placeholder="1000000" />
+    </article>
+  </div>
+  <p class="price" id="cOut">1.0 KAS = 1 000 000 grams</p>
+  <p class="tiny">1 000 000 grams = 1.0 KAS. Rate is policy, not a market. USD is not quoted.</p>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
-  <form class="row" action="/convert" method="get">
-    <div>
-      <label>amount</label>
-      <input name="amount" value="{{.Query}}" placeholder="0.5" />
-    </div>
-    <div>
-      <label>unit</label>
-      <select name="unit">
-        <option value="kas">KAS</option>
-        <option value="grams">grams</option>
-        <option value="sompi">sompi</option>
-      </select>
-    </div>
-    <button class="btn mint" type="submit">Convert</button>
-    <a class="btn ghost" href="/convert?from=remaining">Use remaining</a>
-  </form>
-  <p class="tiny">Examples: <a href="/convert?kas=0.5">0.5 KAS</a> · <a href="/convert?grams=8000">8 000 grams</a> · <a href="/convert?kas=1">1 KAS</a></p>
+  <p class="actions">
+    <a class="btn mint" href="/stablegram">Fill the jar</a>
+    <a class="btn ghost" href="/docs">dApp API</a>
+  </p>
 
-  {{if .Conv}}
-  <table>
-    <tr><th>grams</th><td class="mono">{{.Conv.Grams}}</td></tr>
-    <tr><th>KAS at policy</th><td class="mono">{{.Conv.KASText}}</td></tr>
-    <tr><th>sompi</th><td class="mono">{{.Conv.Sompi}}</td></tr>
-    {{if .Conv.Dust}}<tr><th>dust (not a whole gram)</th><td class="mono">{{.Conv.Dust}} sompi</td></tr>{{end}}
-    <tr><th>rate</th><td class="mono">{{.Conv.SompiPerGram}} sompi/gram · policy, not consensus</td></tr>
-    <tr><th>USD</th><td>{{.Conv.USD}}</td></tr>
-    <tr><th>KCC-20</th><td>no — a token would invite a DEX listing. This meter is a quote.</td></tr>
-  </table>
-  <p class="lede">{{.Conv.Note}}</p>
-  {{if .Fits}}
-  <h2>Jobs this amount covers</h2>
-  <table>
-    <tr><th>job</th><th>grams</th><th>runs</th></tr>
-    {{range .Fits}}
-    <tr>
-      <td><a href="/job/{{.Job.ID}}">{{.Job.Name}}</a></td>
-      <td class="mono">{{.Job.Grams}}</td>
-      <td class="mono">{{.Runs}}</td>
-    </tr>
-    {{end}}
-  </table>
-  {{else}}
-  <p class="lede">Nothing in the catalog fits this amount.</p>
-  {{end}}
-  {{end}}
-
-  <h2>Why not a KCC-20?</h2>
-  <p class="lede">KCC-20 is a fungible token. Grams are prepaid sequenced work. Listing them on a DEX would fake a dollar. The covenant is WorkCredit (issuer, holder, credits, lane). The converter is the policy arithmetic miners already use for mass. Miners still want KAS.</p>
-  <pre>GET /api/convert?kas=0.5
-GET /api/convert?grams=8000
-GET /api/convert?from=remaining</pre>
+  <details>
+    <summary>Can a dApp use this?</summary>
+    <p class="help">Yes. Quote and pay in grams. Do not wait for Tether on this path.</p>
+    <pre>GET  /api/convert?kas=1
+GET  /api/quote?job=dag
+POST /api/run?job=dag
+Header: X-Work-Credit: grams
+No header → HTTP 402</pre>
+  </details>
 </main>
+<script>
+(function () {
+  var kas = document.getElementById("cKas");
+  var grams = document.getElementById("cGrams");
+  var out = document.getElementById("cOut");
+  var lock = false;
+  function fmtKas(n) {
+    var x = Number(n);
+    if (!isFinite(x)) return "0.0";
+    return x.toFixed(1);
+  }
+  function fmtGrams(n) {
+    var x = Math.floor(Number(n) || 0);
+    return String(x).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  }
+  function from(kind, amount) {
+    if (lock) return;
+    lock = true;
+    fetch("/api/convert?" + kind + "=" + encodeURIComponent(amount))
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok || !j.convert) return;
+        var c = j.convert;
+        if (kind === "kas") grams.value = c.grams;
+        else kas.value = c.kas1 || fmtKas(c.kas);
+        out.textContent = fmtKas(c.kas) + " KAS = " + fmtGrams(c.grams) + " grams";
+      })
+      .finally(function () { lock = false; });
+  }
+  kas.addEventListener("input", function () { from("kas", kas.value || "0"); });
+  grams.addEventListener("input", function () { from("grams", grams.value || "0"); });
+  from("kas", kas.value || "1");
+})();
+</script>
 {{template "footer" .}}

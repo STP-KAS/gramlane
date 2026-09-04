@@ -46,6 +46,12 @@ func TestConvertHalfKASIs500kGrams(t *testing.T) {
 	}
 }
 
+func TestFormatKAS1OneDecimal(t *testing.T) {
+	if FormatKAS1(SompiPerKAS) != "1.0" || FormatKAS1(50_000_000) != "0.5" {
+		t.Fatal(FormatKAS1(SompiPerKAS), FormatKAS1(50_000_000))
+	}
+}
+
 func TestFromUSDSettlesKASNotGramsNote(t *testing.T) {
 	b, err := FromUSD("1.00", "0.10")
 	if err != nil {

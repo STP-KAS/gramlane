@@ -19,7 +19,12 @@
       <a href="/s/" class="{{if eq .Active "shop"}}on{{end}}" title="Open a name as a shop">Shops</a>
       <a href="/mine" class="{{if eq .Active "mine"}}on{{end}}">My names</a>
       <a href="/pay" class="{{if or (eq .Active "pay") (eq .Active "stablegram")}}on{{end}}">Pay</a>
+      <a href="/convert" class="{{if eq .Active "convert"}}on{{end}}">Convert</a>
     </nav>
+    <a class="bal" href="/convert" data-balances hidden title="Wallet KAS and jar grams">
+      <span data-kas-balance>KAS 0.0</span>
+      <span data-gram-balance>0 g</span>
+    </a>
     <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
   </header>
