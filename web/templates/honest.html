@@ -17,7 +17,7 @@
     <tr><td>GRAM needs a KCC-20</td><td class="chip bad">wrong</td><td>A token would look listable. WorkCredit is the voucher. /convert is policy arithmetic (100 sompi/gram), not a mint.</td></tr>
     <tr><td>POS spend pile is $1</td><td class="chip bad">wrong</td><td>You set KAS aside into grams. Those grams stay grams. Merchants can reprice. No Tether, no freeze.</td></tr>
     <tr><td>Pay + KaChat</td><td class="chip">live</td><td>/pay is the till. /kachat resolves a name, stamps postage, can invoice that wallet. E2E stays in KaChat.</td></tr>
-    <tr><td>kasdomain</td><td class="chip compiled">compiled</td><td>Name = P2SH of KasName.sil + label. First UTXO at that script is the name. No yearly rent. Not KNS. Not an inscription. api.kaspa.org for that address only — not api.knsdomains.org.</td></tr>
+    <tr><td>kasdomain</td><td class="chip compiled">compiled</td><td>Name = P2SH of KasName.sil + label. First UTXO at that script is the name. One wallet, many names: first funded is the face; extras are custody and can be sold in grams. No yearly rent. Not KNS.</td></tr>
     <tr><td>kasdomain uses api.knsdomains.org</td><td class="chip bad">wrong</td><td>Gated off. Desk KNS jobs stay labeled indexer · not kasdomain.</td></tr>
     <tr><td>API job without X-Work-Credit</td><td class="chip">local</td><td>HTTP 402. Header present → HTTP receipt only. No L1 consume verify.</td></tr>
     <tr><td>KCC-20 is the gram token</td><td class="chip bad">wrong</td><td>KCC-0020 is Draft. Vectors sit in <a href="https://github.com/kaspanet/kccs/pull/20">kccs#20</a> (open). WorkCredit is the voucher.</td></tr>

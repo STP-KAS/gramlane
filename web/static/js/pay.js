@@ -106,6 +106,15 @@
         link.textContent = "explorer.kaspa.org";
       }
       say("On L1. Txid " + txid);
+      var nm = btn.getAttribute("data-name");
+      if (nm && acc[0]) {
+        var body = "act=held&name=" + encodeURIComponent(nm) + "&address=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
+        fetch("/kasdomain", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body })
+          .finally(function () {
+            location.href = "/kasdomain?q=" + encodeURIComponent(nm) + "&address=" + encodeURIComponent(acc[0]);
+          });
+        return;
+      }
       var after = btn.getAttribute("data-after");
       if (after === "run") {
         say("On L1. Txid " + txid + " — running job.");
