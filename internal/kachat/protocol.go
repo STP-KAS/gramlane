@@ -19,10 +19,12 @@ const (
 )
 
 type Contact struct {
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	PayURI  string `json:"payUri,omitempty"`
-	Note    string `json:"note"`
+	Name     string `json:"name"`
+	Address  string `json:"address"`
+	PayURI   string `json:"payUri,omitempty"`
+	Note     string `json:"note"`
+	Initial  string `json:"initial"`
+	DeepLink string `json:"deepLink"`
 }
 
 type Envelope struct {
@@ -37,11 +39,22 @@ func ContactFrom(name, addr string) Contact {
 		pay = "kaspa:" + strings.TrimPrefix(pay, "kaspa:")
 	}
 	return Contact{
-		Name:    name,
-		Address: addr,
-		PayURI:  pay,
-		Note:    "The wallet is the person. This page finds them. Encryption stays in KaChat.",
+		Name:     name,
+		Address:  addr,
+		PayURI:   pay,
+		Note:     "The wallet is the person. Encryption stays in the KaChat app.",
+		Initial:  Initial(name),
+		DeepLink: DeepLink(addr),
 	}
+}
+
+func Initial(name string) string {
+	n := strings.TrimSuffix(strings.ToLower(strings.TrimSpace(name)), ".kas")
+	n = strings.TrimPrefix(n, "#")
+	if n == "" {
+		return "K"
+	}
+	return strings.ToUpper(string([]rune(n)[0:1]))
 }
 
 func Envelopes(alias string) []Envelope {
