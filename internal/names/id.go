@@ -34,7 +34,7 @@ func ForAddress(addr string) (*Identity, error) {
 	id := &Identity{
 		Address: addr,
 		Display: addr,
-		Note:    "Indexer-backed. Linking one .kas name here is Gramlane’s choice for this address, not a consensus primary.",
+		Note:    "One Kasdomain per Kaspa address on Gramlane. A name is a shop sign. The address is the door. Live names come from the public name index.",
 	}
 	q := url.Values{}
 	q.Set("owner", addr)
@@ -195,7 +195,13 @@ func Link(addr, name string) error {
 	if links == nil {
 		links = map[string]string{}
 	}
-	links[strings.ToLower(addr)] = name
+	key := strings.ToLower(addr)
+	for a, n := range links {
+		if n == name && a != key {
+			delete(links, a)
+		}
+	}
+	links[key] = name
 	return saveLinksLocked()
 }
 

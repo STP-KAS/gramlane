@@ -25,7 +25,7 @@
     {{range .Wallets}}{{if eq .Kind "native"}}
     <article class="card">
       <h3>{{.Name}}</h3>
-      <p><span class="chip">{{.Connect}}</span>{{if .KNS}} <span class="chip live">KNS</span>{{end}}{{if .KRC20}} <span class="chip">KRC-20</span>{{end}}{{if .NFT}} <span class="chip">NFT</span>{{end}}</p>
+      <p><span class="chip">{{.Connect}}</span>{{if .KNS}} <span class="chip live">Kasdomain</span>{{end}}{{if .KRC20}} <span class="chip">KRC-20</span>{{end}}{{if .NFT}} <span class="chip">NFT</span>{{end}}</p>
       <p>{{.Note}}</p>
       <p class="tiny">{{range .Platforms}}{{.}} · {{end}}</p>
       {{if eq .Connect "inject"}}

@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   <div class="kicker">KaChat · Gramlane app</div>
-  <h1>Message a .kas name.</h1>
+  <h1>Message a Kasdomain.</h1>
   <p class="lede">KaChat seals E2E on Kaspa (<span class="mono">ciph_msg:1:</span>) in the wallet. Gramlane resolves the name, stamps postage in grams, and can open a Pay ticket to that address. This page does not encrypt.</p>
   {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> GRAM.</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}

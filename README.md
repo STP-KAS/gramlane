@@ -40,7 +40,9 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/stablegram` | Set aside % of KAS into the Stablegram jar |
 | `/pay` | Pay hub — EUR/USD ticket, QR, counter |
 | `/pay/{id}` | Pay a ticket from the jar |
-| `/kachat` | KaChat: resolve .kas, postage, pay that wallet |
+| `/kasdomain` | Your names: one unique sign, living page |
+| `/market` | Buy/sell Kasdomains for grams only |
+| `/kachat` | KaChat: resolve a name, postage, pay that wallet |
 | `/apps` | Apps: KaChat, vault, agent, site, jobs |
 | `/convert` | KAS ↔ grams at policy 100 sompi/gram. Not a KCC-20 |
 | `/desk` | Job catalog in GRAM |

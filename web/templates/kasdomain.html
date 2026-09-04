@@ -1,0 +1,83 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">Kasdomain · a shop sign, not GPS</div>
+  <h1>Your name on Kaspa.</h1>
+  <p class="lede">A <strong>Kasdomain</strong> is a sign people can remember — like <span class="mono">bakery.kas</span> instead of a long Kaspa address. The address is the door. You may hang <strong>one sign</strong> on Gramlane. That is your face when you log in. Then the name can live as a webpage, and you can sell or buy signs for grams.</p>
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> GRAM · <a href="/market">Market</a></p>{{end}}
+
+  <p class="tiny">Log in first. We look up every Kasdomain on that Kaspa address.</p>
+  <form class="row" action="/kasdomain" method="get">
+    <input class="mono" name="address" placeholder="kaspa:q… (filled when you log in)" />
+    <button class="btn mint" type="submit">Show my names</button>
+  </form>
+
+  {{if .ID}}
+  {{if .ID.Linked}}
+  <div class="card" style="margin:18px 0">
+    <div class="kicker">your unique sign</div>
+    <h2>{{.ID.Linked}}</h2>
+    <p>This is what Gramlane shows instead of your Kaspa address. One name. Once is enough.</p>
+    <p>
+      <a class="btn mint" href="/site/{{.ID.Linked}}">Open the living page</a>
+      <a class="btn ghost" href="/market">Sell or buy</a>
+    </p>
+    <form action="/kasdomain" method="post" style="margin-top:16px">
+      <input type="hidden" name="address" value="{{.ID.Address}}" />
+      <input type="hidden" name="act" value="live" />
+      <input type="hidden" name="name" value="{{.ID.Linked}}" />
+      <label>headline (the name on the door)</label>
+      <input name="headline" value="{{if .Live}}{{.Live.Headline}}{{end}}" placeholder="The bakery on the corner" />
+      <label>about (what this place is)</label>
+      <textarea name="about" rows="4" placeholder="We sell bread. Pay in grams.">{{if .Live}}{{.Live.About}}{{end}}</textarea>
+      <p style="margin-top:12px"><button class="btn mint" type="submit">Publish the page</button></p>
+    </form>
+  </div>
+  {{end}}
+
+  <h2>Names on this address</h2>
+  <p class="lede">{{.ID.Total}} Kasdomains live here. Pick <strong>one</strong> as your sign. The rest stay in the wallet; they are not your Gramlane face.</p>
+  <p><input id="kasFilter" placeholder="type kdao or bakery" style="width:100%;max-width:420px" /></p>
+  <div class="grid" id="kasGrid">
+    {{range .ID.Names}}
+    <article class="card kas-card" data-name="{{.}}">
+      <h3>{{.}}</h3>
+      {{if eq . $.ID.Linked}}<p class="ok">This is your sign.</p>{{else}}
+      <form action="/kasdomain" method="post">
+        <input type="hidden" name="address" value="{{$.ID.Address}}" />
+        <input type="hidden" name="act" value="pin" />
+        <input type="hidden" name="name" value="{{.}}" />
+        <button class="btn mint" type="submit">Use this name</button>
+      </form>
+      {{end}}
+      <p><a class="btn ghost" href="/site/{{.}}">View page</a></p>
+    </article>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="lede">No names loaded yet. Log in, then Show my names.</p>
+  {{end}}
+
+  <h2>What a domain is (plain)</h2>
+  <ol>
+    <li>A Kaspa address is a lock. Nobody remembers it.</li>
+    <li>A Kasdomain is a word on a sign. People say “pay bakery.kas”.</li>
+    <li>You hang one sign on Gramlane. That is unique here.</li>
+    <li>The living page is the shop behind the sign.</li>
+    <li>The market sells signs for grams, not dollars.</li>
+  </ol>
+</main>
+<script>
+(function () {
+  var f = document.getElementById("kasFilter");
+  if (!f) return;
+  f.addEventListener("input", function () {
+    var q = (f.value || "").toLowerCase();
+    document.querySelectorAll(".kas-card").forEach(function (el) {
+      var n = (el.getAttribute("data-name") || "").toLowerCase();
+      el.style.display = !q || n.indexOf(q) !== -1 ? "" : "none";
+    });
+  });
+})();
+</script>
+{{template "footer" .}}

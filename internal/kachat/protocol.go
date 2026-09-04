@@ -40,7 +40,7 @@ func ContactFrom(name, addr string) Contact {
 		Name:    name,
 		Address: addr,
 		PayURI:  pay,
-		Note:    "KaChat identity is the wallet. KNS is a label. Aliases are not proof of identity. Encryption stays in KaChat.",
+		Note:    "KaChat identity is the wallet. A Kasdomain is a label. Aliases are not proof of identity. Encryption stays in KaChat.",
 	}
 }
 
