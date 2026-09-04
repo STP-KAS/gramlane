@@ -48,7 +48,7 @@ func List() []Listing {
 }
 
 func Open(name, seller string, grams uint64) (*Listing, error) {
-	name = names.Normalize(name)
+	name = names.DisplayName(name)
 	seller = strings.TrimSpace(seller)
 	if grams == 0 {
 		return nil, fmt.Errorf("price in grams")
@@ -56,9 +56,8 @@ func Open(name, seller string, grams uint64) (*Listing, error) {
 	if !strings.HasPrefix(seller, "kaspa:") {
 		return nil, fmt.Errorf("seller must be a kaspa address")
 	}
-	p, err := names.Lookup(name)
-	if err != nil || !strings.EqualFold(p.Owner, seller) {
-		return nil, fmt.Errorf("only the owner of %s can list it", name)
+	if !names.Holds(seller, name) {
+		return nil, fmt.Errorf("only a wallet that holds %s can list it", name)
 	}
 	mu.Lock()
 	defer mu.Unlock()
@@ -75,7 +74,7 @@ func Open(name, seller string, grams uint64) (*Listing, error) {
 		Grams:  grams,
 		Status: "open",
 		When:   time.Now().UTC().Format(time.RFC3339),
-		Note:   "Price is grams. Sale on Gramlane moves the shop-sign here. The inscription still needs a name-service transfer to finish on-chain.",
+		Note:   "Price is grams. Sale moves custody here. The name UTXO still needs a KasName transfer spend to finish on L1.",
 	}
 	b.Listings = append([]Listing{L}, b.Listings...)
 	if err := save(b); err != nil {
@@ -117,9 +116,9 @@ func Buy(id, buyer string) (*Listing, error) {
 	L.Status = "sold"
 	L.Buyer = buyer
 	L.Sold = time.Now().UTC().Format(time.RFC3339)
-	if err := names.Link(buyer, L.Name); err != nil {
-		// sale still recorded; sign may need a manual pin
-		L.Note = L.Note + " Pin the name on Kasdomain if the unique-sign step needs a click."
+	names.Unhold(L.Seller, L.Name)
+	if err := names.Receive(buyer, L.Name); err != nil {
+		L.Note = L.Note + " Buyer drawer: " + err.Error()
 	}
 	if err := save(b); err != nil {
 		return L, err

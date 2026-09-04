@@ -74,6 +74,7 @@ type page struct {
 	Result    *names.Result
 	Inspect   bool
 	Public    bool
+	Held      *names.WalletBook
 }
 
 func New(addr string) (*Server, error) {
@@ -629,14 +630,49 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 	p := page{Title: "kasdomain · Gramlane", Active: "kasdomain"}
+	addr := strings.TrimSpace(r.FormValue("address"))
+	if addr == "" {
+		addr = strings.TrimSpace(r.URL.Query().Get("address"))
+	}
 	q := strings.TrimSpace(r.FormValue("q"))
 	if q == "" {
 		q = strings.TrimSpace(r.URL.Query().Get("q"))
 	}
 	p.Inspect = r.URL.Query().Get("inspect") != "" || r.FormValue("inspect") == "1"
 	p.Query = q
+	if r.Method == http.MethodPost {
+		switch r.FormValue("act") {
+		case "held":
+			if _, err := names.Record(addr, r.FormValue("name"), r.FormValue("tx")); err != nil {
+				p.Error = err.Error()
+			}
+		case "face":
+			if err := names.SetPrimary(addr, r.FormValue("name")); err != nil {
+				p.Error = err.Error()
+			}
+		case "list-drawer":
+			b := names.Book(addr)
+			if b == nil {
+				p.Error = "no names in this wallet"
+			} else {
+				for _, h := range b.Names {
+					if h.Face {
+						continue
+					}
+					if _, err := market.Open(h.Name, addr, h.Suggest); err != nil && p.Error == "" {
+						p.Error = err.Error()
+					}
+				}
+				http.Redirect(w, r, "/market", http.StatusSeeOther)
+				return
+			}
+		}
+	}
 	if q != "" {
 		p.Result = names.ResolveCovenant(q)
+	}
+	if strings.HasPrefix(addr, "kaspa:") {
+		p.Held = names.Book(addr)
 	}
 	s.render(w, "kasdomain.html", p)
 }
@@ -1027,12 +1063,20 @@ func (s *Server) apiID(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 400, map[string]any{"ok": false, "error": "address"})
 		return
 	}
-	id, err := names.ForAddress(addr)
-	if err != nil {
-		writeJSON(w, 502, map[string]any{"ok": false, "error": err.Error(), "address": addr})
+	if face := names.Primary(addr); face != "" {
+		writeJSON(w, 200, map[string]any{
+			"ok": true,
+			"id": map[string]any{
+				"address": addr, "linked": face, "display": face,
+				"note": "kasdomain face. First registered is the default. Drawer names are custody.",
+			},
+		})
 		return
 	}
-	writeJSON(w, 200, map[string]any{"ok": true, "id": id})
+	writeJSON(w, 200, map[string]any{"ok": true, "id": map[string]any{
+		"address": addr, "display": addr,
+		"note": "No kasdomain face yet. Fund a name. The kaspa address stays the door.",
+	}})
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {

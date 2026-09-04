@@ -2,7 +2,7 @@
 <main>
   <div class="kicker">name market · grams only</div>
   <h1>Buy and sell shop signs.</h1>
-  <p class="lede">Price is grams. Not euro, not dollar. List a name you own. Someone pays from their jar. Gramlane moves the sign here. The name on the chain still needs a transfer at the official shop — we say so.</p>
+  <p class="lede">Price is grams. Extra names in your drawer (not the face) can be sold. Buyer gets custody; it becomes their face only if they have none. L1 transfer of the name UTXO is a later KasName spend.</p>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> GRAM.</p>{{end}}
 
