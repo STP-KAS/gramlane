@@ -159,19 +159,29 @@ func AddItem(name, owner, label string, cents uint64) (*Shop, error) {
 	return &cp, nil
 }
 
+func FindItem(sh *Shop, idOrLabel string) *Item {
+	if sh == nil {
+		return nil
+	}
+	want := strings.TrimSpace(idOrLabel)
+	if want == "" {
+		return nil
+	}
+	for i := range sh.Items {
+		if sh.Items[i].ID == want || strings.EqualFold(sh.Items[i].Label, want) {
+			cp := sh.Items[i]
+			return &cp
+		}
+	}
+	return nil
+}
+
 func Ticket(name, itemID, place string) (*pos.Invoice, error) {
 	sh := Get(name)
 	if sh == nil {
 		return nil, fmt.Errorf("no shop on %s yet", names.DisplayName(name))
 	}
-	itemID = strings.TrimSpace(itemID)
-	var it *Item
-	for i := range sh.Items {
-		if sh.Items[i].ID == itemID {
-			it = &sh.Items[i]
-			break
-		}
-	}
+	it := FindItem(sh, itemID)
 	if it == nil {
 		return nil, fmt.Errorf("unknown item")
 	}
