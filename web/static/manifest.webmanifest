@@ -1,0 +1,24 @@
+{
+  "name": "Gramlane",
+  "short_name": "Gramlane",
+  "description": "Kasdomain, pages, Telegram, apps. Same desk on every phone.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b6b4a",
+  "icons": [
+    {
+      "src": "/static/img/icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/icon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

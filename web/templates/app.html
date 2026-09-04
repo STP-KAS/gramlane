@@ -1,0 +1,43 @@
+{{template "header" .}}
+<main id="main">
+  <h1>Phone app</h1>
+  <p class="lede">Same server. Same names, pages, jar, Telegram rooms. iPhone and Android install this URL. There is no second database.</p>
+  {{if .Public}}
+  <p class="ok">This desk is public at this host. Install from this page.</p>
+  {{else}}
+  <p class="help">Install works on the URL you open. For a real phone off this PC, set <span class="mono">PUBLIC_BASE</span> to an https host. Localhost is fine on this machine.</p>
+  {{end}}
+
+  <h2>iPhone</h2>
+  <ol>
+    <li>Open this desk in <strong>Safari</strong> (not Chrome).</li>
+    <li>Share → <strong>Add to Home Screen</strong>.</li>
+    <li>Gramlane appears like an app. Same jar, same names.</li>
+  </ol>
+
+  <h2>Android</h2>
+  <ol>
+    <li>Open this desk in <strong>Chrome</strong>.</li>
+    <li>Menu → <strong>Install app</strong> or Add to Home screen.</li>
+    <li>Same desk as the computer.</li>
+  </ol>
+
+  <p class="help">Kasware is a desktop extension. On the phone, paste a <span class="mono">kaspa:</span> address or use a mobile Kaspa wallet in the in-app browser. Telegram’s secret is typed on each device — the boxes live on this server, so rooms stay in sync once the same secret is entered.</p>
+  <p class="actions"><a class="btn mint" id="installBtn" hidden>Install Gramlane</a> <a class="btn ghost" href="/">Home</a></p>
+</main>
+<script>
+(function () {
+  var btn = document.getElementById("installBtn");
+  var ev = null;
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    ev = e;
+    if (btn) btn.hidden = false;
+  });
+  if (btn) btn.addEventListener("click", function () {
+    if (!ev) return;
+    ev.prompt();
+  });
+})();
+</script>
+{{template "footer" .}}
