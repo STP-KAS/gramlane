@@ -698,7 +698,7 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 	raw := strings.ToLower(strings.TrimSpace(q))
 	board := raw == "board" || raw == "#board"
 	p := page{
-		Title: "Chat · Gramlane", Active: "kachat", Job: &j, Address: addr,
+		Title: "Chat · Gramlane", Active: "kachat", Job: &j, Address: addr, PayTo: desk.PayTo(),
 	}
 	if strings.HasPrefix(addr, "kaspa:") {
 		p.Held = names.Book(addr)
@@ -737,10 +737,15 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 		if text == "" {
 			text = p.Query
 		}
-		_, rec, err := s.burnJob("postage", text, addr)
-		p.Run = &rec
-		if err != nil {
-			p.Error = err.Error()
+		tx := strings.TrimSpace(r.FormValue("tx"))
+		if tx != "" {
+			post.StampMsg(addr, text+"\n"+tx, 0)
+		} else {
+			_, rec, err := s.burnJob("postage", text, addr)
+			p.Run = &rec
+			if err != nil {
+				p.Error = err.Error()
+			}
 		}
 	}
 	p.Stamps = post.List()

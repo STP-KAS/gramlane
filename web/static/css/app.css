@@ -294,6 +294,7 @@ input.bad, select.bad, textarea.bad { border-color: var(--danger); background: #
 .kc-bar input { flex: 1; min-height: 44px; }
 .kc-bar .btn { width: auto; }
 .kc-empty { margin: auto; text-align: center; padding: 40px 20px; max-width: 28em; }
+.kc-bar-note { padding: 0 12px 12px; margin: 0; }
 @media (max-width: 800px) {
   main { padding: 28px 16px 56px; }
   h1 { font-size: 30px; }

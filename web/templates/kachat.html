@@ -72,16 +72,20 @@
         {{end}}
         <p class="tiny" data-pay-status></p>
       </div>
-      {{if and .Job .Seq (ge .Seq.Remaining .Job.Grams)}}
       <form class="kc-bar" action="/kachat" method="post">
         <input type="hidden" name="q" value="{{.Query}}" />
         <input type="hidden" name="address" value="{{.Address}}" data-wallet-addr />
-        <input name="text" maxlength="280" placeholder="Message (postage, not E2E)" autocomplete="off" />
-        <button class="btn mint" type="submit">Send</button>
+        <input type="hidden" name="tx" value="" />
+        <input name="text" maxlength="280" placeholder="Message on this URL (Kasware, not the KaChat app)" autocomplete="off" />
+        {{if eq .Query "board"}}
+        <button class="btn mint" type="button" data-kachat-send data-kind="bcast" data-to="{{.PayTo}}" data-sompi="50000000">Send on L1</button>
+        {{else if .Contact.Address}}
+        <button class="btn mint" type="button" data-kachat-send data-kind="pay" data-to="{{.Contact.Address}}" data-sompi="50000000">Send on L1</button>
+        {{else}}
+        <button class="btn ghost" type="submit">Stamp only</button>
+        {{end}}
       </form>
-      {{else}}
-      <p class="kc-bar tiny">Jar cannot cover postage. <a href="/spend">Fill the jar</a>. Encrypted send lives in the KaChat app.</p>
-      {{end}}
+      <p class="tiny kc-bar-note">Send stays on this page. Kasware confirms. 0.5 KAS min. Payload is on L1 (public memo / kchat pay or bcast). Not KaChat E2E — the app may not decrypt it. This thread will.</p>
       {{else}}
       <div class="kc-empty">
         <h2>KaChat</h2>
