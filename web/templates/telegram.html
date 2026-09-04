@@ -1,0 +1,52 @@
+{{template "header" .}}
+<main id="main" class="kc-wrap" data-telegram data-room="{{.Query}}" data-from="{{.Address}}">
+  <p class="tiny kc-honest">Telegram here is a joke name. Encrypted in this browser (AES-GCM). Grams pay the desk. Not Telegram Messenger. Not KaChat. The secret never goes to the server.</p>
+  {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
+  {{if .Job}}<p class="tiny">{{.Job.Grams}} grams a note · jar {{if .Seq}}{{.Seq.Remaining}}{{end}}</p>{{end}}
+
+  <div class="kc">
+    <aside class="kc-side">
+      <form class="kc-find" action="/telegram" method="get">
+        <input name="q" value="{{if ne .Query "board"}}{{.Query}}{{end}}" placeholder="Room: bakery.kas" autocomplete="off" spellcheck="false" />
+        {{if .Address}}<input type="hidden" name="address" value="{{.Address}}" />{{end}}
+      </form>
+      <a class="kc-row {{if eq .Query "board"}}on{{end}}" href="/telegram?q=board{{if .Address}}&amp;address={{.Address}}{{end}}">
+        <span class="kc-av">#</span>
+        <span><strong>Board</strong><span class="tiny">shared secret</span></span>
+      </a>
+      {{range .Choices}}
+      <a class="kc-row {{if eq $.Query .Name}}on{{end}}" href="/telegram?q={{.Name}}{{if $.Address}}&amp;address={{$.Address}}{{end}}">
+        <span class="kc-av">{{printf "%.1s" .Name}}</span>
+        <span><strong>{{.Name}}</strong><span class="tiny">room</span></span>
+      </a>
+      {{end}}
+    </aside>
+    <section class="kc-thread">
+      <header class="kc-top">
+        <span class="kc-av">{{printf "%.1s" .Query}}</span>
+        <div class="kc-who">
+          <strong>{{.Query}}</strong>
+          <div class="tiny">Same secret on both sides. Desk stores boxes only.</div>
+        </div>
+        <label class="sr" for="tgSecret">Secret</label>
+        <input id="tgSecret" type="password" placeholder="shared secret" autocomplete="off" style="max-width:180px;min-height:36px" />
+      </header>
+      <div class="kc-msgs" id="tgMsgs">
+        {{range .Notes}}
+        <div class="kc-bubble" data-nonce="{{.Nonce}}" data-box="{{.Box}}" data-from="{{.From}}" data-when="{{.When}}" data-grams="{{.Grams}}">
+          <div class="tg-plain tiny">locked</div>
+          <div class="tiny">{{.When}} · {{.Grams}} g</div>
+        </div>
+        {{end}}
+        {{if not .Notes}}<p class="help">No notes in this room yet. Set a secret. Send. The other person types the same secret.</p>{{end}}
+      </div>
+      <form class="kc-bar" id="tgForm">
+        <input type="hidden" name="address" value="{{.Address}}" data-wallet-addr />
+        <input id="tgText" maxlength="280" placeholder="Encrypted note (grams)" autocomplete="off" />
+        <button class="btn mint" type="submit">Send</button>
+      </form>
+    </section>
+  </div>
+</main>
+<script src="/static/js/telegram.js"></script>
+{{template "footer" .}}

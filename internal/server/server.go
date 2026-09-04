@@ -17,6 +17,7 @@ import (
 	"gramlane/internal/feedback"
 	"gramlane/internal/framing"
 	"gramlane/internal/genesis"
+	"gramlane/internal/gramchat"
 	"gramlane/internal/jobs"
 	"gramlane/internal/kachat"
 	"gramlane/internal/livepage"
@@ -91,6 +92,7 @@ type page struct {
 	Address       string
 	Prior         *prior.Record
 	Priors        []prior.Record
+	Notes         []gramchat.Note
 }
 
 func New(addr string) (*Server, error) {
@@ -118,6 +120,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/till", s.posPage)
 	mux.HandleFunc("/pay", s.posPage)
 	mux.HandleFunc("/kachat", s.kachatPage)
+	mux.HandleFunc("/telegram", s.telegramPage)
+	mux.HandleFunc("/api/telegram", s.apiTelegram)
 	mux.HandleFunc("/kasdomain", s.kasdomainPage)
 	mux.HandleFunc("/kns", s.kasdomainPage)
 	mux.HandleFunc("/mine", s.minePage)
@@ -750,6 +754,56 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 	}
 	p.Stamps = post.List()
 	s.render(w, "kachat.html", p)
+}
+
+func (s *Server) telegramPage(w http.ResponseWriter, r *http.Request) {
+	j, _ := jobs.Get("telegram")
+	q := strings.TrimSpace(r.FormValue("q"))
+	if q == "" {
+		q = strings.TrimSpace(r.URL.Query().Get("q"))
+	}
+	if q == "" {
+		q = "board"
+	}
+	addr := walletAddr(r)
+	room := gramchat.Room(q)
+	p := page{Title: "Telegram · Gramlane", Active: "telegram", Job: &j, Query: room, Address: addr}
+	if strings.HasPrefix(addr, "kaspa:") {
+		p.Held = names.Book(addr)
+		p.Choices = shop.Choices(addr)
+	}
+	p.Notes = gramchat.List(room)
+	s.render(w, "telegram.html", p)
+}
+
+func (s *Server) apiTelegram(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		room := gramchat.Room(r.URL.Query().Get("room"))
+		writeJSON(w, 200, map[string]any{"ok": true, "room": room, "notes": gramchat.List(room)})
+		return
+	}
+	if r.Method != http.MethodPost {
+		writeJSON(w, 405, map[string]any{"ok": false, "error": "POST"})
+		return
+	}
+	body, _ := io.ReadAll(io.LimitReader(r.Body, 1<<16))
+	var req struct{ Room, From, Nonce, Box string }
+	_ = json.Unmarshal(body, &req)
+	if req.From == "" {
+		req.From = walletAddr(r)
+	}
+	j, _ := jobs.Get("telegram")
+	_, rec, err := s.burnJob("telegram", req.Room, req.From)
+	if err != nil {
+		writeJSON(w, 402, map[string]any{"ok": false, "error": err.Error(), "remaining": rec.Remaining})
+		return
+	}
+	n, err := gramchat.Put(req.Room, req.From, req.Nonce, req.Box, j.Grams)
+	if err != nil {
+		writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "note": n, "remaining": rec.Remaining})
 }
 
 func walletAddr(r *http.Request) string {

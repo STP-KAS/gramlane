@@ -50,6 +50,7 @@ var Catalog = []Job{
 	{ID: "batch", Name: "Batch three KNS resolves", Blurb: "Three inscription lookups. Indexer · not kasdomain.", Grams: 40_000, Lane: "SIGN1", Kind: "batch", Tag: "indexer · not kasdomain"},
 	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: 8_000, Lane: "SEQ1", Kind: "vault"},
 	{ID: "postage", Name: "KaChat postage", Blurb: "Sequenced stamp to a .kas contact. Not E2E — KaChat seals ciph_msg in the wallet.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
+	{ID: "telegram", Name: "Telegram note", Blurb: "Encrypted note in the browser. Grams pay the desk. Not Telegram Inc. Not KaChat.", Grams: 9_000, Lane: "MSG1", Kind: "telegram"},
 	{ID: "prior", Name: "Stamp prior art", Blurb: "Hash a work. Desk stamp in grams. Optional KAS to the hash lock on L1. Not a patent office.", Grams: 14_000, Lane: "SEQ1", Kind: "prior"},
 	{ID: "agent", Name: "AI agent call", Blurb: "HTTP 402 for a machine. Grok if XAI_API_KEY is set; otherwise local tools. Grams pay the call.", Grams: 25_000, Lane: "AGENT", Kind: "agent"},
 	{ID: "site", Name: "KNS generated page", Blurb: "Indexer profile → a page. Not a kasdomain covenant UTXO.", Grams: 15_000, Lane: "SIGN1", Kind: "site", Tag: "indexer · not kasdomain"},
@@ -263,6 +264,8 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 			return r, err
 		}
 		r.Output = string(b)
+	case "telegram", "prior":
+		r.Output = "desk"
 	case "agent":
 		name, prompt := splitAgentQ(q)
 		if prompt == "" {
