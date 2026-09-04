@@ -152,6 +152,21 @@ func P2SHFor(name string) (addr, hashHex string, redeem []byte, err error) {
 	return addr, hex.EncodeToString(sum[:]), redeem, nil
 }
 
+// P2SHForTagged bakes sha256(tag+payload) into KasName bytecode. Used for
+// prior-art locks (tag kasprior:v1:) so they never collide with a .kas label.
+func P2SHForTagged(tag, payload string) (addr, hashHex string, redeem []byte, err error) {
+	tpl, err := templateScript()
+	if err != nil {
+		return "", "", nil, err
+	}
+	out := append([]byte(nil), tpl...)
+	sum := sha256.Sum256([]byte(tag + payload))
+	copy(out[labelOffset:labelOffset+labelLen], sum[:])
+	h := blake2b.Sum256(out)
+	addr = kasaddr.Encode("kaspa", h[:], kasaddr.VersionScriptHash)
+	return addr, hex.EncodeToString(h[:]), out, nil
+}
+
 // ResolveCovenant never calls KNS. The name is a P2SH from KasName.sil + label.
 // First UTXO at that address is the name. api.kaspa.org is L1, not an inscription index.
 func ResolveCovenant(raw string) *Result {

@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   <h1>Postage</h1>
-  <p class="lede">Stamp the envelope, not the letter. Grams pay the stamp.</p>
+  <p class="lede">Use when a machine or a person must prove a short message was sequenced: “paid, included, hashed.” Stamp the envelope, not the letter. KaChat still encrypts. For a whole work, use <a href="/prior">prior art</a>.</p>
   {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Run}}<p class="ok">Stamped. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}

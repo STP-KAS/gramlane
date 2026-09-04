@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   <h1>Vault</h1>
-  <p class="lede">KAS stays locked. Grams pay the bump. This UTXO only — no foreign readInputState.</p>
+  <p class="lede">Use when KAS must sit still: escrow, a bond, a hold until a deal clears. The vault locks KAS. Grams pay this bump (check the 42-byte packing). Not a shop till. <a href="/prior">Prior art</a> is the hash stamp; this is the coin lock.</p>
   {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Run}}<p class="ok">Bumped. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}

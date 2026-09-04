@@ -1,6 +1,6 @@
 // Package shop hangs a page and a till on a kasdomain.
 // The name is L1 (P2SH). Words and menu live on this desk until a content covenant exists.
-// Till tickets settle in grams (recurrent sequencing). Acquiring the name stays KAS.
+// Shop till is KAS to PayTo. Acquiring the name is also KAS. Grams are dApp opex, not the shop drawer.
 package shop
 
 import (
@@ -306,7 +306,7 @@ func View(raw string) *Storefront {
 		Name:       disp,
 		Evidence:   "live",
 		Rate:       rate,
-		TillUnit:   "gram",
+		TillUnit:   "kas",
 		NameSettle: "kas",
 		Web4: map[string]any{
 			"named":     true,
@@ -316,7 +316,7 @@ func View(raw string) *Storefront {
 			"kns":       false,
 			"vprogs":    "roadmap",
 			"toccata":   "live",
-			"note":      "The name is a covenant output. The page and menu are this desk. Agents pay without an account.",
+			"note":      "The name is a covenant output. The page and menu are this desk. The till is KAS to PayTo. Grams are for apps, not the shop drawer.",
 		},
 	}
 	if disp == "" {
@@ -338,7 +338,7 @@ func View(raw string) *Storefront {
 	}
 	if sh := Get(disp); sh != nil {
 		v.Shop = sh
-		v.Warning = "Name is L1. Words and prices are this desk — not DNS, not IPFS, not a vProg. Till is grams. Acquiring the name is KAS. USD is the board sign. Not KNS."
+		v.Warning = "Name is L1. Words and prices are this desk. Till is KAS to the shop address. USD is the board sign. Grams are for apps, not this drawer. Not KNS."
 		return v
 	}
 	if v.Hit {

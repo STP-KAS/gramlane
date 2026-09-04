@@ -41,6 +41,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/spend` | Pay KAS to the desk; grams land in the jar book. `/stablegram` still opens this page. |
 | `/jar` | Miller's book: fills and burns. Operator accounting until consume() |
 | `/pay` | Pay hub — EUR/USD ticket, QR, counter |
+| `/prior` | Prior art: hash stamp (grams) + optional KAS lock. Not a patent office. |
 | `/pay/{id}` | Pay a ticket from the jar |
 | `/kasdomain` | Get a name (KAS to the P2SH). Dollar shelf. Not KNS. |
 | `/mine` | All kasdomains on a wallet after fund or buy |
