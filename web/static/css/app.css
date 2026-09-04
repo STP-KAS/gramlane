@@ -117,6 +117,12 @@ pre {
 }
 .chip.indexer, .chip.live, .chip.local, .chip.compiled, .chip.roadmap { letter-spacing: .04em; text-transform: lowercase; }
 .chip.compiled { color: var(--mint); border-color: #cde8dc; }
+.chip.live {
+  color: #fff;
+  background: var(--mint);
+  border-color: var(--mint);
+  font-weight: 600;
+}
 .chip.indexer { color: var(--ink); }
 .chip.local { color: var(--muted); }
 .chip.roadmap { color: var(--warn); border-color: #ead9b8; }
