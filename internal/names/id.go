@@ -39,8 +39,8 @@ func ForAddress(addr string) (*Identity, error) {
 	q := url.Values{}
 	q.Set("owner", addr)
 	q.Set("type", "domain")
-	q.Set("pageSize", "20")
-	for page := 1; page <= 3; page++ {
+	q.Set("pageSize", "100")
+	for page := 1; page <= 5; page++ {
 		q.Set("page", fmt.Sprintf("%d", page))
 		b, err := getJSON(indexer + "/assets?" + q.Encode())
 		if err != nil {
@@ -77,6 +77,7 @@ func ForAddress(addr string) (*Identity, error) {
 			break
 		}
 	}
+	id.Names = sortNames(id.Names)
 	id.Linked = Linked(addr)
 	if id.Linked != "" {
 		id.Display = id.Linked
@@ -84,6 +85,79 @@ func ForAddress(addr string) (*Identity, error) {
 		id.Display = id.Names[0]
 	}
 	return id, nil
+}
+
+func sortNames(in []string) []string {
+	if len(in) < 2 {
+		return in
+	}
+	score := func(n string) int {
+		switch {
+		case n == "kdao.kas" || n == "kaspadao.kas":
+			return 0
+		case strings.HasPrefix(n, "kdao"):
+			return 1
+		case strings.Contains(n, "kdao") || strings.Contains(n, "kaspadao"):
+			return 2
+		default:
+			return 3
+		}
+	}
+	out := append([]string(nil), in...)
+	for i := 0; i < len(out); i++ {
+		for j := i + 1; j < len(out); j++ {
+			if score(out[j]) < score(out[i]) || (score(out[j]) == score(out[i]) && out[j] < out[i]) {
+				out[i], out[j] = out[j], out[i]
+			}
+		}
+	}
+	return out
+}
+
+// PickOwned turns "kdao" into an owned name. Exact match first, then unique substring.
+func PickOwned(addr, q string) (string, []string, error) {
+	q = strings.ToLower(strings.TrimSpace(q))
+	if q == "" {
+		return "", nil, fmt.Errorf("name")
+	}
+	want := Normalize(q)
+	id, err := ForAddress(addr)
+	if err != nil {
+		return "", nil, err
+	}
+	needle := strings.TrimSuffix(q, ".kas")
+	var hits []string
+	for _, n := range id.Names {
+		if n == want {
+			return n, nil, nil
+		}
+		if knsMatch(n, needle) {
+			hits = append(hits, n)
+		}
+	}
+	if p, lerr := Lookup(want); lerr == nil && strings.EqualFold(p.Owner, addr) {
+		return want, nil, nil
+	}
+	if len(hits) == 1 {
+		return hits[0], nil, nil
+	}
+	if len(hits) > 1 {
+		return "", hits, fmt.Errorf("several names match %s — pick one", q)
+	}
+	return "", nil, fmt.Errorf("%s is not owned by this kaspa address", want)
+}
+
+func knsMatch(name, needle string) bool {
+	if needle == "" {
+		return false
+	}
+	if strings.Contains(name, needle) {
+		return true
+	}
+	if needle == "kdao" && (strings.Contains(name, "kaspadao") || strings.HasPrefix(name, "kdao")) {
+		return true
+	}
+	return false
 }
 
 func Linked(addr string) string {
@@ -107,24 +181,14 @@ func Link(addr, name string) error {
 		linkMu.Unlock()
 		return err
 	}
-	name = Normalize(name)
-	id, err := ForAddress(addr)
+	picked, hits, err := PickOwned(addr, name)
 	if err != nil {
+		if len(hits) > 0 {
+			return fmt.Errorf("%s (try %s)", err.Error(), strings.Join(hits, ", "))
+		}
 		return err
 	}
-	ok := false
-	for _, n := range id.Names {
-		if n == name {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		p, lerr := Lookup(name)
-		if lerr != nil || !strings.EqualFold(p.Owner, addr) {
-			return fmt.Errorf("%s is not owned by this kaspa address", name)
-		}
-	}
+	name = picked
 	loadLinks()
 	linkMu.Lock()
 	defer linkMu.Unlock()

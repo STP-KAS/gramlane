@@ -107,7 +107,12 @@
     if (payer) payer.value = c.address || "";
     const wallet = document.querySelector('input[name="wallet"]');
     if (wallet) wallet.value = c.id || "";
-    if (c.address) status("");
+    if (c.address && c.name) status(c.name + " · change");
+    else if (c.address) status("");
+    document.querySelectorAll("[data-wallet-status]").forEach(function (el) {
+      if (c.address && c.name) el.setAttribute("data-wallet-change-name", "1");
+      else el.removeAttribute("data-wallet-change-name");
+    });
   }
 
   async function kaswareAccountsQuiet() {
@@ -183,7 +188,11 @@
     paintButtons();
     status("Logged in");
     loadIdentity(r.address).then(function (id) {
-      if (id && id.names && id.names.length > 1 && !id.linked) openNameModal(id);
+      if (id && id.linked) {
+        status(id.linked);
+        return;
+      }
+      if (id && id.names && id.names.length > 1) openNameModal(id);
     });
     return r;
   }
@@ -217,9 +226,16 @@
 
   async function clickLogin(btn) {
     if (current().address) {
+      if (current().name) {
+        status(current().name + " is pinned. Click Change name to switch.");
+        loadIdentity(current().address).then(function (id) {
+          if (id) window._gramlaneId = id;
+        });
+        return;
+      }
       loadIdentity(current().address).then(function (id) {
         if (id && id.names && id.names.length > 1) openNameModal(id);
-        else status(display(current()) + (current().name ? "" : " · " + shortAddr(current().address)));
+        else status(display(current()));
       });
       return;
     }
@@ -281,6 +297,17 @@
         pickName("");
         return;
       }
+      if (e.target.closest("[data-kns-pin]")) {
+        var pin = document.getElementById("knsPin");
+        pickName(pin && pin.value ? pin.value : "kdao");
+        return;
+      }
+      if (e.target.closest("[data-wallet-change-name]")) {
+        loadIdentity(current().address).then(function (id) {
+          if (id) openNameModal(id);
+        });
+        return;
+      }
       var kns = e.target.closest("[data-kns-pick]");
       if (kns) {
         pickName(kns.getAttribute("data-kns-pick"));
@@ -330,8 +357,9 @@
         '<div id="knsModal" class="wmodal" hidden><div class="wmodal-card">' +
         '<div class="wmodal-head"><strong>Link a .kas name</strong>' +
         '<button type="button" class="btn ghost" data-kns-close>Close</button></div>' +
-        '<p class="tiny">This Kaspa address owns more than one domain. Pick the one Gramlane should show. Permanent on this site until you change it.</p>' +
-        '<input id="knsFilter" placeholder="filter" style="width:100%;margin:10px 0" />' +
+        '<p class="tiny">Pick one .kas name for this Kaspa address. Once is enough — Gramlane keeps it. Type kdao if you do not see it.</p>' +
+        '<div class="row"><input id="knsPin" placeholder="kdao or kdao.kas" /><button type="button" class="btn mint" data-kns-pin>Pin once</button></div>' +
+        '<input id="knsFilter" placeholder="filter the list" style="width:100%;margin:10px 0" />' +
         '<div id="knsList" class="kns-list"></div>' +
         '<p style="margin-top:12px"><button type="button" class="btn ghost" data-kns-clear>Show kaspa address</button></p>' +
         "</div></div>";
@@ -354,6 +382,7 @@
     }
     draw("");
     var f = document.getElementById("knsFilter");
+    f.value = "";
     f.oninput = function () {
       draw(f.value);
     };
@@ -372,12 +401,25 @@
         return r.json();
       })
       .then(function (j) {
+        if (!j || !j.ok) {
+          status((j && j.error) || "could not pin");
+          var sug = (j && j.suggestions) || [];
+          var list = document.getElementById("knsList");
+          if (list && sug.length) {
+            list.innerHTML = sug
+              .map(function (n) {
+                return '<button type="button" class="btn mint" data-kns-pick="' + n + '">' + n + "</button>";
+              })
+              .join(" ");
+          }
+          return;
+        }
         var linked = j && j.id && j.id.linked ? j.id.linked : name || "";
         persist(c.id, c.address, linked);
         paintButtons();
         var m = document.getElementById("knsModal");
         if (m) m.hidden = true;
-        status(linked ? "Linked " + linked : "Showing kaspa address");
+        status(linked ? linked + " pinned" : "Showing kaspa address");
       })
       .catch(function (err) {
         status(err.message || String(err));

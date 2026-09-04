@@ -887,7 +887,8 @@ func (s *Server) apiID(w http.ResponseWriter, r *http.Request) {
 			req.Name = r.FormValue("name")
 		}
 		if err := names.Link(req.Address, req.Name); err != nil {
-			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
+			_, hits, _ := names.PickOwned(req.Address, req.Name)
+			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error(), "suggestions": hits})
 			return
 		}
 		id, err := names.ForAddress(req.Address)
