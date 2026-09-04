@@ -67,9 +67,10 @@
       <div class="invoice-row"><span>Shelf</span><strong>{{.Result.Shelf.USD}}</strong></div>
       <div class="invoice-row total"><span>You send</span><strong>{{.Result.Mint.TotalKAS}} KAS</strong></div>
     </div>
+    <label for="pay-to">Name lock — not your wallet. 100 KAS of the mint goes here.</label>
     <input class="mono" id="pay-to" value="{{.Result.PayURI}}" readonly />
-    <p><button type="button" class="btn ghost" data-copy-text="{{.Result.PayURI}}">Copy address</button></p>
-    <p class="tiny">Growth vault <span class="mono">{{.Result.Mint.Vault}}</span></p>
+    <p><button type="button" class="btn ghost" data-copy-text="{{.Result.PayURI}}">Copy lock</button></p>
+    <p class="tiny">Growth vault <span class="mono">{{.Result.Mint.Vault}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Result.Mint.Vault}}">Copy vault</button></p>
     <p class="actions">
       <button class="btn mint" type="button" data-pay-l1 data-name="{{.Result.Name}}" data-after="/kasdomain?q={{.Query}}&address=" data-sompi="{{.Result.Mint.NameSompi}}" data-vault="{{.Result.Mint.Vault}}" data-vault-sompi="{{.Result.Mint.VaultSompi}}">Fund {{.Result.Name}}</button>
     </p>
@@ -95,8 +96,13 @@
       {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
     </details>
     {{else}}
-    <p class="help">This name is funded. A shop is this same name with a page.</p>
-    {{if .Result.PayURI}}<p class="tiny"><span class="mono">{{.Result.PayURI}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Result.PayURI}}">Copy address</button></p>{{end}}
+    <p class="help">This name is funded. The <span class="mono">kaspa:p…</span> is the name lock. The minter is a <span class="mono">kaspa:q…</span> wallet.</p>
+    {{if .Result.Owner}}
+    <p>Minter <span class="mono">{{.Result.Owner}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Result.Owner}}">Copy minter address</button></p>
+    {{else}}
+    <p class="tiny">Minter wallet is not on this desk book. The lock below is still the name on L1.</p>
+    {{end}}
+    {{if .Result.PayURI}}<p class="tiny">Name lock <span class="mono">{{.Result.PayURI}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Result.PayURI}}">Copy lock</button></p>{{end}}
     <p class="actions">
       <a class="btn mint" href="/{{.Result.Name}}">See {{.Result.Name}}</a>
       {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Open as a shop</a>{{end}}

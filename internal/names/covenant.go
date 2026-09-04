@@ -48,6 +48,7 @@ type Result struct {
 	Layout     string          `json:"layout,omitempty"`
 	Hit        bool            `json:"hit"`
 	Hold       *Hold           `json:"hold,omitempty"`
+	Outpoint   string          `json:"outpoint,omitempty"`
 }
 
 func LabelBytes(name string) []byte {
@@ -199,9 +200,12 @@ func ResolveCovenant(raw string) *Result {
 		return out
 	}
 	out.Hit = true
-	out.Owner = utxos[0].TxID + ":" + fmt.Sprint(utxos[0].Index)
+	out.Outpoint = utxos[0].TxID + ":" + fmt.Sprint(utxos[0].Index)
+	if who := HolderOf(disp); who != "" {
+		out.Owner = who
+	}
 	rawJSON, _ := json.Marshal(utxos)
 	out.Raw = rawJSON
-	out.Warning = fmt.Sprintf("%s has a UTXO at this exact script. That is L1, not a KNS inscription. We do not scan every other template. #234: this name never reads a sibling voucher.", disp)
+	out.Warning = fmt.Sprintf("%s has a UTXO at this exact script. That is L1, not a KNS inscription. The kaspa:p… is the name lock, not the minter wallet.", disp)
 	return out
 }
