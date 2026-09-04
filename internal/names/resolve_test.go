@@ -1,49 +1,49 @@
 package names
 
-import (
-	"os"
-	"path/filepath"
-	"testing"
+import "testing"
 
-	"gramlane/internal/appenv"
-)
-
-func TestResolveCovenantDoesNotUseKNS(t *testing.T) {
-	ResetFixturesForTest()
-	r := ResolveCovenant("google")
-	if r.Hit || r.Owner != "" || r.Evidence != "roadmap" {
-		t.Fatalf("google must not be a KNS hit: %+v", r)
+func TestP2SHDiffersPerName(t *testing.T) {
+	ResetCovenantForTest()
+	a, ha, ra, err := P2SHFor("bakery")
+	if err != nil || a == "" || len(ra) < 32 || ha == "" {
+		t.Fatalf("%v %s", err, a)
 	}
-	if r.Evidence == "live" || r.Evidence == "indexer" {
-		t.Fatal(r.Evidence)
+	b, hb, _, err := P2SHFor("google")
+	if err != nil {
+		t.Fatal(err)
 	}
-	kns := ResolveCovenant("kns.kas")
-	if kns.Hit || kns.Owner != "" {
-		t.Fatalf("kns.kas is not kasdomain: %+v", kns)
+	if a == b || ha == hb {
+		t.Fatal("names must not share a P2SH")
+	}
+	if a[6] != 'p' {
+		t.Fatalf("want script hash address, got %s", a)
+	}
+	c, _, _, err := P2SHFor("kns.kas")
+	if err != nil || c == a || c == b {
+		t.Fatalf("kns.kas must be a different covenant address: %v %s", err, c)
 	}
 }
 
-func TestResolveCovenantLocalFixture(t *testing.T) {
-	dir := t.TempDir()
-	t.Setenv("DATA_DIR", dir)
-	ResetFixturesForTest()
-	body := []byte(`{"names":[{"name":"demo","ownerPub":"aa","payUri":"kaspa:qtest","scriptHash":"bb","hex":"deadbeef","layout":"State { label, owner }"}]}`)
-	if err := os.WriteFile(filepath.Join(dir, "kasdomain-fixture.json"), body, 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// appenv.File uses DATA_DIR at call time; loadFixtures reads it.
-	_ = appenv.File("kasdomain-fixture.json")
-	r := ResolveCovenant("demo")
-	if !r.Hit || r.Evidence != "local" || r.Hex != "deadbeef" {
-		t.Fatalf("%+v", r)
-	}
+func TestResolveCovenantNoKNS(t *testing.T) {
+	ResetCovenantForTest()
+	r := ResolveCovenant("google")
 	if r.Evidence == "indexer" || r.Evidence == "live" {
 		t.Fatal(r.Evidence)
+	}
+	if r.PayURI == "" || r.ScriptHash == "" {
+		t.Fatalf("expected derived P2SH: %+v", r)
+	}
+	if r.Hit {
+		t.Fatal("skipChain should not mark funded")
+	}
+	kns := ResolveCovenant("kns.kas")
+	if kns.PayURI == r.PayURI {
+		t.Fatal("kns.kas must not reuse google script")
 	}
 }
 
 func TestDisplayName(t *testing.T) {
-	if DisplayName(" Google ") != "google" {
-		t.Fatal(DisplayName(" Google "))
+	if DisplayName("Bakery") != "bakery.kas" || DisplayName("google.kas") != "google.kas" {
+		t.Fatal(DisplayName("Bakery"), DisplayName("google.kas"))
 	}
 }

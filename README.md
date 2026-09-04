@@ -29,7 +29,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | Path | What |
 | --- | --- |
 | `/` | Home: name, Stablegram jar, Pay |
-| `/kasdomain` | Covenant names on L1. Not KNS. Not live. Quote in grams. |
+| `/kasdomain` | Covenant name = P2SH(KasName.sil, label). First UTXO wins. Not KNS. |
 | `/why` | Beyond the chain: household, plant, agent, counter |
 | `/vault` | Vault bump — grams pay the action, KAS stays locked |
 | `/postage` | Message postage board |
