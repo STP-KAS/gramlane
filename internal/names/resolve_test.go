@@ -27,8 +27,8 @@ func TestP2SHDiffersPerName(t *testing.T) {
 func TestResolveCovenantNoKNS(t *testing.T) {
 	ResetCovenantForTest()
 	r := ResolveCovenant("google")
-	if r.Evidence == "indexer" || r.Evidence == "live" {
-		t.Fatal(r.Evidence)
+	if r.Evidence == "indexer" || r.Evidence != "live" {
+		t.Fatalf("want live covenant, not indexer: %s", r.Evidence)
 	}
 	if r.PayURI == "" || r.ScriptHash == "" {
 		t.Fatalf("expected derived P2SH: %+v", r)

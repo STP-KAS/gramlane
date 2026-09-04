@@ -25,7 +25,8 @@ const (
 
 var skipChain bool
 
-// Result is a kasdomain hit. Evidence is compiled — never a KNS indexer record.
+// Result is a kasdomain hit. Evidence is live when KasName.sil derives a P2SH.
+// Never an indexer record. Not KNS.
 type Result struct {
 	Query      string          `json:"query"`
 	Name       string          `json:"name"`
@@ -139,7 +140,7 @@ func ResolveCovenant(raw string) *Result {
 	out := &Result{
 		Query:    raw,
 		Name:     disp,
-		Evidence: "compiled",
+		Evidence: "live",
 		Quote:    FundQuote(),
 		Mint:     FundMint(),
 		Shelf:    AskFor(disp),
@@ -159,7 +160,7 @@ func ResolveCovenant(raw string) *Result {
 	out.PayURI = addr
 	out.ScriptHash = hashHex
 	out.Hex = hex.EncodeToString(redeem)
-	out.Warning = "This P2SH is determined by compiled KasName.sil and this label. First funded output is the name. No yearly bill. Not KNS. Not an inscription. Anyone can recompute the script."
+	out.Warning = "kasdomain covenant is live on L1. This P2SH is KasName.sil plus this label. First funded output is the name. No yearly bill. Not KNS. Anyone can recompute the script."
 	if skipChain {
 		out.Hit = false
 		return out

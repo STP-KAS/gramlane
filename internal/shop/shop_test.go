@@ -57,8 +57,8 @@ func TestMenuGramsNotKNS(t *testing.T) {
 		t.Fatalf("%v %+v", err, inv)
 	}
 	v := View("bakery")
-	if v.Evidence == "indexer" || v.Evidence == "live" {
-		t.Fatal(v.Evidence)
+	if v.Evidence == "indexer" || v.Evidence != "live" {
+		t.Fatalf("want live covenant: %s", v.Evidence)
 	}
 	if v.Shop == nil || v.NameSettle != "kas" || v.TillUnit != "gram" {
 		t.Fatalf("%+v", v)
@@ -128,7 +128,7 @@ func TestViewDoesNotNeedShop(t *testing.T) {
 	if v.Shop != nil {
 		t.Fatal("empty shop")
 	}
-	if v.P2SH == "" || v.Evidence != "compiled" {
+	if v.P2SH == "" || v.Evidence != "live" {
 		t.Fatalf("%+v", v)
 	}
 }

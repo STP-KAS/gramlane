@@ -304,7 +304,7 @@ func View(raw string) *Storefront {
 	rate := names.LoadSign().KasInFiat
 	v := &Storefront{
 		Name:       disp,
-		Evidence:   "compiled",
+		Evidence:   "live",
 		Rate:       rate,
 		TillUnit:   "gram",
 		NameSettle: "kas",
