@@ -37,15 +37,15 @@
 
   <p class="actions">
     {{if not .Store.Hit}}<a class="btn mint" href="/kasdomain?q={{.Store.Name}}">Get this name</a>{{end}}
-    {{if and .Store.Hit (not .Store.Shop)}}<a class="btn mint" href="/shop?name={{.Store.Name}}">Open as a shop</a>{{end}}
+    {{if and .Store.Hit (not .Store.Shop)}}<a class="btn mint" href="/shop?name={{.Store.Name}}">Hang a page</a>{{end}}
   </p>
   {{if .Store.Shop}}
   <p><img alt="QR for {{.Store.Name}}" width="180" height="180" src="/qr/{{.Store.Name}}.png" /></p>
   {{end}}
   {{else}}
-  <h1>Shops</h1>
-  <p class="lede">A shop is a name with a page at <span class="mono">bakery.kas</span>. Get the name first. Then open it as a shop.</p>
-  <p class="help">Prefer a <strong>separate Kaspa address for each shop</strong>. Several names on one address is allowed — if that address is sold or leaked, every shop on it moves.</p>
+  <h1>Pages</h1>
+  <p class="lede">Your kasdomain is for dApps. The page is a separate URL: <span class="mono">bakery.kas</span> or <span class="mono">/bakery.kas</span>.</p>
+  <p class="help">Prefer a <strong>separate Kaspa address for each name</strong>. A leak or a sale then moves every page on that key.</p>
 
   {{if .Choices}}
   <h2>Your names</h2>
@@ -53,14 +53,14 @@
     {{range .Choices}}
     <article class="card">
       <h3>{{.Name}}</h3>
-      {{if .HasShop}}<p class="ok">Shop open{{if .Headline}} · {{.Headline}}{{end}}</p>
-      {{else}}<p class="tiny">No shop yet</p>{{end}}
+      {{if .HasShop}}<p class="ok">Page live{{if .Headline}} · {{.Headline}}{{end}}</p>
+      {{else}}<p class="tiny">No page yet</p>{{end}}
       <p class="actions">
         {{if .HasShop}}
         <a class="btn mint" href="/{{.Name}}">See page</a>
         <a class="btn ghost" href="/shop?name={{.Name}}{{if $.Held}}&amp;address={{$.Held.Address}}{{end}}">Edit</a>
         {{else}}
-        <a class="btn mint" href="/shop?name={{.Name}}{{if $.Held}}&amp;address={{$.Held.Address}}{{end}}">Open as shop</a>
+        <a class="btn mint" href="/shop?name={{.Name}}{{if $.Held}}&amp;address={{$.Held.Address}}{{end}}">Hang a page</a>
         {{end}}
       </p>
     </article>
