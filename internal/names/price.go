@@ -150,9 +150,9 @@ func FundQuote() quote.Quote {
 	return quote.Quote{
 		Unit:       "KAS",
 		Sompi:      m.NameSompi,
-		KAS:        0.5,
+		KAS:        100,
 		PaySompi:   m.NameSompi,
-		PayKAS:     0.5,
+		PayKAS:     100,
 		PayKASText: m.TotalKAS,
 		Lane:       "kasdomain",
 		Scheme:     "kaspa-l1",
@@ -184,18 +184,24 @@ func VaultAddress() string {
 	return AdoptionVault
 }
 
+const (
+	MintKAS      uint64 = 200
+	MintSharePct uint64 = 50
+)
+
 func FundMint() Mint {
-	half := quote.KaswareMinSompi
+	total := MintKAS * quote.SompiPerKAS
+	half := total / 2
 	return Mint{
 		NameSompi:  half,
 		VaultSompi: half,
-		TotalSompi: half * 2,
-		NameKAS:    "0.5",
-		VaultKAS:   "0.5",
-		TotalKAS:   "1",
+		TotalSompi: total,
+		NameKAS:    "100",
+		VaultKAS:   "100",
+		TotalKAS:   "200",
 		Vault:      VaultAddress(),
-		SharePct:   50,
-		Note:       "Half funds the name output. Half goes to a Kaspa address for ideas and dApps that grow Kaspa. Not a protocol tax. Not grams.",
+		SharePct:   MintSharePct,
+		Note:       "Standard mint is 200 KAS. Half funds the name output. Half goes to a Kaspa address for ideas and dApps that grow Kaspa. Not a protocol tax. Not grams.",
 	}
 }
 
