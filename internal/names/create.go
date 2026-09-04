@@ -127,7 +127,7 @@ func Check(raw, myAddr string) (*Want, error) {
 	}
 	p, err := Lookup(w.Name)
 	if err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "no owner") {
+		if isFreeOnIndex(err) {
 			w.Available = true
 			return w, nil
 		}

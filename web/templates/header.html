@@ -15,11 +15,12 @@
   <header class="nav">
     <a class="brand" href="/" title="Gramlane home">GRAMLANE</a>
     <nav>
+      <a href="/" class="{{if eq .Active "home"}}on{{end}}">Home</a>
       <a href="/kasdomain" class="{{if eq .Active "kasdomain"}}on{{end}}">kasdomain</a>
+      <a href="/stablegram" class="{{if eq .Active "stablegram"}}on{{end}}">Stablegram</a>
+      <a href="/pay" class="{{if eq .Active "pay"}}on{{end}}">Pay</a>
       <a href="/desk" class="{{if or (eq .Active "apps") (eq .Active "desk")}}on{{end}}">Desk</a>
       <a href="/why" class="{{if eq .Active "why"}}on{{end}}">Why</a>
-      <a href="/honest" class="{{if eq .Active "honest"}}on{{end}}">Honest</a>
-      <a href="/safety" class="{{if eq .Active "safety"}}on{{end}}">Safety</a>
     </nav>
     <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>

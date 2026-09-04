@@ -28,7 +28,8 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | Path | What |
 | --- | --- |
-| `/` `/kasdomain` | Resolve a .kas name. Quote in grams. Inspect indexer JSON |
+| `/` | Home: name, Stablegram jar, Pay |
+| `/kasdomain` | Check a word. Get it (once, no rent). Host the site. Resolve / inspect. |
 | `/why` | Beyond the chain: household, plant, agent, counter |
 | `/vault` | Vault bump — grams pay the action, KAS stays locked |
 | `/postage` | Message postage board |

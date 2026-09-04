@@ -236,7 +236,8 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	s.kasdomainPage(w, r)
+	seedSign()
+	s.render(w, "home.html", page{Title: "Gramlane", Active: "home", Query: names.Linked(genesis.HolderAddress)})
 }
 
 func (s *Server) jarPage(w http.ResponseWriter, r *http.Request) {
@@ -644,12 +645,26 @@ func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 		if err != nil && p.Error == "" {
 			p.Error = err.Error()
 		}
+		if res != nil && res.Name != "" && !strings.HasPrefix(strings.ToLower(q), "kaspa:") {
+			if want, werr := names.Check(q, addr); werr == nil {
+				p.Want = want
+			} else if res.Available {
+				w := names.ParseWant(q)
+				w.Available = true
+				p.Want = w
+			}
+		}
 	}
 	if r.Method == http.MethodPost {
 		switch r.FormValue("act") {
 		case "pin":
-			if err := names.Link(addr, r.FormValue("name")); err != nil {
+			name := r.FormValue("name")
+			if err := names.Link(addr, name); err != nil {
 				p.Error = err.Error()
+			} else {
+				livepage.Ensure(name, name, "This name is hosted on Gramlane. Pay in grams. The long kaspa:q… is the door.", "Open a Pay ticket from the jar.")
+				http.Redirect(w, r, "/site/"+names.Normalize(name), http.StatusSeeOther)
+				return
 			}
 		case "live":
 			name := r.FormValue("name")
