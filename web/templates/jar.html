@@ -1,9 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">the jar · miller's book</div>
-  <h1>Grams in. Grams out.</h1>
-  <p class="lede">This is the spend pile. Fills are L1 sends to the desk. Burns are sequenced work. They are <strong>operator accounting</strong> until <span class="mono">consume()</span> spends the WorkCredit UTXO. Not a dollar. Not a KCC-20.</p>
-  {{if .Query}}<p class="lede">Shop sign: <a class="mono" href="/site/{{.Query}}">{{.Query}}</a></p>{{end}}
+  <h1>The jar</h1>
+  <p class="lede">Grams in, grams out. A book on this desk until consume() on L1.</p>
+  {{if .Query}}<p class="tiny">Shop: <a href="/s/{{.Query}}">{{.Query}}</a></p>{{end}}
   {{if .Seq}}
   <div class="stats">
     <div><b>{{.Seq.Remaining}}</b><span>grams left</span></div>

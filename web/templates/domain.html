@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   {{if .Site}}
-  <div class="kicker">Kasdomain · this name is a place</div>
+
   {{if .Site.Avatar}}<img class="site-av" src="{{.Site.Avatar}}" alt="" />{{end}}
   <h1>{{if .Live}}{{if .Live.Headline}}{{.Live.Headline}}{{else}}{{.Site.Name}}{{end}}{{else}}{{.Site.Name}}{{end}}</h1>
   <p class="price">{{.Site.Name}}</p>

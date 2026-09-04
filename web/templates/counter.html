@@ -4,9 +4,9 @@
   <div class="kicker" data-status>{{.Invoice.Status}} · {{.Invoice.Merchant}}</div>
   <h1>{{.Invoice.Item}}</h1>
   {{if .Invoice.Shelf}}<p class="lede">{{.Invoice.Shelf}}</p>{{end}}
-  <p class="till">{{.Invoice.Grams}} GRAM</p>
+  <p class="till">{{.Invoice.Grams}} grams</p>
   {{if eq .Invoice.Status "paid"}}
-  <p class="ok" style="font-size:28px">PAID</p>
+  <p class="ok" style="font-size:28px">Paid</p>
   {{else}}
   <p><img alt="QR" width="256" height="256" src="/qr/{{.Invoice.ID}}.png" /></p>
   <p class="tiny">Scan to pay · {{.Invoice.ID}}</p>

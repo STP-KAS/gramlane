@@ -1,9 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">desk · grams</div>
-  <h1>Jobs in grams.</h1>
-  <p class="lede">Lookups on this desk that hit the public name index are <strong>indexer · not kasdomain</strong>. kasdomain is a covenant name, not an inscription.</p>
-  {{if .Seq}}<p class="lede">Jar: <strong class="mono">{{.Seq.Remaining}}</strong> GRAM.</p>{{end}}
+  <h1>Desk</h1>
+  <p class="lede">Jobs cost grams. Name lookups here that hit the public index are not kasdomain.</p>
+  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} grams</p>{{end}}
   <div class="grid">
     <article class="card">
       <h3>kasdomain</h3>

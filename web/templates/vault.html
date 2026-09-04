@@ -1,8 +1,7 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">vault bump · grams pay the action</div>
-  <h1>Vaults still lock KAS. Grams pay the bump.</h1>
-  <p class="lede">This is the sequenced vault operation — not the value locked. Worked #234: the same 42 bytes, amount 1, a hostile packing reads <strong>264</strong>. Gramlane never <span class="mono">readInputState</span>s a foreign UTXO.</p>
+  <h1>Vault</h1>
+  <p class="lede">KAS stays locked. Grams pay the bump. This UTXO only — no foreign readInputState.</p>
   {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}}</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Run}}<p class="ok">Bumped. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}

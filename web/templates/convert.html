@@ -1,9 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">policy meter · not a token</div>
-  <h1>KAS ↔ grams.</h1>
-  <p class="lede">This is the KIP-21 policy rate: <strong>100 sompi per gram</strong>. 1&nbsp;000&nbsp;000 grams = 1 KAS. It is not a market, not a peg, and not a KCC-20. WorkCredit already is the voucher. A transferable token would be the wrong object.</p>
-  {{if .Seq}}<p class="lede">Prepaid remaining: <span class="mono">{{.Seq.Remaining}}</span> grams ≈ {{if .Seq}}<a href="/convert?from=remaining">convert remaining</a>{{end}}.</p>{{end}}
+  <h1>Convert</h1>
+  <p class="lede">100 sompi per gram. Policy arithmetic, not a token and not a peg.</p>
+  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} grams · <a href="/convert?from=remaining">convert remaining</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <form class="row" action="/convert" method="get">

@@ -1,8 +1,7 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">AI agent · HTTP 402 · grams pay the call</div>
-  <h1>A machine that pays in grams.</h1>
-  <p class="lede">Build an agent card from a live .kas name, then ask. If <span class="mono">XAI_API_KEY</span> is set this process calls Grok on api.x.ai. Otherwise it is a local tools agent — not a fake LLM. Grams pay the sequenced call, not a dollar.</p>
+  <h1>Agent</h1>
+  <p class="lede">Ask from a name. Grams pay the call. Grok if a key is set, otherwise local tools.</p>
   {{if .Job}}<p class="price">{{.Job.Grams}} GRAM · lane {{.Job.Lane}} · {{if .HasGrok}}<span class="ok">Grok wired</span>{{else}}local tools{{end}}</p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
   {{if .Run}}<p class="ok">Called. Settlement {{.Run.Settlement}} · remaining {{.Run.Remaining}} grams.</p>{{end}}
