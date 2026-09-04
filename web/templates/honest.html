@@ -18,6 +18,12 @@
     <tr><td>POS spend pile is $1</td><td class="chip bad">wrong</td><td>You set KAS aside into grams. Those grams stay grams. Merchants can reprice. No Tether, no freeze.</td></tr>
     <tr><td>Pay + KaChat</td><td class="chip">live</td><td>/pay is the till. /kachat resolves a name, stamps postage, can invoice that wallet. E2E stays in KaChat.</td></tr>
     <tr><td>Kasdomain</td><td class="chip">live</td><td>One unique shop sign per Kaspa address. Living page. Market in grams only. We say Kasdomain, not KNS.</td></tr>
+    <tr><td>KCC-20 is the gram token</td><td class="chip bad">wrong</td><td>KCC-0020 is Draft. Vectors sit in <a href="https://github.com/kaspanet/kccs/pull/20">kccs#20</a> (open). WorkCredit is the voucher.</td></tr>
+    <tr><td>silverc master is the pin</td><td class="chip bad">wrong</td><td>Pin is v1-rc1. Portable ABI <a href="https://github.com/kaspanet/silverscript/pull/232">#232</a> merged; we read that JSON. Do not recompile onto master.</td></tr>
+    <tr><td>Foreign readInputState</td><td class="chip bad">wrong</td><td><a href="https://github.com/kaspanet/silverscript/pull/234">#234</a> closed unmerged. Same 42 bytes. WorkCredit only validateOutputState. <a href="/234">/234</a>.</td></tr>
+    <tr><td>consume() has a budget in the artifact</td><td class="chip bad">wrong</td><td><a href="https://github.com/kaspanet/silverscript/issues/243">silverscript#243</a> — cost is still trial-by-rejection. consume() is a later 2-sig, not a job run.</td></tr>
+    <tr><td>This is Argent / Portrait / vProgs</td><td class="chip bad">wrong</td><td>Argent #55 is actor identity for multi-covenant apps. Portrait is Kii, testnet-only. vProgs #139 is a claim kit with no testnet.</td></tr>
+    <tr><td>This is Kassword or kaspa-pqv</td><td class="chip bad">wrong</td><td>Those are other vaults. <a href="https://github.com/KASRANKS/KASSWORD">Kassword</a> (browser PQ locker). <a href="https://github.com/aglov413/kaspa-pqv">kaspa-pqv</a> (hash-based P2SH, TN10 only).</td></tr>
   </table>
   <p class="lede"><a href="/why">Why</a> is the short form.</p>
 </main>

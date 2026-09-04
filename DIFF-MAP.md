@@ -114,11 +114,15 @@ L2 (Igra, bridges, wrapped USDC) is out of scope for both.
 | --- | --- | --- | --- |
 | KaChat `ciph_msg:1:` / `kchat:1:` | E2E chat on Kaspa | **external** | Contact from name. We do not encrypt |
 | KaPosts / groups | KaChat 4.0 social | **external** | `/kaposts` is a **local** board |
-| Kassword | Browser PQ vault, no server | **external** | `/kassword` pointer + `vaultCommit` convention |
+| Kassword | Browser PQ vault + on-chain locker | **external** | [KASRANKS/KASSWORD](https://github.com/KASRANKS/KASSWORD). Pointer only. |
+| kaspa-pqv | Hash-based PQ P2SH (SLH-DSA / LMS) | **external / research** | [aglov413/kaspa-pqv](https://github.com/aglov413/kaspa-pqv). TN10 spends. Not mainnet. |
 | kaspa-data-vault | AES-GCM + 5-min window | **external / research** | Commitment only. Bytes not on chain |
 | KasRanks ocean bags | Live balance → Shrimp… | **local** | `/ranks` via `api.kaspa.org` |
 | KASRANKS NFT (782) | Separate collection | **external** | We do not look it up |
-| KCC-0/1/2/20 | Draft conventions | **external drafts** | `/kcc` lists them |
+| KCC-0/1/2/20 | Draft conventions | **external drafts** | Spec merged; vectors [kccs#20](https://github.com/kaspanet/kccs/pull/20) still draft. No GRAM token. |
+| Portrait | Kii covenant language + pattern library | **external** | [KaspaKii/Portrait](https://github.com/KaspaKii/Portrait). Testnet-only. We do not clone. |
+| Argent | Multi-actor covenant apps | **external** | [argent-lang/argent](https://github.com/argent-lang/argent). #55 actor identity. Not production SC. |
+| vProgs | Based ZK programs | **research** | [kaspanet/vprogs](https://github.com/kaspanet/vprogs). Claim kit #139 open. No testnet. |
 | KCC-KNS-Web4 | Agent record idea | **local** | `conventions/kcc-kns-web4.md` |
 | KCC-Work-Credits | Gram voucher idea | **local** | `conventions/kcc-work-credits.md` |
 
@@ -127,6 +131,8 @@ L2 (Igra, bridges, wrapped USDC) is out of scope for both.
 ## Covenants — Silverscript v1-rc1
 
 Official compiler: kaspanet `v1-rc1` (30 Aug 2026, @OriNewman). RC ≠ tagged `v1`. Windows `silverc.exe` SHA256 `fbf75851e8d1c97e1982e72cb26e8b8f6417fa5a6ed99d58693d6314890619c3`. Clone: `C:\Users\Remco\silverscript` @ `c7d17a1`.
+
+Portable ABI JSON: [silverscript#232](https://github.com/kaspanet/silverscript/pull/232) merged. `WorkCredit-live.json` is `schema_version: 1`; loader accepts map or array `contracts`. Do not recompile onto silverc master. Foreign `readInputState` framing: [silverscript#234](https://github.com/kaspanet/silverscript/pull/234) **closed unmerged**. Compute budget is not in the artifact ([#243](https://github.com/kaspanet/silverscript/issues/243)).
 
 | Contract | Role | Status |
 | --- | --- | --- |
