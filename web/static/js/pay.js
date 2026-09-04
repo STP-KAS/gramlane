@@ -89,6 +89,79 @@
     return nameTx;
   }
 
+  function toHex(s) {
+    var out = "";
+    var u = new TextEncoder().encode(String(s || ""));
+    for (var i = 0; i < u.length; i++) out += u[i].toString(16).padStart(2, "0");
+    return out;
+  }
+
+  async function sendWithPayload(to, sompi, payload) {
+    var w = window.kasware;
+    if (!w || typeof w.sendKaspa !== "function") throw new Error("Kasware is not in this tab. Log in here first.");
+    var attempts = [
+      { priorityFee: 10000, payload: payload },
+      { priorityFee: 10000, payload: toHex(payload) },
+    ];
+    var last = null;
+    for (var i = 0; i < attempts.length; i++) {
+      try {
+        return await w.sendKaspa(to, sompi, attempts[i]);
+      } catch (e) {
+        last = e;
+      }
+    }
+    try {
+      return await w.sendKaspa(to, sompi, { priorityFee: 10000 });
+    } catch (e) {
+      throw last || e;
+    }
+  }
+
+  async function kachatSend(ev) {
+    ev.preventDefault();
+    var btn = ev.currentTarget;
+    if (btn.dataset.busy === "1") return;
+    var form = btn.closest("form");
+    var textEl = form && form.querySelector('input[name="text"], textarea[name="text"]');
+    var text = (textEl && textEl.value ? textEl.value : "").trim();
+    if (!text) {
+      say("Type a message first.");
+      return;
+    }
+    var to = (btn.getAttribute("data-to") || "").trim();
+    var sompi = Number(btn.getAttribute("data-sompi") || "50000000");
+    var kind = btn.getAttribute("data-kind") || "pay";
+    if (!to || to.indexOf("kaspa:") !== 0) {
+      say("No Kaspa address to send to.");
+      return;
+    }
+    var me = loginAddr();
+    if (me && to === me) {
+      say("Kasware blocks send-to-self. Open a contact, not your own login.");
+      return;
+    }
+    var payload = kind === "bcast" ? "kchat:1:bcast:gramlane:" + text : "kchat:1:pay:" + btoa(unescape(encodeURIComponent(text)));
+    btn.dataset.busy = "1";
+    btn.disabled = true;
+    say("Kasware confirm on this page. 0.5 KAS + payload. Not KaChat E2E.");
+    try {
+      await accounts();
+      var raw = await sendWithPayload(to, sompi, payload);
+      var txid = parseTxid(raw);
+      if (!txid) throw new Error("Kasware returned no txid.");
+      var tx = form && form.querySelector('input[name="tx"]');
+      if (tx) tx.value = txid;
+      say("On L1. " + txid);
+      if (form) form.submit();
+    } catch (e) {
+      say((e && e.message ? e.message : String(e)) + " Stay on this URL. Do not open the KaChat app for this send.");
+    } finally {
+      btn.dataset.busy = "0";
+      btn.disabled = false;
+    }
+  }
+
   async function payL1(ev) {
     ev.preventDefault();
     ev.stopPropagation();
@@ -193,6 +266,9 @@
     if (host) host.textContent = "Stay on " + location.origin + ".";
     document.querySelectorAll("[data-pay-l1]").forEach(function (payBtn) {
       payBtn.addEventListener("click", payL1);
+    });
+    document.querySelectorAll("[data-kachat-send]").forEach(function (btn) {
+      btn.addEventListener("click", kachatSend);
     });
     document.querySelectorAll("[data-copy], [data-copy-text]").forEach(function (btn) {
       btn.addEventListener("click", function (ev) {
