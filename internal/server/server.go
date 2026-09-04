@@ -113,6 +113,26 @@ func (s *Server) Handler() http.Handler {
 		log.Fatal(err)
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
+	mux.HandleFunc("/manifest.webmanifest", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/manifest+json")
+		b, err := web.Static.ReadFile("static/manifest.webmanifest")
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		_, _ = w.Write(b)
+	})
+	mux.HandleFunc("/sw.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		w.Header().Set("Service-Worker-Allowed", "/")
+		b, err := web.Static.ReadFile("static/js/sw.js")
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		_, _ = w.Write(b)
+	})
+	mux.HandleFunc("/app", s.appPage)
 	mux.HandleFunc("/", s.home)
 	mux.HandleFunc("/desk", s.desk)
 	mux.HandleFunc("/work", s.desk)
@@ -279,6 +299,10 @@ func seedSign() {
 		"kaspadao.kas",
 		"Shop sign for this Kaspa address on Gramlane. Pay in grams. The long kaspa:q… is the door.",
 		"Open a Pay ticket from the jar. Not a dollar.")
+}
+
+func (s *Server) appPage(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "app.html", page{Title: "Phone app · Gramlane", Active: "home"})
 }
 
 func (s *Server) home(w http.ResponseWriter, r *http.Request) {
