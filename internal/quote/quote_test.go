@@ -1,6 +1,9 @@
 package quote
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestMillionGramsIsOneKAS(t *testing.T) {
 	q, err := Grams(1_000_000, "SIGN1")
@@ -40,6 +43,29 @@ func TestConvertHalfKASIs500kGrams(t *testing.T) {
 	s, err := FromSompi(150)
 	if err != nil || s.Grams != 1 || s.Dust != 50 {
 		t.Fatalf("%v %+v", err, s)
+	}
+}
+
+func TestFromUSDSettlesKASNotGramsNote(t *testing.T) {
+	b, err := FromUSD("1.00", "0.10")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.Ccy != "USD" || b.Sompi != 10*SompiPerKAS || b.KASText != "10" {
+		t.Fatalf("%+v", b)
+	}
+	if b.Note == "" || !strings.Contains(b.Note, "KAS on L1") {
+		t.Fatalf("want KAS settlement note %+v", b)
+	}
+	if strings.Contains(b.Note, "grams at 100") {
+		t.Fatal("FromUSD must not settle in grams")
+	}
+	c, err := USDCents("$0.50")
+	if err != nil || c != 50 {
+		t.Fatalf("%v %d", err, c)
+	}
+	if FormatUSD(40) != "$0.40" || FloorPay(1) != KaswareMinSompi {
+		t.Fatal(FormatUSD(40), FloorPay(1))
 	}
 }
 

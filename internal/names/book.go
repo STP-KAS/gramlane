@@ -15,12 +15,15 @@ import (
 // Held is a kasdomain this wallet funded. Only Primary is the face (replaces kaspa:q…).
 // The rest are in custody: you keep them, you can sell them, they do not log you in.
 type Held struct {
-	Name    string `json:"name"`
-	P2SH    string `json:"p2sh"`
-	When    string `json:"when"`
-	Tx      string `json:"tx,omitempty"`
-	Suggest uint64 `json:"suggestGrams"`
-	Face    bool   `json:"face"`
+	Name     string `json:"name"`
+	P2SH     string `json:"p2sh"`
+	When     string `json:"when"`
+	Tx       string `json:"tx,omitempty"`
+	USDCents uint64 `json:"usdCents"`
+	USD      string `json:"usd"`
+	KAS      string `json:"kas"`
+	Sompi    uint64 `json:"sompi"`
+	Face     bool   `json:"face"`
 }
 
 type WalletBook struct {
@@ -97,8 +100,7 @@ func Book(addr string) *WalletBook {
 	cp := *src
 	cp.Names = append([]Held(nil), src.Names...)
 	for i := range cp.Names {
-		cp.Names[i].Suggest = SuggestGrams(cp.Names[i].Name)
-		cp.Names[i].Face = cp.Names[i].Name == cp.Primary
+		paintHeld(&cp.Names[i], cp.Primary)
 	}
 	return &cp
 }
@@ -143,12 +145,20 @@ func Record(addr, name, tx string) (*WalletBook, error) {
 	return snapshotLocked(b), nil
 }
 
+func paintHeld(h *Held, primary string) {
+	a := AskFor(h.Name)
+	h.USDCents = a.USDCents
+	h.USD = a.USD
+	h.KAS = a.PayKAS
+	h.Sompi = a.PaySompi
+	h.Face = h.Name == primary
+}
+
 func snapshotLocked(b *WalletBook) *WalletBook {
 	cp := *b
 	cp.Names = append([]Held(nil), b.Names...)
 	for i := range cp.Names {
-		cp.Names[i].Suggest = SuggestGrams(cp.Names[i].Name)
-		cp.Names[i].Face = cp.Names[i].Name == cp.Primary
+		paintHeld(&cp.Names[i], cp.Primary)
 	}
 	return &cp
 }

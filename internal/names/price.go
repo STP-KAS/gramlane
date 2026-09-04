@@ -1,33 +1,82 @@
 package names
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"gramlane/internal/appenv"
+	"gramlane/internal/quote"
 )
 
-// SuggestGrams is a fair, affordable list price in grams (not USD, not KNS KAS).
+// Sign is 1 KAS in USD on this name board. Operator sign, not an oracle, not a peg.
+type Sign struct {
+	Ccy       string `json:"ccy"`
+	KasInFiat string `json:"kasInFiat"`
+}
+
+// Ask is a kasdomain shelf in USD that settles in KAS on L1.
+// Recurrent desk jobs stay in grams. Acquiring or buying a name is a Kaspa transaction.
+type Ask struct {
+	Name     string `json:"name,omitempty"`
+	USDCents uint64 `json:"usdCents"`
+	USD      string `json:"usd"`
+	Amount   string `json:"amount"`
+	Rate     string `json:"rate"`
+	Sompi    uint64 `json:"sompi"`
+	KASText  string `json:"kasText"`
+	PaySompi uint64 `json:"paySompi"`
+	PayKAS   string `json:"payKas"`
+	Note     string `json:"note"`
+}
+
+var signPath = appenv.File("name-rate.json")
+
+func ResetSignForTest(dir string) {
+	signPath = filepath.Join(dir, "name-rate.json")
+}
+
+func LoadSign() Sign {
+	b, err := os.ReadFile(signPath)
+	if err != nil {
+		return Sign{Ccy: "USD", KasInFiat: "0.10"}
+	}
+	var s Sign
+	if json.Unmarshal(b, &s) != nil || s.Ccy == "" || s.KasInFiat == "" {
+		return Sign{Ccy: "USD", KasInFiat: "0.10"}
+	}
+	s.Ccy = strings.ToUpper(strings.TrimSpace(s.Ccy))
+	if s.Ccy != "USD" {
+		s.Ccy = "USD"
+	}
+	return s
+}
+
+// SuggestUSDCents is a fair, affordable list price in USD cents.
 // Short names cost more. Long everyday names stay cheap so extras can sit on the market.
-func SuggestGrams(name string) uint64 {
+func SuggestUSDCents(name string) uint64 {
 	n := apex(name)
 	if n == "" {
-		return 25_000
+		return 15
 	}
 	L := utf8.RuneCountInString(n)
 	var base uint64
 	switch {
 	case L <= 1:
-		base = 8_000_000 // ~8 KAS at policy — rare, still far under KNS 4200 KAS
+		base = 800 // $8.00 — rare, still far under KNS 4200 KAS
 	case L == 2:
-		base = 2_000_000
+		base = 250
 	case L == 3:
-		base = 500_000
+		base = 100
 	case L == 4:
-		base = 150_000
+		base = 50
 	case L <= 6:
-		base = 50_000
+		base = 25
 	default:
-		base = 25_000
+		base = 15
 	}
 	mult := 1.0
 	if allDigits(n) {
@@ -46,10 +95,70 @@ func SuggestGrams(name string) uint64 {
 		mult *= 1.4
 	}
 	g := uint64(float64(base)*mult + 0.5)
-	if g < 10_000 {
-		g = 10_000
+	if g < 10 {
+		g = 10
 	}
 	return g
+}
+
+func Settle(cents uint64) Ask {
+	sign := LoadSign()
+	amount := quote.FormatUSDAmount(cents)
+	bill, err := quote.FromUSD(amount, sign.KasInFiat)
+	if err != nil {
+		pay := quote.KaswareMinSompi
+		return Ask{
+			USDCents: cents,
+			USD:      quote.FormatUSD(cents),
+			Amount:   amount,
+			Rate:     sign.KasInFiat,
+			Sompi:    pay,
+			KASText:  "0.5",
+			PaySompi: pay,
+			PayKAS:   "0.5",
+			Note:     "Could not convert USD to KAS at this sign. Wallet floor 0.5 KAS.",
+		}
+	}
+	pay := quote.FloorPay(bill.Sompi)
+	kas := bill.KASText
+	if pay != bill.Sompi {
+		if c, e := quote.FromSompi(pay); e == nil {
+			kas = c.KASText
+		}
+	}
+	return Ask{
+		USDCents: cents,
+		USD:      quote.FormatUSD(cents),
+		Amount:   amount,
+		Rate:     sign.KasInFiat,
+		Sompi:    bill.Sompi,
+		KASText:  bill.KASText,
+		PaySompi: pay,
+		PayKAS:   kas,
+		Note:     bill.Note,
+	}
+}
+
+func AskFor(name string) Ask {
+	a := Settle(SuggestUSDCents(name))
+	a.Name = DisplayName(name)
+	return a
+}
+
+func FundQuote() quote.Quote {
+	pay := quote.KaswareMinSompi
+	return quote.Quote{
+		Unit:       "KAS",
+		Sompi:      pay,
+		KAS:        0.5,
+		PaySompi:   pay,
+		PayKAS:     0.5,
+		PayKASText: "0.5",
+		Lane:       "kasdomain",
+		Scheme:     "kaspa-l1",
+		USD:        "shelf",
+		Note:       "Acquire with a Kaspa transaction to this P2SH. Not grams. Recurrent desk work stays in grams.",
+	}
 }
 
 func allDigits(s string) bool {

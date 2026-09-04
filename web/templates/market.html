@@ -1,10 +1,9 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">name market · grams only</div>
+  <div class="kicker">name market · USD shelf · KAS on L1</div>
   <h1>Buy and sell shop signs.</h1>
-  <p class="lede">Price is grams. Extra names in your drawer (not the face) can be sold. Buyer gets custody; it becomes their face only if they have none. L1 transfer of the name UTXO is a later KasName spend.</p>
+  <p class="lede">Price is a dollar shelf. You pay in KAS. Extra names (not the face) can be sold. Buyer gets custody; it becomes their face only if they have none. Desk jobs that keep sequencing on L1 stay in grams. L1 transfer of the name UTXO is a later KasName spend.</p>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
-  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> GRAM.</p>{{end}}
 
   <div class="grid">
     <article class="card">
@@ -13,37 +12,39 @@
         <input type="hidden" name="act" value="list" />
         <label for="listName">The name you want to sell</label>
         <input id="listName" name="name" placeholder="bakery.kas" />
-        <label for="listGrams">Price in grams</label>
-        <input id="listGrams" name="grams" placeholder="50000" inputmode="numeric" />
+        <label for="listUSD">Shelf in USD</label>
+        <input id="listUSD" name="usd" placeholder="1.00" inputmode="decimal" />
         <label for="listSeller">Your Kaspa address</label>
         <input id="listSeller" class="mono" name="seller" placeholder="filled when you log in" data-wallet-addr />
-        <p class="help">Only list a name you own.</p>
-        <p style="margin-top:12px"><button class="btn mint" type="submit">List for grams</button></p>
+        <p class="help">Only list a name you own. Buyer sends KAS at this board’s USD sign.</p>
+        <p style="margin-top:12px"><button class="btn mint" type="submit">List for USD · settle in KAS</button></p>
       </form>
     </article>
     <article class="card">
-      <h3>Why grams</h3>
-      <p>A name is not a currency. The fee to change hands is work on this rail. Grams do not move when KAS/USD does. USD is not quoted.</p>
-      <p><a href="/kasdomain">Back to your names</a></p>
+      <h3>Why dollars on the shelf</h3>
+      <p>A name is not work. Recurrent desk sequencing stays in grams so the meter does not jump with KAS/USD. Acquiring a kasdomain is one Kaspa transaction. The dollar figure is the sign on this board, not a peg and not an oracle.</p>
+      <p><a href="/mine">Your names</a> · <a href="/kasdomain">Get a name</a></p>
     </article>
   </div>
 
   <h2>For sale</h2>
   {{if .Listings}}
   <table>
-    <tr><th>name</th><th>grams</th><th>status</th><th></th></tr>
+    <tr><th>name</th><th>USD</th><th>KAS</th><th>status</th><th></th></tr>
     {{range .Listings}}
     <tr>
       <td><a href="/site/{{.Name}}">{{.Name}}</a></td>
-      <td class="price">{{.Grams}}</td>
+      <td class="price">{{.USD}}</td>
+      <td class="mono">{{.KAS}}</td>
       <td>{{.Status}}</td>
       <td>
         {{if eq .Status "open"}}
-        <form action="/market" method="post">
+        <button class="btn mint" type="button" data-pay-l1 data-to="{{.Seller}}" data-sompi="{{.Sompi}}" data-buy-id="{{.ID}}" data-after="/mine?address=">Buy {{.USD}}</button>
+        <form action="/market" method="post" style="margin-top:8px">
           <input type="hidden" name="act" value="buy" />
           <input type="hidden" name="id" value="{{.ID}}" />
-          <input class="mono" name="buyer" placeholder="your kaspa:q…" />
-          <button class="btn mint" type="submit">Buy</button>
+          <input class="mono" name="buyer" placeholder="your kaspa:q…" data-wallet-addr />
+          <button class="btn ghost" type="submit">Mark bought</button>
         </form>
         {{end}}
       </td>

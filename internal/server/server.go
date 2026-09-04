@@ -101,7 +101,10 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/kachat", s.kachatPage)
 	mux.HandleFunc("/kasdomain", s.kasdomainPage)
 	mux.HandleFunc("/kns", s.kasdomainPage)
+	mux.HandleFunc("/mine", s.minePage)
+	mux.HandleFunc("/names", s.minePage)
 	mux.HandleFunc("/api/name", s.apiName)
+	mux.HandleFunc("/api/mine", s.apiMine)
 	mux.HandleFunc("/market", s.marketPage)
 	mux.HandleFunc("/api/market", s.apiMarket)
 	mux.HandleFunc("/convert", s.convertPage)
@@ -628,45 +631,58 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "kachat.html", p)
 }
 
-func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
-	p := page{Title: "kasdomain · Gramlane", Active: "kasdomain"}
+func walletAddr(r *http.Request) string {
 	addr := strings.TrimSpace(r.FormValue("address"))
 	if addr == "" {
 		addr = strings.TrimSpace(r.URL.Query().Get("address"))
 	}
+	return addr
+}
+
+func (s *Server) applyNameActs(w http.ResponseWriter, r *http.Request, p *page, addr string) bool {
+	if r.Method != http.MethodPost {
+		return false
+	}
+	switch r.FormValue("act") {
+	case "held":
+		if _, err := names.Record(addr, r.FormValue("name"), r.FormValue("tx")); err != nil {
+			p.Error = err.Error()
+		}
+	case "face":
+		if err := names.SetPrimary(addr, r.FormValue("name")); err != nil {
+			p.Error = err.Error()
+		}
+	case "list-drawer":
+		b := names.Book(addr)
+		if b == nil {
+			p.Error = "no names in this wallet"
+			return false
+		}
+		for _, h := range b.Names {
+			if h.Face {
+				continue
+			}
+			if _, err := market.Open(h.Name, addr, h.USDCents); err != nil && p.Error == "" {
+				p.Error = err.Error()
+			}
+		}
+		http.Redirect(w, r, "/market", http.StatusSeeOther)
+		return true
+	}
+	return false
+}
+
+func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "kasdomain · Gramlane", Active: "kasdomain"}
+	addr := walletAddr(r)
 	q := strings.TrimSpace(r.FormValue("q"))
 	if q == "" {
 		q = strings.TrimSpace(r.URL.Query().Get("q"))
 	}
 	p.Inspect = r.URL.Query().Get("inspect") != "" || r.FormValue("inspect") == "1"
 	p.Query = q
-	if r.Method == http.MethodPost {
-		switch r.FormValue("act") {
-		case "held":
-			if _, err := names.Record(addr, r.FormValue("name"), r.FormValue("tx")); err != nil {
-				p.Error = err.Error()
-			}
-		case "face":
-			if err := names.SetPrimary(addr, r.FormValue("name")); err != nil {
-				p.Error = err.Error()
-			}
-		case "list-drawer":
-			b := names.Book(addr)
-			if b == nil {
-				p.Error = "no names in this wallet"
-			} else {
-				for _, h := range b.Names {
-					if h.Face {
-						continue
-					}
-					if _, err := market.Open(h.Name, addr, h.Suggest); err != nil && p.Error == "" {
-						p.Error = err.Error()
-					}
-				}
-				http.Redirect(w, r, "/market", http.StatusSeeOther)
-				return
-			}
-		}
+	if s.applyNameActs(w, r, &p, addr) {
+		return
 	}
 	if q != "" {
 		p.Result = names.ResolveCovenant(q)
@@ -675,6 +691,31 @@ func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 		p.Held = names.Book(addr)
 	}
 	s.render(w, "kasdomain.html", p)
+}
+
+func (s *Server) minePage(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "Your names · Gramlane", Active: "mine"}
+	addr := walletAddr(r)
+	if s.applyNameActs(w, r, &p, addr) {
+		return
+	}
+	if strings.HasPrefix(addr, "kaspa:") {
+		p.Held = names.Book(addr)
+	}
+	s.render(w, "mine.html", p)
+}
+
+func (s *Server) apiMine(w http.ResponseWriter, r *http.Request) {
+	addr := walletAddr(r)
+	if !strings.HasPrefix(addr, "kaspa:") {
+		writeJSON(w, 400, map[string]any{"ok": false, "error": "kaspa address"})
+		return
+	}
+	b := names.Book(addr)
+	writeJSON(w, 200, map[string]any{
+		"ok": true, "held": b, "settle": "kas", "unit": "USD",
+		"note": "USD is the board sign. Settlement is KAS. Desk jobs stay in grams.",
+	})
 }
 
 func (s *Server) apiName(w http.ResponseWriter, r *http.Request) {
@@ -687,23 +728,42 @@ func (s *Server) apiName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := names.ResolveCovenant(q)
-	writeJSON(w, 200, map[string]any{"ok": true, "result": res, "usd": "not quoted", "kns": false})
+	writeJSON(w, 200, map[string]any{
+		"ok": true, "result": res, "shelf": res.Shelf, "settle": "kas", "kns": false,
+		"note": "USD is a board sign. Settlement is KAS. Desk jobs stay in grams.",
+	})
+}
+
+func parseListingCents(r *http.Request) uint64 {
+	if c := strings.TrimSpace(r.FormValue("cents")); c != "" {
+		n, _ := strconv.ParseUint(strings.ReplaceAll(c, ",", ""), 10, 64)
+		if n > 0 {
+			return n
+		}
+	}
+	n, err := quote.USDCents(r.FormValue("usd"))
+	if err != nil {
+		return 0
+	}
+	return n
 }
 
 func (s *Server) marketPage(w http.ResponseWriter, r *http.Request) {
-	p := page{Title: "Kasdomain market · Gramlane", Active: "kasdomain", Listings: market.List()}
+	p := page{Title: "Kasdomain market · Gramlane", Active: "mine", Listings: market.List()}
 	if r.Method == http.MethodPost {
 		act := r.FormValue("act")
 		if act == "list" {
-			grams := uint64(0)
-			fmt.Sscanf(strings.ReplaceAll(r.FormValue("grams"), ",", ""), "%d", &grams)
-			if _, err := market.Open(r.FormValue("name"), r.FormValue("seller"), grams); err != nil {
+			cents := parseListingCents(r)
+			if _, err := market.Open(r.FormValue("name"), r.FormValue("seller"), cents); err != nil {
 				p.Error = err.Error()
 			}
 		}
 		if act == "buy" {
-			if _, err := market.Buy(r.FormValue("id"), r.FormValue("buyer")); err != nil {
+			if _, err := market.Buy(r.FormValue("id"), r.FormValue("buyer"), r.FormValue("tx")); err != nil {
 				p.Error = err.Error()
+			} else if b := strings.TrimSpace(r.FormValue("buyer")); strings.HasPrefix(b, "kaspa:") {
+				http.Redirect(w, r, "/mine?address="+b, http.StatusSeeOther)
+				return
 			}
 		}
 		p.Listings = market.List()
@@ -714,21 +774,28 @@ func (s *Server) marketPage(w http.ResponseWriter, r *http.Request) {
 func (s *Server) apiMarket(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		var req struct {
-			Act, Name, Seller, Buyer, ID string
-			Grams                        uint64
+			Act, Name, Seller, Buyer, ID, Tx, USD string
+			Cents, USDCents                       uint64
 		}
 		body, _ := io.ReadAll(io.LimitReader(r.Body, 1<<16))
 		_ = json.Unmarshal(body, &req)
-		if req.Act == "buy" || req.ID != "" {
-			L, err := market.Buy(req.ID, req.Buyer)
+		if req.Act == "buy" || (req.ID != "" && req.Buyer != "") {
+			L, err := market.Buy(req.ID, req.Buyer, req.Tx)
 			if err != nil {
 				writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error(), "listing": L})
 				return
 			}
-			writeJSON(w, 200, map[string]any{"ok": true, "listing": L, "seq": seq.Snap()})
+			writeJSON(w, 200, map[string]any{"ok": true, "listing": L, "held": names.Book(req.Buyer)})
 			return
 		}
-		L, err := market.Open(req.Name, req.Seller, req.Grams)
+		cents := req.Cents
+		if cents == 0 {
+			cents = req.USDCents
+		}
+		if cents == 0 && req.USD != "" {
+			cents, _ = quote.USDCents(req.USD)
+		}
+		L, err := market.Open(req.Name, req.Seller, cents)
 		if err != nil {
 			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
 			return
@@ -1063,18 +1130,28 @@ func (s *Server) apiID(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 400, map[string]any{"ok": false, "error": "address"})
 		return
 	}
+	b := names.Book(addr)
+	var list []string
+	if b != nil {
+		for _, h := range b.Names {
+			list = append(list, h.Name)
+		}
+	}
 	if face := names.Primary(addr); face != "" {
 		writeJSON(w, 200, map[string]any{
-			"ok": true,
+			"ok":    true,
+			"names": list,
+			"held":  b,
 			"id": map[string]any{
 				"address": addr, "linked": face, "display": face,
-				"note": "kasdomain face. First registered is the default. Drawer names are custody.",
+				"names": list,
+				"note":  "kasdomain face. First registered is the default. Other names on this wallet are custody.",
 			},
 		})
 		return
 	}
-	writeJSON(w, 200, map[string]any{"ok": true, "id": map[string]any{
-		"address": addr, "display": addr,
+	writeJSON(w, 200, map[string]any{"ok": true, "names": list, "held": b, "id": map[string]any{
+		"address": addr, "display": addr, "names": list,
 		"note": "No kasdomain face yet. Fund a name. The kaspa address stays the door.",
 	}})
 }
