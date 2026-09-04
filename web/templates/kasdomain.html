@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
   <h1>Get a name.</h1>
-  <p class="lede">One KAS. Half funds the name. Half supports Kaspa growth. Forever. Then it is a shop.</p>
+  <p class="lede">200 KAS. Half funds the name. Half supports Kaspa growth. Forever. Then it is a shop.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="q">Name</label>
@@ -44,7 +44,7 @@
     </form>
     <details>
       <summary>What you are paying</summary>
-      <p class="help">{{.Result.Mint.Note}} Kasware’s 0.5 KAS floor applies to each output, so the mint is 1 KAS. USD is a board sign, not a peg. Not KNS. We do not broadcast for you.</p>
+      <p class="help">{{.Result.Mint.Note}} USD is a board sign, not a peg. Not KNS. We do not broadcast for you.</p>
       {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
     </details>
     {{else}}

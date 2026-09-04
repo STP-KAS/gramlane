@@ -34,14 +34,14 @@ func TestFundMintHalfToVault(t *testing.T) {
 	if m.SharePct != 50 || m.NameSompi != m.VaultSompi || m.TotalSompi != m.NameSompi*2 {
 		t.Fatalf("%+v", m)
 	}
-	if m.NameSompi != quote.KaswareMinSompi || m.TotalKAS != "1" {
-		t.Fatalf("wallet floor %+v", m)
+	if m.TotalKAS != "200" || m.NameKAS != "100" || m.NameSompi != 100*quote.SompiPerKAS {
+		t.Fatalf("standard mint %+v", m)
 	}
 	if m.Vault != AdoptionVault || !strings.HasPrefix(m.Vault, "kaspa:q") {
 		t.Fatalf("vault %s", m.Vault)
 	}
 	q := FundQuote()
-	if q.PaySompi != m.NameSompi || q.PayKASText != "1" {
+	if q.PaySompi != m.NameSompi || q.PayKASText != "200" {
 		t.Fatalf("quote %+v mint %+v", q, m)
 	}
 }

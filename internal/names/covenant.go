@@ -171,7 +171,7 @@ func ResolveCovenant(raw string) *Result {
 	}
 	if len(utxos) == 0 {
 		out.Hit = false
-		out.Warning = fmt.Sprintf("No kasdomain covenant output for %s yet. Fund the P2SH once (Kasware floor 0.5 KAS). First UTXO wins. No yearly rent. Inscriptions and KNS are out of scope.", disp)
+		out.Warning = fmt.Sprintf("No kasdomain covenant output for %s yet. Fund the P2SH once (200 KAS mint: 100 name, 100 growth). First UTXO wins. No yearly rent. Inscriptions and KNS are out of scope.", disp)
 		return out
 	}
 	out.Hit = true

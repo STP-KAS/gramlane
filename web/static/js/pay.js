@@ -78,13 +78,13 @@
         outputs: [{ address: vaultTo, amount: vaultSompi }],
       });
     } catch (_) {}
-    say("Name first (0.5 KAS). Then confirm the Kaspa growth share.");
+    say("Name first (100 KAS). Then confirm the Kaspa growth share.");
     var nameTx = await window.kasware.sendKaspa(nameTo, nameSompi, { priorityFee: 10000 });
-    say("Name on L1. Confirm 0.5 KAS to the growth vault.");
+    say("Name on L1. Confirm 100 KAS to the growth vault.");
     try {
       await window.kasware.sendKaspa(vaultTo, vaultSompi, { priorityFee: 10000 });
     } catch (e) {
-      say("Name is funded. Growth share failed — send 0.5 KAS to the vault when you can. " + (e && e.message ? e.message : ""));
+      say("Name is funded. Growth share failed — send 100 KAS to the vault when you can. " + (e && e.message ? e.message : ""));
     }
     return nameTx;
   }
