@@ -1,71 +1,99 @@
 {{template "header" .}}
-<main id="main">
-  <h1>Chat</h1>
-  <p class="lede">Find a .kas. Open KaChat. This page does not encrypt. The wallet does.</p>
+<main id="main" class="kc-wrap">
+  <p class="tiny kc-honest">This desk finds names and stamps postage. Encrypted chat is the <a href="https://www.kachat.org/">KaChat 4.0</a> app — same protocol, not a clone.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
   {{if .Run}}<p class="ok">Postage stamped. Remaining {{.Run.Remaining}} grams.</p>{{end}}
 
-  <div class="chat-desk">
-    <div>
-      <form class="search" action="/kachat" method="get" role="search">
-        <label class="sr" for="chatQ">Name</label>
-        <input id="chatQ" name="q" value="{{.Query}}" placeholder="bakery" autocomplete="off" spellcheck="false" />
-        <span class="tld" aria-hidden="true">.kas</span>
-        <button class="btn mint" type="submit">Find</button>
+  <div class="kc">
+    <aside class="kc-side">
+      <form class="kc-find" action="/kachat" method="get">
+        <input name="q" value="{{if ne .Query "board"}}{{.Query}}{{end}}" placeholder="Search bakery.kas" autocomplete="off" spellcheck="false" />
+        {{if .Address}}<input type="hidden" name="address" value="{{.Address}}" />{{end}}
       </form>
-      {{if .Choices}}
-      <p class="tiny">Your names</p>
-      <p class="picks">
-        {{range .Choices}}
-        <a class="btn ghost" href="/kachat?q={{.Name}}{{if $.Address}}&amp;address={{$.Address}}{{end}}">{{.Name}}</a>
-        {{end}}
-      </p>
+      <a class="kc-row {{if eq .Query "board"}}on{{end}}" href="/kachat?q=board{{if .Address}}&amp;address={{.Address}}{{end}}">
+        <span class="kc-av">#</span>
+        <span>
+          <strong>Board</strong>
+          <span class="tiny">Public postage · not E2E</span>
+        </span>
+      </a>
+      {{range .Choices}}
+      <a class="kc-row {{if eq $.Query .Name}}on{{end}}" href="/kachat?q={{.Name}}{{if $.Address}}&amp;address={{$.Address}}{{end}}">
+        <span class="kc-av">{{printf "%.1s" .Name}}</span>
+        <span>
+          <strong>{{.Name}}</strong>
+          <span class="tiny">{{if .HasShop}}shop{{else}}name{{end}}</span>
+        </span>
+      </a>
       {{end}}
-      <p class="tiny"><a href="https://www.kachat.org/">kachat.org</a> · <a href="https://apps.apple.com/us/app/kachat/id6759102359">iOS</a> · <a href="https://play.google.com/store/apps/details?id=com.kachat.app">Android</a></p>
-    </div>
+      <p class="kc-apps">
+        <a href="https://apps.apple.com/us/app/kachat/id6759102359">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.kachat.app">Play</a>
+        <a href="https://www.kachat.org/">kachat.org</a>
+      </p>
+    </aside>
 
-    <div>
-      {{if .Contact}}
-      <div class="card">
-        <p class="kicker">{{.Contact.Name}}</p>
-        <h2>{{.Contact.Name}}</h2>
-        {{if .Contact.Address}}
-        <p class="mono">{{.Contact.Address}}</p>
-        <p>
-          <button type="button" class="btn ghost" data-copy-text="{{.Contact.Address}}">Copy address</button>
-        </p>
+    <section class="kc-thread">
+      {{if or .Contact (eq .Query "board")}}
+      <header class="kc-top">
+        {{if eq .Query "board"}}
+        <span class="kc-av">#</span>
+        <div>
+          <strong>Board</strong>
+          <div class="tiny">Sequenced stamps on this desk. Not KaChat encryption.</div>
+        </div>
+        {{else}}
+        <span class="kc-av">{{.Contact.Initial}}</span>
+        <div class="kc-who">
+          <strong>{{.Contact.Name}}</strong>
+          {{if .Contact.Address}}<div class="tiny mono">{{.Contact.Address}}</div>{{end}}
+        </div>
+        <div class="kc-top-actions">
+          {{if .Contact.Address}}
+          <button type="button" class="btn ghost" data-copy-text="{{.Contact.Address}}">Copy</button>
+          {{if .Contact.PayURI}}
+          <button class="btn ghost" type="button" data-pay-l1 data-to="{{.Contact.PayURI}}" data-sompi="50000000">Send 0.5 KAS</button>
+          {{end}}
+          {{end}}
+          <a class="btn mint" href="{{if .Contact.DeepLink}}{{.Contact.DeepLink}}{{else}}https://www.kachat.org/{{end}}">Open KaChat</a>
+        </div>
         {{end}}
-        <p class="help">{{.Contact.Note}}</p>
-        <p class="actions">
-          <a class="btn mint" href="{{if .Contact.Address}}https://www.kachat.org/?to={{.Contact.Address}}{{else}}https://www.kachat.org/{{end}}">Open KaChat</a>
-          {{if .Contact.PayURI}}<a class="btn ghost" href="/{{.Contact.Name}}">Shop</a>{{end}}
-        </p>
+      </header>
+      <div class="kc-msgs">
+        {{if .Stamps}}
+        {{range .Stamps}}
+        <div class="kc-bubble">
+          <div>{{.Text}}</div>
+          <div class="tiny">{{.When}} · {{.Grams}} g · postage</div>
+        </div>
+        {{end}}
+        {{else}}
+        <p class="help">No stamps yet. Open KaChat for encrypted history. Postage here is a public envelope hash, not a letter.</p>
+        {{end}}
+        <p class="tiny" data-pay-status></p>
       </div>
       {{if and .Job .Seq (ge .Seq.Remaining .Job.Grams)}}
-      <form action="/kachat" method="post" style="margin-top:16px">
-        <input type="hidden" name="q" value="{{.Contact.Name}}" />
+      <form class="kc-bar" action="/kachat" method="post">
+        <input type="hidden" name="q" value="{{.Query}}" />
         <input type="hidden" name="address" value="{{.Address}}" data-wallet-addr />
-        <label for="chatText">Postage (not the letter — {{.Job.Grams}} grams)</label>
-        <textarea id="chatText" name="text" rows="3" maxlength="280" placeholder="hello"></textarea>
-        <p class="actions"><button class="btn ghost" type="submit">Stamp postage</button></p>
+        <input name="text" maxlength="280" placeholder="Message (postage, not E2E)" autocomplete="off" />
+        <button class="btn mint" type="submit">Send</button>
       </form>
-      {{else if .Job}}
-      <p class="tiny">Jar cannot cover postage. <a href="/spend">Fill the jar</a>.</p>
+      {{else}}
+      <p class="kc-bar tiny">Jar cannot cover postage. <a href="/spend">Fill the jar</a>. Encrypted send lives in the KaChat app.</p>
       {{end}}
       {{else}}
-      <p class="help">Type a name. Find. Open KaChat with their Kaspa address.</p>
+      <div class="kc-empty">
+        <h2>KaChat</h2>
+        <p class="lede">Find a .kas. Pay KAS. Encrypted messages stay in the official app.</p>
+        <p class="actions">
+          <a class="btn mint" href="https://apps.apple.com/us/app/kachat/id6759102359">Get KaChat</a>
+          <a class="btn ghost" href="https://play.google.com/store/apps/details?id=com.kachat.app">Android</a>
+        </p>
+      </div>
       {{end}}
-    </div>
+    </section>
   </div>
-
-  <details>
-    <summary>Envelope shapes (for the KaChat app, not this page)</summary>
-    {{range .Envelopes}}
-    <p class="tiny"><strong>{{.Kind}}</strong></p>
-    <pre>{{.Template}}</pre>
-    <p class="help">{{.Fill}}</p>
-    {{end}}
-  </details>
 </main>
 <script>
 (function () {

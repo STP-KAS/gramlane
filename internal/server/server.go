@@ -695,14 +695,19 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 		q = strings.TrimSpace(r.URL.Query().Get("q"))
 	}
 	addr := walletAddr(r)
+	raw := strings.ToLower(strings.TrimSpace(q))
+	board := raw == "board" || raw == "#board"
 	p := page{
-		Title: "Chat · Gramlane", Active: "kachat", Job: &j, Query: names.DisplayName(q), Address: addr,
+		Title: "Chat · Gramlane", Active: "kachat", Job: &j, Address: addr,
 	}
 	if strings.HasPrefix(addr, "kaspa:") {
 		p.Held = names.Book(addr)
 		p.Choices = shop.Choices(addr)
 	}
-	if disp := names.DisplayName(q); disp != "" {
+	if board {
+		p.Query = "board"
+		p.Envelopes = kachat.Envelopes("board")
+	} else if disp := names.DisplayName(q); disp != "" {
 		p.Query = disp
 		who := names.HolderOf(disp)
 		if who == "" {
@@ -737,8 +742,8 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			p.Error = err.Error()
 		}
-		p.Stamps = post.List()
 	}
+	p.Stamps = post.List()
 	s.render(w, "kachat.html", p)
 }
 
