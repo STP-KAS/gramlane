@@ -1,38 +1,52 @@
 {{template "header" .}}
 <main>
-  <p class="kicker">kasdomain · compiled · not live</p>
+  <p class="kicker">kasdomain · compiled · not KNS</p>
   <h1>kasdomain — covenant names on Kaspa L1. Not KNS. Not an inscription.</h1>
-  <p class="lede">A name is an output. This app does not register names yet. It will resolve a name UTXO and quote the call in grams. USD not quoted. No yearly bill. No L2.</p>
+  <p class="lede">A name is an output. The script is determined by this label. First funded UTXO at that P2SH is the name. No yearly bill. No company in the middle. USD not quoted. No L2.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="q">Name</label>
-    <input id="q" name="q" value="{{.Query}}" placeholder="a name" autocomplete="off" spellcheck="false" />
+    <input id="q" name="q" value="{{.Query}}" placeholder="bakery" autocomplete="off" spellcheck="false" />
+    <span class="tld" aria-hidden="true">.kas</span>
     <button class="btn mint" type="submit">Resolve</button>
     <button class="btn ghost" type="submit" name="inspect" value="1">Inspect</button>
   </form>
-  <p class="help">Empty is correct. Inscriptions and KNS are out of scope here. Desk jobs that hit the indexer are labeled indexer · not kasdomain.</p>
+  <p class="help">Same idea as a name people can say. Different rail: Toccata covenant, not a KNS inscription. Desk jobs that still hit the inscription index are labeled indexer · not kasdomain.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Result}}
   <div class="card want-card">
-    <p><span class="chip {{.Result.Evidence}}">{{.Result.Evidence}}</span></p>
+    <p><span class="chip {{.Result.Evidence}}">{{.Result.Evidence}}</span>{{if .Result.Hit}} <span class="ok">funded on L1</span>{{else if .Result.PayURI}} <span class="ok">unfunded — first UTXO wins</span>{{end}}</p>
     <h2>{{.Result.Name}}</h2>
     <p class="help">{{.Result.Warning}}</p>
-    {{if .Result.Hit}}
-    <p>Owner pubkey <span class="mono">{{.Result.Owner}}</span></p>
-    {{if .Result.PayURI}}<p>Pay URI <span class="mono">{{.Result.PayURI}}</span></p>{{end}}
-    {{if .Result.Layout}}<p>Record layout <span class="mono">{{.Result.Layout}}</span></p>{{end}}
-    {{if .Result.ScriptHash}}<p>Script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
+    {{if .Result.PayURI}}
+    <p>Name output <span class="mono">{{.Result.PayURI}}</span></p>
+    {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
+    {{if .Result.Owner}}<p class="tiny">outpoint <span class="mono">{{.Result.Owner}}</span></p>{{end}}
+    <p class="price">{{.Result.Quote.Grams}} GRAM to resolve · {{printf "%.3f" .Result.Quote.KAS}} KAS fallback · USD {{.Result.Quote.USD}}</p>
+    {{if not .Result.Hit}}
+    <div class="invoice">
+      <div class="invoice-row"><span>Duration</span><strong>Forever</strong></div>
+      <div class="invoice-row"><span>Yearly rent</span><strong>None</strong></div>
+      <div class="invoice-row"><span>Who is the registry</span><strong>Nobody. The script is.</strong></div>
+      <div class="invoice-row total"><span>Fund once (wallet floor)</span><strong>{{.Result.Quote.PayKASText}} KAS</strong></div>
+    </div>
+    <p class="help">Send to this P2SH. That is the name. Kasware’s 0.5 KAS floor is a wallet rule, not a kasdomain tax. We do not broadcast for you.</p>
+    <input class="mono" id="pay-to" value="{{.Result.PayURI}}" readonly />
+    <p style="margin-top:12px">
+      <button class="btn mint" type="button" data-pay-l1 data-after="/kasdomain?q={{.Query}}" data-sompi="{{.Result.Quote.PaySompi}}">Fund {{.Result.Name}}</button>
+    </p>
+    <p class="tiny" data-pay-status></p>
+    {{else}}
+    <p>
+      <a class="btn mint" href="/pay?merchant={{.Result.Name}}&amp;payTo={{.Result.PayURI}}">Pay this name</a>
+    </p>
     {{end}}
-    <p class="price">{{.Result.Quote.Grams}} GRAM · {{printf "%.3f" .Result.Quote.KAS}} KAS fallback · USD {{.Result.Quote.USD}}</p>
     {{if .Inspect}}
     <h3>Inspect</h3>
-    {{if .Result.Hex}}
-    <p class="tiny">Raw bytes / hex. Local fixture only.</p>
+    <p class="tiny">Redeem script hex. Own UTXO only. No sibling readInputState.</p>
     <pre>{{.Result.Hex}}</pre>
     {{if .Result.Raw}}<pre>{{printf "%s" .Result.Raw}}</pre>{{end}}
-    {{else}}
-    <p class="tiny">No covenant UTXO bytes. Nothing to inspect on L1 yet.</p>
     {{end}}
     {{end}}
   </div>

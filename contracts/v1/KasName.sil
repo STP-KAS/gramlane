@@ -1,0 +1,34 @@
+pragma silverscript ^0.1.0;
+
+// kasdomain name. Compiled silverc v1-rc1.
+// A name is this output. Label is baked into the redeem script, so the P2SH
+// is determined by the label alone. First UTXO at that address is the name.
+// Own UTXO only: validateOutputState. No foreign input state. No KNS inscription.
+// Unclaimed owner is the 32-byte zero pubkey. claim() sets the owner.
+// transfer() moves the name. Label never changes.
+
+contract KasName(byte[32] initLabel, pubkey initOwner) {
+    byte[32] label = initLabel;
+    int claimed = 0;
+    pubkey owner = initOwner;
+
+    entry claim(sig s, pubkey p) {
+        require(claimed == 0);
+        require(checkSig(s, p));
+        validateOutputState(0, State {
+            label: label,
+            claimed: 1,
+            owner: p
+        });
+    }
+
+    entry transfer(sig s, pubkey next) {
+        require(claimed == 1);
+        require(checkSig(s, owner));
+        validateOutputState(0, State {
+            label: label,
+            claimed: 1,
+            owner: next
+        });
+    }
+}
