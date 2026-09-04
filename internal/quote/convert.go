@@ -16,6 +16,7 @@ type Convert struct {
 	Dust         uint64  `json:"dustSompi"`
 	KAS          float64 `json:"kas"`
 	KASText      string  `json:"kasText"`
+	KAS1         string  `json:"kas1"`
 	SompiPerGram uint64  `json:"sompiPerGram"`
 	SompiPerKAS  uint64  `json:"sompiPerKas"`
 	USD          string  `json:"usd"`
@@ -300,6 +301,7 @@ func pack(src string, grams, sompi, dust uint64) (Convert, error) {
 		Dust:         dust,
 		KAS:          float64(sompi) / float64(SompiPerKAS),
 		KASText:      kasText(sompi),
+		KAS1:         FormatKAS1(sompi),
 		SompiPerGram: SompiPerGram,
 		SompiPerKAS:  SompiPerKAS,
 		USD:          "not quoted",

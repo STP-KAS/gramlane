@@ -67,3 +67,8 @@ func kasText(sompi uint64) string {
 	s = strings.TrimRight(s, ".")
 	return s
 }
+
+// FormatKAS1 is KAS with one decimal for the UI (12.5, 200.0).
+func FormatKAS1(sompi uint64) string {
+	return fmt.Sprintf("%.1f", float64(sompi)/float64(SompiPerKAS))
+}
