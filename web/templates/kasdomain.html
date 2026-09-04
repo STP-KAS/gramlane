@@ -21,11 +21,20 @@
       {{else if .Result.PayURI}}<span class="ok">Available</span>
       {{end}}
     </p>
-    <h2>{{.Result.Name}}</h2>
+    <h2>{{.Result.Name}} <button type="button" class="btn ghost" data-copy-text="{{.Result.Name}}">Copy name</button></h2>
     {{if .Result.PayURI}}
     {{if and .Result.Hold (eq .Result.Hold.Kind "retailer")}}
     <p class="help">Not for sale. Reserved for the real {{.Result.Name}} — giant industry or company, not a squatter.</p>
-    <p class="tiny">Held on the Kaspa growth vault. <span class="mono">{{.Result.Hold.Owner}}</span></p>
+    <p class="tiny">Held on the Kaspa growth vault. <span class="mono">{{.Result.Hold.Owner}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Result.Hold.Owner}}">Copy address</button></p>
+    {{if $.TestMint}}
+    <form action="/kasdomain" method="post">
+      <input type="hidden" name="act" value="test-mint" />
+      <input type="hidden" name="name" value="{{.Result.Name}}" />
+      <input type="hidden" name="address" value="{{$.Address}}" data-wallet-addr />
+      <button class="btn mint" type="submit">Mint free (test)</button>
+    </form>
+    <p class="tiny">Vault test. No 200 KAS. Desk only unless you also fund the P2SH on L1.</p>
+    {{end}}
     {{else if and .Result.Hold (eq .Result.Hold.Kind "sale")}}
     <div class="invoice">
       <div class="invoice-row"><span>Reserved by</span><strong>Kaspa growth vault</strong></div>
@@ -33,11 +42,20 @@
       <div class="invoice-row total"><span>You send</span><strong>{{.Result.Hold.KAS}} KAS</strong></div>
     </div>
     <input class="mono" id="pay-to" value="{{.Result.Hold.Owner}}" readonly />
+    <p><button type="button" class="btn ghost" data-copy-text="{{.Result.Hold.Owner}}">Copy address</button></p>
     <p class="tiny">Pay the vault. 1 letter 1000 · 2 letters 500 · 3 letters 250 · rest 30 KAS.</p>
     <p class="actions">
       <button class="btn mint" type="button" data-pay-l1 data-to="{{.Result.Hold.Owner}}" data-sompi="{{.Result.Hold.Sompi}}" data-reserve-buy="{{.Result.Name}}">Buy {{.Result.Name}}</button>
     </p>
     <p class="tiny" data-pay-status></p>
+    {{if $.TestMint}}
+    <form action="/kasdomain" method="post">
+      <input type="hidden" name="act" value="test-mint" />
+      <input type="hidden" name="name" value="{{.Result.Name}}" />
+      <input type="hidden" name="address" value="{{$.Address}}" data-wallet-addr />
+      <button class="btn mint" type="submit">Mint free (test)</button>
+    </form>
+    {{end}}
     <p class="help">{{.Result.Hold.Note}}</p>
     {{else if not .Result.Hit}}
     <div class="invoice">
@@ -50,11 +68,21 @@
       <div class="invoice-row total"><span>You send</span><strong>{{.Result.Mint.TotalKAS}} KAS</strong></div>
     </div>
     <input class="mono" id="pay-to" value="{{.Result.PayURI}}" readonly />
+    <p><button type="button" class="btn ghost" data-copy-text="{{.Result.PayURI}}">Copy address</button></p>
     <p class="tiny">Growth vault <span class="mono">{{.Result.Mint.Vault}}</span></p>
     <p class="actions">
       <button class="btn mint" type="button" data-pay-l1 data-name="{{.Result.Name}}" data-after="/kasdomain?q={{.Query}}&address=" data-sompi="{{.Result.Mint.NameSompi}}" data-vault="{{.Result.Mint.Vault}}" data-vault-sompi="{{.Result.Mint.VaultSompi}}">Fund {{.Result.Name}}</button>
     </p>
     <p class="tiny" data-pay-status></p>
+    {{if $.TestMint}}
+    <form action="/kasdomain" method="post">
+      <input type="hidden" name="act" value="test-mint" />
+      <input type="hidden" name="name" value="{{.Result.Name}}" />
+      <input type="hidden" name="address" value="{{$.Address}}" data-wallet-addr />
+      <button class="btn mint" type="submit">Mint free (test)</button>
+    </form>
+    <p class="tiny">Vault test. No 200 KAS. Desk only unless you also fund the P2SH on L1.</p>
+    {{end}}
     <form id="heldForm" action="/kasdomain" method="post" hidden>
       <input type="hidden" name="act" value="held" />
       <input type="hidden" name="name" value="{{.Result.Name}}" />
@@ -68,6 +96,7 @@
     </details>
     {{else}}
     <p class="help">This name is funded. A shop is this same name with a page.</p>
+    {{if .Result.PayURI}}<p class="tiny"><span class="mono">{{.Result.PayURI}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Result.PayURI}}">Copy address</button></p>{{end}}
     <p class="actions">
       <a class="btn mint" href="/{{.Result.Name}}">See {{.Result.Name}}</a>
       {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Open as a shop</a>{{end}}
@@ -85,7 +114,7 @@
   {{end}}
 
   {{if .Held}}
-  <p class="help" style="margin-top:28px">Signed in as {{if .Held.Primary}}<strong>{{.Held.Primary}}</strong>{{else}}this wallet{{end}}. {{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}.</p>
+  <p class="help" style="margin-top:28px">Signed in as {{if .Held.Primary}}<strong>{{.Held.Primary}}</strong> <button type="button" class="btn ghost" data-copy-text="{{.Held.Primary}}">Copy name</button>{{else}}this wallet{{end}}. <span class="mono">{{.Held.Address}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Held.Address}}">Copy address</button>. {{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}.</p>
   <p class="actions">
     <a class="btn mint" href="/s/?address={{.Held.Address}}">Open a shop</a>
     <a class="btn ghost" href="/mine?address={{.Held.Address}}">My names</a>

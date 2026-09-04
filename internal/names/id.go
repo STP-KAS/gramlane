@@ -169,6 +169,48 @@ func Linked(addr string) string {
 	return links[strings.ToLower(strings.TrimSpace(addr))]
 }
 
+// Face is this wallet's kasdomain identity. Not KNS. Names come from the held book.
+func Face(addr string) *Identity {
+	addr = strings.TrimSpace(addr)
+	id := &Identity{
+		Address: addr,
+		Names:   []string{},
+		Display: addr,
+		Note:    "kasdomain face. First registered is the default. Other names on this wallet are custody. Same wallet, switch shop.",
+	}
+	if !strings.HasPrefix(addr, "kaspa:") {
+		id.Note = "kaspa address"
+		return id
+	}
+	b := Book(addr)
+	if b == nil {
+		id.Note = "No kasdomain face yet. Fund a name. The kaspa address stays the door."
+		return id
+	}
+	for _, h := range b.Names {
+		id.Names = append(id.Names, h.Name)
+	}
+	id.Total = len(id.Names)
+	if b.Primary != "" {
+		id.Linked = b.Primary
+		id.Display = b.Primary
+	}
+	return id
+}
+
+// Pin sets which held kasdomain is the face, or clears the display link when name is empty.
+func Pin(addr, name string) error {
+	addr = strings.TrimSpace(addr)
+	if !strings.HasPrefix(addr, "kaspa:") {
+		return fmt.Errorf("kaspa address")
+	}
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return Link(addr, "")
+	}
+	return SetPrimary(addr, name)
+}
+
 func Link(addr, name string) error {
 	addr = strings.TrimSpace(addr)
 	name = strings.ToLower(strings.TrimSpace(name))

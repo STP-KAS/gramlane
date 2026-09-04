@@ -114,7 +114,7 @@ func Record(addr, name, tx string) (*WalletBook, error) {
 	if disp == "" {
 		return nil, fmt.Errorf("name")
 	}
-	if h := LookupHold(disp); h != nil && h.Kind != HoldSold {
+	if h := LookupHold(disp); h != nil && h.Kind != HoldSold && !IsVault(addr) {
 		if h.Kind == HoldRetailer {
 			return nil, fmt.Errorf("not for sale — reserved for the real %s", disp)
 		}

@@ -184,6 +184,10 @@ func VaultAddress() string {
 	return AdoptionVault
 }
 
+func IsVault(addr string) bool {
+	return keyAddr(addr) != "" && keyAddr(addr) == keyAddr(VaultAddress())
+}
+
 const (
 	MintKAS      uint64 = 200
 	MintSharePct uint64 = 50
