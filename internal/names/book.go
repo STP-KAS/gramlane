@@ -114,6 +114,14 @@ func Record(addr, name, tx string) (*WalletBook, error) {
 	if disp == "" {
 		return nil, fmt.Errorf("name")
 	}
+	if h := LookupHold(disp); h != nil && h.Kind != HoldSold {
+		if h.Kind == HoldRetailer {
+			return nil, fmt.Errorf("not for sale — reserved for the real %s", disp)
+		}
+		if keyAddr(addr) != keyAddr(h.Owner) {
+			return nil, fmt.Errorf("reserved. Buy %s from the growth vault", disp)
+		}
+	}
 	p2sh, _, _, err := P2SHFor(disp)
 	if err != nil {
 		return nil, err

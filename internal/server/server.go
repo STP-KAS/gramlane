@@ -92,6 +92,9 @@ func New(addr string) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err := names.SeedVault(); err != nil {
+		log.Printf("reserve seed: %v", err)
+	}
 	return &Server{Addr: addr, T: t}, nil
 }
 
@@ -690,6 +693,13 @@ func (s *Server) applyNameActs(w http.ResponseWriter, r *http.Request, p *page, 
 	case "held":
 		if _, err := names.Record(addr, r.FormValue("name"), r.FormValue("tx")); err != nil {
 			p.Error = err.Error()
+		}
+	case "buy-reserve":
+		if _, err := names.BuyReserved(r.FormValue("name"), addr, r.FormValue("tx")); err != nil {
+			p.Error = err.Error()
+		} else {
+			http.Redirect(w, r, "/mine?address="+addr, http.StatusSeeOther)
+			return true
 		}
 	case "face":
 		if err := names.SetPrimary(addr, r.FormValue("name")); err != nil {

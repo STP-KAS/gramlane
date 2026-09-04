@@ -153,6 +153,15 @@
           });
         return;
       }
+      var reserve = btn.getAttribute("data-reserve-buy");
+      if (reserve && acc[0]) {
+        var rb = "act=buy-reserve&name=" + encodeURIComponent(reserve) + "&address=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
+        fetch("/kasdomain", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: rb })
+          .finally(function () {
+            location.href = "/mine?address=" + encodeURIComponent(acc[0]);
+          });
+        return;
+      }
       var nm = btn.getAttribute("data-name");
       if (nm && acc[0]) {
         var body = "act=held&name=" + encodeURIComponent(nm) + "&address=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
