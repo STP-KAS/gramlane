@@ -1,9 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">pay · online or on the counter</div>
-  <h1>One ticket. Two doors.</h1>
-  <p class="lede">A URL for the phone. A QR for the shop. Same grams. Customer pays from the jar.</p>
-  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> grams. <a href="/stablegram">Stablegram</a></p>{{end}}
+  <h1>New ticket</h1>
+  <p class="lede">A link for the phone. A QR for the counter. Paid from the jar.</p>
+  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} grams · <a href="/stablegram">fill</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <form action="/pay" method="post">

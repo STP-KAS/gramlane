@@ -7,25 +7,20 @@
   <title>{{.Title}}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/app.css" />
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="nav">
-    <a class="brand" href="/" title="Gramlane home">GRAMLANE</a>
+    <a class="brand" href="/" title="Home">Gramlane</a>
     <nav>
-      <a href="/" class="{{if eq .Active "home"}}on{{end}}">Home</a>
-      <a href="/kasdomain" class="{{if eq .Active "kasdomain"}}on{{end}}">kasdomain</a>
-      <a href="/mine" class="{{if eq .Active "mine"}}on{{end}}">Names</a>
+      <a href="/kasdomain" class="{{if eq .Active "kasdomain"}}on{{end}}">Name</a>
       <a href="/s/" class="{{if eq .Active "shop"}}on{{end}}">Shops</a>
-      <a href="/stablegram" class="{{if eq .Active "stablegram"}}on{{end}}">Stablegram</a>
-      <a href="/pay" class="{{if eq .Active "pay"}}on{{end}}">Pay</a>
-      <a href="/desk" class="{{if or (eq .Active "apps") (eq .Active "desk")}}on{{end}}">Desk</a>
-      <a href="/why" class="{{if eq .Active "why"}}on{{end}}">Why</a>
+      <a href="/mine" class="{{if eq .Active "mine"}}on{{end}}">My names</a>
+      <a href="/pay" class="{{if or (eq .Active "pay") (eq .Active "stablegram")}}on{{end}}">Pay</a>
     </nav>
     <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
-    {{if .Seq}}<a class="chip" href="/jar" title="jar receipts">{{.Seq.Remaining}} GRAM</a>{{end}}
   </header>
 {{end}}

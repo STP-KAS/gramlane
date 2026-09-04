@@ -1,42 +1,20 @@
 {{template "header" .}}
-<main>
-  <div class="kicker">Gramlane · three things</div>
-  <h1>A name is a shop.</h1>
-  <p class="lede">kasdomain for the many: a name people say, a page they open, a till they pay. Not only a nicer kaspa:q…. Acquire in KAS. The till stays in grams. No company in the middle. The script is the registry.</p>
-  {{if .Query}}<p class="lede">Sign: <a class="mono" href="/site/{{.Query}}">{{.Query}}</a></p>{{end}}
-  {{if .Seq}}
-  <a class="meter" href="/jar">
-    <div class="till">{{.Seq.Remaining}}</div>
-    <span>grams in the jar · open the book</span>
-  </a>
-  {{if .Seq.Burns}}
-  {{with index (.Seq.LastBurns 1) 0}}
-  <p class="tiny">Last burn: <span class="mono">{{.Job}}</span> · {{.Grams}} GRAM · <a href="/jar">all receipts</a></p>
-  {{end}}
-  {{end}}
-  {{end}}
-  <div class="grid doors">
-    <article class="card">
-      <h3>1 · kasdomain</h3>
-      <p>Fund a name in KAS. Hang a shop. Share the QR. Dollar shelf, grams at the till.</p>
-      <a class="btn mint" href="/kasdomain">Get a name</a>
-    </article>
-    <article class="card">
-      <h3>2 · Fill the jar</h3>
-      <p>Put some KAS aside as grams. One send. Many payments later.</p>
-      <a class="btn mint" href="/stablegram">Fill the jar</a>
-    </article>
-    <article class="card">
-      <h3>3 · Pay</h3>
-      <p>A link on your phone, or a QR at the counter.</p>
-      <form class="row" action="/go" method="get">
-        <label class="sr" for="ticketId">Ticket id</label>
-        <input id="ticketId" name="id" placeholder="ticket id" autocomplete="off" />
-        <button class="btn mint" type="submit">Pay</button>
-      </form>
-      <p style="margin-top:10px"><a class="btn ghost" href="/pay">New ticket</a></p>
-    </article>
-  </div>
-  <p class="lede" style="margin-top:36px">A household bills groceries. A plant bills events. An agent pays without a click. <a href="/why">Why</a> · <a href="/apps">Apps</a></p>
+<main id="main">
+  <h1>A name people can say.</h1>
+  <p class="lede">Get a shop on Kaspa. No company in the middle. No yearly rent.</p>
+
+  <form class="search" action="/kasdomain" method="get" role="search">
+    <label class="sr" for="homeQ">Name</label>
+    <input id="homeQ" name="q" placeholder="bakery" autocomplete="off" spellcheck="false" />
+    <span class="tld" aria-hidden="true">.kas</span>
+    <button class="btn mint" type="submit">Get it</button>
+  </form>
+
+  <ol class="steps">
+    <li><strong>1 · Name</strong>Pay once in KAS. Yours forever.</li>
+    <li><strong>2 · Shop</strong>A page and a menu. Share the link.</li>
+    <li><strong>3 · Pay</strong>Customer taps. Grams at the till.</li>
+  </ol>
+  {{if .Query}}<p class="tiny">Your sign: <a href="/s/{{.Query}}">{{.Query}}</a></p>{{end}}
 </main>
 {{template "footer" .}}

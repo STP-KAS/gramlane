@@ -1,40 +1,35 @@
 {{template "header" .}}
-<main>
-  <p class="kicker">kasdomain · compiled · not KNS</p>
-  <h1>kasdomain — covenant names on Kaspa L1. Not KNS. Not an inscription.</h1>
-  <p class="lede">A name is a shop door. Fund it with a Kaspa transaction — not grams. Then hang a page and a till. The dollar figure is the board shelf. Desk apps that sequence work stay in grams. No yearly bill. No company in the middle.</p>
+<main id="main">
+  <h1>Get a name.</h1>
+  <p class="lede">One KAS payment. Forever. Then it is a shop.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="q">Name</label>
     <input id="q" name="q" value="{{.Query}}" placeholder="bakery" autocomplete="off" spellcheck="false" />
     <span class="tld" aria-hidden="true">.kas</span>
-    <button class="btn mint" type="submit">Resolve</button>
-    <button class="btn ghost" type="submit" name="inspect" value="1">Inspect</button>
+    <button class="btn mint" type="submit">Look up</button>
   </form>
-  <p class="help">Same idea as a name people can say. Different rail: Toccata covenant, not a KNS inscription. Desk jobs that still hit the inscription index are labeled indexer · not kasdomain.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Result}}
   <div class="card want-card">
-    <p><span class="chip {{.Result.Evidence}}">{{.Result.Evidence}}</span>{{if .Result.Hit}} <span class="ok">funded on L1</span>{{else if .Result.PayURI}} <span class="ok">unfunded — first UTXO wins</span>{{end}}</p>
+    <p>
+      {{if .Result.Hit}}<span class="ok">Taken on L1</span>
+      {{else if .Result.PayURI}}<span class="ok">Available</span>
+      {{end}}
+    </p>
     <h2>{{.Result.Name}}</h2>
-    <p class="help">{{.Result.Warning}}</p>
     {{if .Result.PayURI}}
-    <p>Name output <span class="mono">{{.Result.PayURI}}</span></p>
-    {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
-    {{if .Result.Owner}}<p class="tiny">outpoint <span class="mono">{{.Result.Owner}}</span></p>{{end}}
-    <p class="price">Shelf {{.Result.Shelf.USD}} · {{.Result.Shelf.PayKAS}} KAS at this board · 1 KAS = ${{.Result.Shelf.Rate}} USD</p>
     {{if not .Result.Hit}}
     <div class="invoice">
-      <div class="invoice-row"><span>Duration</span><strong>Forever</strong></div>
+      <div class="invoice-row"><span>Yours for</span><strong>Forever</strong></div>
       <div class="invoice-row"><span>Yearly rent</span><strong>None</strong></div>
-      <div class="invoice-row"><span>Who is the registry</span><strong>Nobody. The script is.</strong></div>
-      <div class="invoice-row"><span>Shelf (USD)</span><strong>{{.Result.Shelf.USD}}</strong></div>
-      <div class="invoice-row total"><span>You send (KAS)</span><strong>{{.Result.Quote.PayKASText}} KAS</strong></div>
+      <div class="invoice-row"><span>Registry</span><strong>The script</strong></div>
+      <div class="invoice-row"><span>Shelf</span><strong>{{.Result.Shelf.USD}}</strong></div>
+      <div class="invoice-row total"><span>You send</span><strong>{{.Result.Quote.PayKASText}} KAS</strong></div>
     </div>
-    <p class="help">Send KAS to this P2SH. That is the name. Not grams — grams are for desk jobs that keep sequencing on L1. Kasware’s 0.5 KAS floor is a wallet rule, not a kasdomain tax. The dollar shelf is a board sign, not a peg. We do not broadcast for you.</p>
     <input class="mono" id="pay-to" value="{{.Result.PayURI}}" readonly />
-    <p style="margin-top:12px">
+    <p class="actions">
       <button class="btn mint" type="button" data-pay-l1 data-name="{{.Result.Name}}" data-after="/kasdomain?q={{.Query}}&address=" data-sompi="{{.Result.Quote.PaySompi}}">Fund {{.Result.Name}}</button>
     </p>
     <p class="tiny" data-pay-status></p>
@@ -44,39 +39,35 @@
       <input type="hidden" name="address" data-wallet-addr />
       <input type="hidden" name="tx" name-tx="1" />
     </form>
+    <details>
+      <summary>What you are paying</summary>
+      <p class="help">A Kaspa output at this script is the name. Not grams — grams are for the till later. Kasware’s 0.5 KAS floor is a wallet rule. USD is a board sign, not a peg. Not KNS. We do not broadcast for you.</p>
+      {{if .Result.ScriptHash}}<p class="tiny">script hash <span class="mono">{{.Result.ScriptHash}}</span></p>{{end}}
+    </details>
     {{else}}
-    <p>
-      <a class="btn mint" href="/s/{{.Result.Name}}">Open the shop</a>
-      {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Hang a shop on this name</a>{{end}}
+    <p class="help">This name is funded. Open the shop, or hang one if you hold it.</p>
+    <p class="actions">
+      <a class="btn mint" href="/s/{{.Result.Name}}">Open shop</a>
+      {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Hang a shop</a>{{end}}
     </p>
     {{end}}
     {{if .Inspect}}
-    <h3>Inspect</h3>
-    <p class="tiny">Redeem script hex. Own UTXO only. No sibling readInputState.</p>
-    <pre>{{.Result.Hex}}</pre>
-    {{if .Result.Raw}}<pre>{{printf "%s" .Result.Raw}}</pre>{{end}}
+    <details open>
+      <summary>Inspect</summary>
+      <pre>{{.Result.Hex}}</pre>
+      {{if .Result.Raw}}<pre>{{printf "%s" .Result.Raw}}</pre>{{end}}
+    </details>
     {{end}}
     {{end}}
   </div>
   {{end}}
 
   {{if .Held}}
-  <div class="card" style="margin:22px 0">
-    <div class="kicker">your face</div>
-    <h2>{{if .Held.Primary}}{{.Held.Primary}}{{else}}kaspa address{{end}}</h2>
-    <p class="help">This wallet holds {{len .Held.Names}} kasdomain{{if ne (len .Held.Names) 1}}s{{end}}. Only the face replaces kaspa:q… when you log in. Open <a href="/mine?address={{.Held.Address}}">Names</a> to see every domain on this wallet after you buy or fund one.</p>
-    {{if .Held.Primary}}<p class="tiny">First registered: {{.Held.First}}</p>{{end}}
-    <p style="margin-top:12px">
-      <a class="btn mint" href="/mine?address={{.Held.Address}}">See all names on this wallet</a>
-      {{if .Held.Primary}}<a class="btn ghost" href="/shop?name={{.Held.Primary}}&amp;address={{.Held.Address}}">Hang a shop</a>{{end}}
-    </p>
-  </div>
-  {{else}}
-  <p class="help">Log in, fund a name with KAS, and it is recorded on the Names tab. First funded is your face. Fund more only if you want inventory to sell — not to decorate the login.</p>
-  <form class="row" action="/mine" method="get">
-    <input class="mono" name="address" placeholder="kaspa:q…" data-wallet-addr />
-    <button class="btn ghost" type="submit">Show names on this wallet</button>
-  </form>
+  <p class="help" style="margin-top:28px">Signed in as {{if .Held.Primary}}<strong>{{.Held.Primary}}</strong>{{else}}this wallet{{end}}. {{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}.</p>
+  <p class="actions">
+    <a class="btn mint" href="/mine?address={{.Held.Address}}">My names</a>
+    {{if .Held.Primary}}<a class="btn ghost" href="/shop?name={{.Held.Primary}}&amp;address={{.Held.Address}}">Hang a shop</a>{{end}}
+  </p>
   {{end}}
 </main>
 <script>
@@ -92,4 +83,3 @@
 })();
 </script>
 {{template "footer" .}}
-
