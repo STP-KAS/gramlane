@@ -1,0 +1,51 @@
+package names
+
+// Giant industries — not for sale. Real retailer only.
+var retailerIndustries = []string{
+	"bank", "banks", "insurance", "health", "hospital", "pharma", "pharmacy",
+	"energy", "oil", "gas", "mining", "coal", "steel", "copper", "gold", "silver",
+	"telecom", "mobile", "phone", "internet", "broadband",
+	"airline", "airlines", "airport", "hotel", "hotels", "travel",
+	"food", "grocery", "groceries", "retail", "store", "stores", "mall", "market",
+	"auto", "car", "cars", "truck", "trucks", "shipping", "logistics", "freight",
+	"farm", "farms", "agriculture", "water", "electric", "power", "solar", "wind", "nuclear",
+	"defense", "army", "navy", "police", "government", "city", "state", "law", "court",
+	"school", "university", "college", "church", "news", "media", "tv", "radio", "film", "music",
+	"sport", "sports", "football", "soccer", "basketball", "baseball", "casino", "lottery",
+	"post", "mail", "cloud", "ai", "tech", "software", "hardware", "chip", "chips",
+	"semiconductor", "crypto", "exchange", "wallet", "node", "miner", "miningpool",
+}
+
+// Important companies — not for sale. Real holder only.
+var retailerCompanies = []string{
+	"google", "apple", "amazon", "microsoft", "meta", "facebook", "tesla", "samsung",
+	"toyota", "walmart", "costco", "target", "nike", "adidas", "coke", "pepsi", "cocacola",
+	"mcdonalds", "starbucks", "disney", "netflix", "uber", "airbnb", "visa", "mastercard",
+	"paypal", "jpmorgan", "goldman", "berkshire", "shell", "exxon", "chevron", "nestle",
+	"unilever", "sony", "nintendo", "intel", "nvidia", "amd", "ibm", "oracle", "cisco",
+	"adobe", "salesforce", "twitter", "instagram", "youtube", "tiktok", "linkedin",
+	"whatsapp", "telegram", "wechat", "alibaba", "tencent", "baidu", "huawei", "xiaomi",
+	"byd", "volkswagen", "bmw", "mercedes", "ford", "honda", "hyundai", "lvmh", "chanel",
+	"gucci", "hermes", "rolex", "ferrari", "porsche", "boeing", "airbus", "fedex", "ups",
+	"dhl", "maersk", "siemens", "caterpillar", "deere", "pfizer", "moderna", "att",
+	"verizon", "vodafone", "tmobile", "comcast", "bbc", "cnn", "reuters", "bloomberg",
+	"spotify", "twitch", "reddit", "github", "cloudflare", "aws", "azure", "openai",
+	"anthropic", "xai", "grok", "kaspa", "bitcoin", "ethereum", "tether", "circle",
+	"binance", "coinbase", "kraken", "blackrock", "vanguard", "fidelity", "hsbc",
+	"barclays", "citi", "wellsfargo", "bofa", "santander", "allianz", "axa", "aig",
+	"lockheed", "raytheon", "northrop", "bae", "totalenergies", "equinor", "aramco",
+	"petrobras", "gazprom", "rosneft", "cosco", "hyundaiheavy", "samsung", "lg",
+	"panasonic", "qualcomm", "broadcom", "tsmc", "asml", "appliedmaterials",
+	"unh", "unitedhealth", "cvs", "walgreens", "kroger", "carrefour", "aldi", "lidl",
+	"ikea", "h&m", "zara", "uniqlo", "gap", "levis", "newbalance", "puma",
+	"redbull", "heineken", "ab-inbev", "diageo", "moet", "louisvuitton",
+	"prada", "dior", "cartier", "tiffany", "omega", "tagheuer",
+	"volkswagen", "audi", "skoda", "seat", "renault", "peugeot", "fiat", "jeep",
+	"landrover", "jaguar", "mini", "volvo", "saab", "mazda", "subaru", "mitsubishi",
+	"suzuki", "kia", "geely", "greatwall", "nio", "xpeng", "li",
+	"delta", "united", "americanair", "lufthansa", "airfrance", "emirates", "qatar",
+	"marriott", "hilton", "hyatt", "airbnb", "booking", "expedia",
+	"visa", "amex", "discover", "unionpay", "alipay", "wechatpay",
+	"slack", "zoom", "dropbox", "notion", "figma", "canva", "shopify", "stripe",
+	"square", "block", "robinhood", "etrade", "schwab",
+}

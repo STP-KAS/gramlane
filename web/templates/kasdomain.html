@@ -16,12 +16,30 @@
     <p>
       <span class="chip {{.Result.Evidence}}">{{.Result.Evidence}}</span>
       {{if .Result.Hit}}<span class="ok">Taken on L1</span>
+      {{else if and .Result.Hold (eq .Result.Hold.Kind "retailer")}}<span class="ok">Reserved — real retailer</span>
+      {{else if and .Result.Hold (eq .Result.Hold.Kind "sale")}}<span class="ok">Reserved — for sale</span>
       {{else if .Result.PayURI}}<span class="ok">Available</span>
       {{end}}
     </p>
     <h2>{{.Result.Name}}</h2>
     {{if .Result.PayURI}}
-    {{if not .Result.Hit}}
+    {{if and .Result.Hold (eq .Result.Hold.Kind "retailer")}}
+    <p class="help">Not for sale. Reserved for the real {{.Result.Name}} — giant industry or company, not a squatter.</p>
+    <p class="tiny">Held on the Kaspa growth vault. <span class="mono">{{.Result.Hold.Owner}}</span></p>
+    {{else if and .Result.Hold (eq .Result.Hold.Kind "sale")}}
+    <div class="invoice">
+      <div class="invoice-row"><span>Reserved by</span><strong>Kaspa growth vault</strong></div>
+      <div class="invoice-row"><span>Length</span><strong>{{.Result.Hold.KAS}} KAS</strong></div>
+      <div class="invoice-row total"><span>You send</span><strong>{{.Result.Hold.KAS}} KAS</strong></div>
+    </div>
+    <input class="mono" id="pay-to" value="{{.Result.Hold.Owner}}" readonly />
+    <p class="tiny">Pay the vault. 1 letter 1000 · 2 letters 500 · 3 letters 250 · rest 30 KAS.</p>
+    <p class="actions">
+      <button class="btn mint" type="button" data-pay-l1 data-to="{{.Result.Hold.Owner}}" data-sompi="{{.Result.Hold.Sompi}}" data-reserve-buy="{{.Result.Name}}">Buy {{.Result.Name}}</button>
+    </p>
+    <p class="tiny" data-pay-status></p>
+    <p class="help">{{.Result.Hold.Note}}</p>
+    {{else if not .Result.Hit}}
     <div class="invoice">
       <div class="invoice-row"><span>Yours for</span><strong>Forever</strong></div>
       <div class="invoice-row"><span>Yearly rent</span><strong>None</strong></div>

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"golang.org/x/crypto/blake2b"
 
@@ -23,7 +24,11 @@ const (
 	labelDomain = "kasdomain:v1:"
 )
 
-var skipChain bool
+var (
+	skipChain bool
+	tplMu     sync.Mutex
+	tplCached []byte
+)
 
 // Result is a kasdomain hit. Evidence is live when KasName.sil derives a P2SH.
 // Never an indexer record. Not KNS.
@@ -42,6 +47,7 @@ type Result struct {
 	Hex        string          `json:"hex,omitempty"`
 	Layout     string          `json:"layout,omitempty"`
 	Hit        bool            `json:"hit"`
+	Hold       *Hold           `json:"hold,omitempty"`
 }
 
 func LabelBytes(name string) []byte {
@@ -71,6 +77,9 @@ func DisplayName(raw string) string {
 
 func ResetCovenantForTest() {
 	skipChain = true
+	tplMu.Lock()
+	tplCached = nil
+	tplMu.Unlock()
 }
 
 func kasNameArtifact() string {
@@ -90,6 +99,13 @@ func kasNameArtifact() string {
 }
 
 func templateScript() ([]byte, error) {
+	tplMu.Lock()
+	if tplCached != nil {
+		out := append([]byte(nil), tplCached...)
+		tplMu.Unlock()
+		return out, nil
+	}
+	tplMu.Unlock()
 	b, err := os.ReadFile(kasNameArtifact())
 	if err != nil {
 		return nil, err
@@ -108,7 +124,10 @@ func templateScript() ([]byte, error) {
 	if !ok || len(c.Compiled.Bytecode) < labelOffset+labelLen {
 		return nil, fmt.Errorf("KasName bytecode")
 	}
-	return c.Compiled.Bytecode, nil
+	tplMu.Lock()
+	tplCached = append([]byte(nil), c.Compiled.Bytecode...)
+	tplMu.Unlock()
+	return append([]byte(nil), c.Compiled.Bytecode...), nil
 }
 
 func RedeemFor(name string) ([]byte, error) {
@@ -160,7 +179,11 @@ func ResolveCovenant(raw string) *Result {
 	out.PayURI = addr
 	out.ScriptHash = hashHex
 	out.Hex = hex.EncodeToString(redeem)
+	out.Hold = LookupHold(disp)
 	out.Warning = "kasdomain covenant is live on L1. This P2SH is KasName.sil plus this label. First funded output is the name. No yearly bill. Not KNS. Anyone can recompute the script."
+	if out.Hold != nil {
+		out.Warning = out.Hold.Note
+	}
 	if skipChain {
 		out.Hit = false
 		return out
