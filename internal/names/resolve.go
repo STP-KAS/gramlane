@@ -2,92 +2,112 @@ package names
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 	"strings"
+	"sync"
 
+	"gramlane/internal/appenv"
 	"gramlane/internal/quote"
 )
 
 const ResolveGrams uint64 = 12_000
 
-// Result is a kasdomain search hit. Evidence is always indexer when Lookup worked.
+// Result is a kasdomain hit. Evidence is never live or indexer.
 type Result struct {
-	Query     string          `json:"query"`
-	Name      string          `json:"name"`
-	Owner     string          `json:"owner,omitempty"`
-	PayURI    string          `json:"payUri,omitempty"`
-	AssetID   string          `json:"assetId,omitempty"`
-	Evidence  string          `json:"evidence"`
-	Warning   string          `json:"warning"`
-	Quote     quote.Quote     `json:"quote"`
-	Raw       json.RawMessage `json:"raw,omitempty"`
-	Available bool            `json:"available,omitempty"`
-	Linked    string          `json:"linked,omitempty"`
-	Names     []string        `json:"names,omitempty"`
-	Total     int             `json:"total,omitempty"`
+	Query      string          `json:"query"`
+	Name       string          `json:"name"`
+	Owner      string          `json:"owner,omitempty"`
+	PayURI     string          `json:"payUri,omitempty"`
+	Evidence   string          `json:"evidence"`
+	Warning    string          `json:"warning"`
+	Quote      quote.Quote     `json:"quote"`
+	Raw        json.RawMessage `json:"raw,omitempty"`
+	ScriptHash string          `json:"scriptHash,omitempty"`
+	Hex        string          `json:"hex,omitempty"`
+	Layout     string          `json:"layout,omitempty"`
+	Hit        bool            `json:"hit"`
 }
 
-func isFreeOnIndex(err error) bool {
-	if err == nil {
-		return false
-	}
-	s := strings.ToLower(err.Error())
-	return strings.Contains(s, "no owner") || strings.Contains(s, "404") || strings.Contains(s, "not found")
+type fixture struct {
+	Name       string `json:"name"`
+	OwnerPub   string `json:"ownerPub"`
+	PayURI     string `json:"payUri"`
+	ScriptHash string `json:"scriptHash"`
+	Hex        string `json:"hex"`
+	Layout     string `json:"layout"`
 }
 
-func looksAddr(s string) bool {
-	s = strings.ToLower(strings.TrimSpace(s))
-	return strings.HasPrefix(s, "kaspa:") || strings.HasPrefix(s, "kaspatest:")
+var (
+	fixOnce sync.Once
+	fixBook map[string]fixture
+)
+
+func DisplayName(raw string) string {
+	return strings.ToLower(strings.TrimSpace(raw))
 }
 
-// Resolve is the kasdomain hero: name or kaspa address → indexer row + gram quote.
-func Resolve(raw string) (*Result, error) {
+func loadFixtures() {
+	fixOnce.Do(func() {
+		fixBook = map[string]fixture{}
+		b, err := os.ReadFile(appenv.File("kasdomain-fixture.json"))
+		if err != nil || len(b) == 0 {
+			return
+		}
+		var env struct {
+			Names []fixture `json:"names"`
+		}
+		if json.Unmarshal(b, &env) != nil {
+			return
+		}
+		for _, f := range env.Names {
+			k := DisplayName(f.Name)
+			if k == "" {
+				continue
+			}
+			fixBook[k] = f
+		}
+	})
+}
+
+func ResetFixturesForTest() {
+	fixOnce = sync.Once{}
+	fixBook = nil
+}
+
+// ResolveCovenant never calls KNS. Empty is correct. A hit is a local fixture only.
+func ResolveCovenant(raw string) *Result {
 	raw = strings.TrimSpace(raw)
+	name := DisplayName(raw)
 	qq, err := quote.Grams(ResolveGrams, "SIGN1")
 	if err != nil {
-		return nil, err
+		qq = quote.Quote{Grams: ResolveGrams, USD: "not quoted"}
 	}
 	out := &Result{
 		Query:    raw,
-		Evidence: "indexer",
+		Name:     name,
+		Evidence: "roadmap",
 		Quote:    qq,
-		Warning:  "Indexer first-come, first-served. Not consensus-unique. This process does not register the name.",
+		Warning:  fmt.Sprintf("No kasdomain covenant for %s. Inscriptions and KNS are out of scope.", name),
 	}
-	if looksAddr(raw) {
-		id, err := ForAddress(raw)
-		if err != nil {
-			return out, err
-		}
-		out.Name = id.Display
-		out.Owner = id.Address
-		out.PayURI = id.Address
-		out.Linked = id.Linked
-		out.Names = id.Names
-		out.Total = id.Total
-		if id.Linked != "" {
-			out.Name = id.Linked
-		}
-		b, _ := json.Marshal(id)
-		out.Raw = b
-		return out, nil
+	if name == "" {
+		out.Warning = "Type a name. This app does not register names yet."
+		return out
 	}
-	p, err := Lookup(raw)
-	if p != nil {
-		out.Name = p.Name
-		out.Owner = p.Owner
-		out.PayURI = p.PayURI
-		out.AssetID = p.AssetID
-		out.Raw = p.Raw
-		if p.Warning != "" {
-			out.Warning = p.Warning
-		}
+	loadFixtures()
+	f, ok := fixBook[name]
+	if !ok {
+		return out
 	}
-	if err != nil {
-		if isFreeOnIndex(err) {
-			out.Available = true
-			out.Warning = "No owner on the indexer. Get it once at the official shop. We host the site. No yearly rent."
-			return out, nil
-		}
-		return out, err
-	}
-	return out, nil
+	out.Hit = true
+	out.Evidence = "local"
+	out.Owner = f.OwnerPub
+	out.PayURI = f.PayURI
+	out.ScriptHash = f.ScriptHash
+	out.Hex = f.Hex
+	out.Layout = f.Layout
+	out.Warning = "Local fixture. Operator-created name UTXO. Not a live unique name on L1. Tagged local, not indexer."
+	rawJSON, _ := json.Marshal(f)
+	out.Raw = rawJSON
+	return out
 }
