@@ -1,18 +1,18 @@
 {{define "footer"}}
   <footer class="foot">
-    <a href="https://x.com/StppStp">@StppStp</a>
-    · <a href="https://www.linkedin.com/in/remco-schietecatte-29aa3b3aa/">Remco</a>
-    · <a href="/kasdomain">Kasdomain</a>
-    · <a href="/market">Market</a>
-    · <a href="/jar">Jar</a>
-    · <a href="/convert">Convert</a>
-    · <a href="/genesis">Genesis</a>
-    · <a href="/honest">Claims</a>
-    · <a href="/guide">Guide</a>
+    <a href="/jar">Jar</a>
     · <a href="/wallets">Wallets</a>
     · <a href="/234">#234</a>
-    <div class="tiny">This site never DMs you. Never paste a seed. <a href="/safety">Safety</a> · <a href="/feedback">Feedback</a>
-      · <a href="http://localhost:8080">KNS :8080</a> · <a href="http://localhost:8082">Till shop :8082</a></div>
+    · <a href="/guide">Guide</a>
+    · <a href="https://x.com/StppStp">@StppStp</a>
+    <div class="tiny">
+      {{if .Public}}Not official KNS. Not Kaspa core. Operator @StppStp. Demo. HTTP receipts only.{{else}}This site never DMs you. Never paste a seed.{{end}}
+      <a href="/safety">Safety</a> · <a href="/feedback">Feedback</a>
+    </div>
+    <details>
+      <summary>More</summary>
+      <p class="tiny"><a href="/stablegram">Fill jar</a> · <a href="/pay">Pay</a> · <a href="/market">Name market</a> · <a href="/genesis">Voucher</a> · <a href="http://localhost:8080">KNS :8080</a> · <a href="http://localhost:8082">Till :8082</a></p>
+    </details>
   </footer>
   <script src="/static/js/wallets.js"></script>
   <script src="/static/js/pay.js"></script>

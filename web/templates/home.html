@@ -1,8 +1,8 @@
 {{template "header" .}}
 <main>
-  <div class="kicker">Gramlane · the jar · not a coin</div>
-  <h1>Keep a jar of spend.</h1>
-  <p class="lede">Gramlane is the project. Hold KAS. Put a share aside as Stablegram. Pay — a link or a QR. Chat a .kas name. The jar does not move when the exchange rate does. Not a dollar. Not Tether.</p>
+  <div class="kicker">Gramlane · three things</div>
+  <h1>A name. A jar. A pay button.</h1>
+  <p class="lede">Gramlane is a shop on Kaspa. Get a name people can say. Keep spend in a jar of grams. Pay with a link or a QR. Not a dollar. Not Tether. The jar does not jump when the price of KAS jumps.</p>
   {{if .Query}}<p class="lede">Sign: <a class="mono" href="/site/{{.Query}}">{{.Query}}</a></p>{{end}}
   {{if .Seq}}
   <a class="meter" href="/jar">
@@ -17,23 +17,24 @@
   {{end}}
   <div class="grid doors">
     <article class="card">
-      <h3>Stablegram</h3>
-      <p>Set 50% aside, or any share. One send fills the jar.</p>
-      <a class="btn mint" href="/stablegram">Fill</a>
+      <h3>1 · Get a name</h3>
+      <p>Pick a word like bakery.kas. That is your shop sign.</p>
+      <a class="btn mint" href="/kasdomain">Get a name</a>
     </article>
     <article class="card">
-      <h3>Pay</h3>
-      <p>Paste a ticket id, or open a counter ticket.</p>
+      <h3>2 · Fill the jar</h3>
+      <p>Put some KAS aside as grams. One send. Many payments later.</p>
+      <a class="btn mint" href="/stablegram">Fill the jar</a>
+    </article>
+    <article class="card">
+      <h3>3 · Pay</h3>
+      <p>A link on your phone, or a QR at the counter.</p>
       <form class="row" action="/go" method="get">
-        <input name="id" placeholder="ticket id" autocomplete="off" />
+        <label class="sr" for="ticketId">Ticket id</label>
+        <input id="ticketId" name="id" placeholder="ticket id" autocomplete="off" />
         <button class="btn mint" type="submit">Pay</button>
       </form>
       <p style="margin-top:10px"><a class="btn ghost" href="/pay">New ticket</a></p>
-    </article>
-    <article class="card">
-      <h3>Kasdomain</h3>
-      <p>Your shop sign. One name. A living page. A grams market.</p>
-      <a class="btn mint" href="/kasdomain">My names</a>
     </article>
   </div>
   <p class="lede" style="margin-top:36px">A household bills groceries. A plant bills events. An agent pays without a click. <a href="/why">Why</a> · <a href="/apps">Apps</a></p>

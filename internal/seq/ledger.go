@@ -12,11 +12,12 @@ import (
 	"sync"
 	"time"
 
+	"gramlane/internal/appenv"
 	"gramlane/internal/chain"
 	"gramlane/internal/genesis"
 )
 
-var path = "data/ledger.json"
+var path = appenv.File("ledger.json")
 
 type Burn struct {
 	When  string `json:"when"`

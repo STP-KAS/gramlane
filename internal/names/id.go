@@ -8,9 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"gramlane/internal/appenv"
 )
 
-const linksPath = "data/id-links.json"
+var linksPath = appenv.File("id-links.json")
 
 type Identity struct {
 	Address string   `json:"address"`

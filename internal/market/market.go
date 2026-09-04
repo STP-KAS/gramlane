@@ -10,11 +10,12 @@ import (
 	"sync"
 	"time"
 
+	"gramlane/internal/appenv"
 	"gramlane/internal/names"
 	"gramlane/internal/seq"
 )
 
-var path = "data/market.json"
+var path = appenv.File("market.json")
 
 type Listing struct {
 	ID     string `json:"id"`

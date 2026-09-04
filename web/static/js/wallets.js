@@ -424,6 +424,39 @@
 
   window.KaspaWallets = { connect: connect, logout: logout, current: current, detected: detected, paintButtons: paintButtons };
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
-  else bind();
+  function bindEasy() {
+    var main = document.querySelector("main");
+    if (main && !main.id) main.id = "main";
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-copy]");
+      if (!b) return;
+      var text = b.getAttribute("data-copy") || "";
+      if (!text) return;
+      function ok() {
+        var old = b.textContent;
+        b.textContent = "Copied";
+        setTimeout(function () { b.textContent = old; }, 1500);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(ok, function () {});
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); ok(); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      bind();
+      bindEasy();
+    });
+  } else {
+    bind();
+    bindEasy();
+  }
 })();

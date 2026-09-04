@@ -16,6 +16,7 @@
     {{if .Run.Explorer}}<tr><th>explorer</th><td><a href="{{.Run.Explorer}}">{{.Run.Explorer}}</a></td></tr>{{end}}
     {{if .Run.TxNote}}<tr><th>tx</th><td>{{.Run.TxNote}}</td></tr>{{end}}
     <tr><th>note</th><td>{{.Run.Note}}</td></tr>
+    <tr><th>USD</th><td class="mono">{{.Run.Quote.USD}}</td></tr>
   </table>
   <pre>{{.Run.Output}}</pre>
   {{end}}

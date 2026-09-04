@@ -10,27 +10,31 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"gramlane/internal/httpcache"
 )
 
 const indexer = "https://api.knsdomains.org/mainnet/api/v1"
 
 type Page struct {
-	Name     string `json:"name"`
-	Owner    string `json:"owner,omitempty"`
-	AssetID  string `json:"assetId,omitempty"`
-	PayURI   string `json:"payUri,omitempty"`
-	KasURI   string `json:"kasUri,omitempty"`
-	DID      string `json:"did,omitempty"`
-	Bio      string `json:"bio,omitempty"`
-	Avatar   string `json:"avatarUrl,omitempty"`
-	Banner   string `json:"banner,omitempty"`
-	Website  string `json:"website,omitempty"`
-	Redirect string `json:"redirectUrl,omitempty"`
-	X        string `json:"x,omitempty"`
-	GitHub   string `json:"github,omitempty"`
-	Telegram string `json:"telegram,omitempty"`
-	Email    string `json:"email,omitempty"`
-	Warning  string `json:"warning"`
+	Name     string          `json:"name"`
+	Owner    string          `json:"owner,omitempty"`
+	AssetID  string          `json:"assetId,omitempty"`
+	PayURI   string          `json:"payUri,omitempty"`
+	KasURI   string          `json:"kasUri,omitempty"`
+	DID      string          `json:"did,omitempty"`
+	Bio      string          `json:"bio,omitempty"`
+	Avatar   string          `json:"avatarUrl,omitempty"`
+	Banner   string          `json:"banner,omitempty"`
+	Website  string          `json:"website,omitempty"`
+	Redirect string          `json:"redirectUrl,omitempty"`
+	X        string          `json:"x,omitempty"`
+	GitHub   string          `json:"github,omitempty"`
+	Telegram string          `json:"telegram,omitempty"`
+	Email    string          `json:"email,omitempty"`
+	Warning  string          `json:"warning"`
+	Raw      json.RawMessage `json:"raw,omitempty"`
+	Evidence string          `json:"evidence,omitempty"`
 }
 
 func Normalize(raw string) string {
@@ -50,10 +54,11 @@ func Normalize(raw string) string {
 func Lookup(raw string) (*Page, error) {
 	name := Normalize(raw)
 	p := &Page{
-		Name:    name,
-		KasURI:  "kas://" + name,
-		DID:     "did:kas:" + name,
-		Warning: "Indexer-backed. Not consensus uniqueness. This is a generated site from profile texts, not IPFS.",
+		Name:     name,
+		KasURI:   "kas://" + name,
+		DID:      "did:kas:" + name,
+		Evidence: "indexer",
+		Warning:  "Indexer-backed. Not consensus uniqueness. This is a generated site from profile texts, not IPFS.",
 	}
 	own, err := getJSON(indexer + "/" + url.PathEscape(name) + "/owner")
 	if err != nil {
@@ -67,6 +72,7 @@ func Lookup(raw string) (*Page, error) {
 			Owner   string `json:"owner"`
 		} `json:"data"`
 	}
+	p.Raw = json.RawMessage(append([]byte(nil), own...))
 	if json.Unmarshal(own, &env) != nil || env.Data.Owner == "" {
 		return p, fmt.Errorf("no owner for %s", name)
 	}
@@ -159,23 +165,25 @@ func githubURL(s string) string {
 var httpc = &http.Client{Timeout: 12 * time.Second}
 
 func getJSON(u string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "gramlane/1.0")
-	res, err := httpc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	b, err := io.ReadAll(io.LimitReader(res.Body, 1<<20))
-	if err != nil {
-		return nil, err
-	}
-	if res.StatusCode >= 400 {
-		return nil, fmt.Errorf("indexer %s", res.Status)
-	}
-	return b, nil
+	return httpcache.Get(u, func() ([]byte, error) {
+		req, err := http.NewRequest(http.MethodGet, u, nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Accept", "application/json")
+		req.Header.Set("User-Agent", "gramlane/1.0")
+		res, err := httpc.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+		b, err := io.ReadAll(io.LimitReader(res.Body, 1<<20))
+		if err != nil {
+			return nil, err
+		}
+		if res.StatusCode >= 400 {
+			return nil, fmt.Errorf("indexer %s", res.Status)
+		}
+		return b, nil
+	})
 }

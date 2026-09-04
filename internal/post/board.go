@@ -12,9 +12,11 @@ import (
 	"sync"
 	"time"
 	"unicode/utf8"
+
+	"gramlane/internal/appenv"
 )
 
-const path = "data/postage.json"
+var path = appenv.File("postage.json")
 
 type Stamp struct {
 	When   string `json:"when"`

@@ -28,7 +28,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | Path | What |
 | --- | --- |
-| `/` | The jar — fund, pay, till |
+| `/` `/kasdomain` | Resolve a .kas name. Quote in grams. Inspect indexer JSON |
 | `/why` | Beyond the chain: household, plant, agent, counter |
 | `/vault` | Vault bump — grams pay the action, KAS stays locked |
 | `/postage` | Message postage board |
@@ -41,7 +41,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/jar` | Miller's book: fills and burns. Operator accounting until consume() |
 | `/pay` | Pay hub — EUR/USD ticket, QR, counter |
 | `/pay/{id}` | Pay a ticket from the jar |
-| `/kasdomain` | Your names: one unique sign, living page |
+| `/kasdomain` | Get a name (check + official shop) · hang one sign · living page |
 | `/market` | Buy/sell Kasdomains for grams only |
 | `/kachat` | KaChat: resolve a name, postage, pay that wallet |
 | `/apps` | Apps: KaChat, vault, agent, site, jobs |

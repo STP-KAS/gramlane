@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"gramlane/internal/agent"
+	"gramlane/internal/appenv"
 	"gramlane/internal/desk"
 	"gramlane/internal/feedback"
 	"gramlane/internal/framing"
@@ -69,6 +70,10 @@ type page struct {
 	ID        *names.Identity
 	Listings  []market.Listing
 	Live      *livepage.Page
+	Want      *names.Want
+	Result    *names.Result
+	Inspect   bool
+	Public    bool
 }
 
 func New(addr string) (*Server, error) {
@@ -95,6 +100,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/kachat", s.kachatPage)
 	mux.HandleFunc("/kasdomain", s.kasdomainPage)
 	mux.HandleFunc("/kns", s.kasdomainPage)
+	mux.HandleFunc("/api/name", s.apiName)
 	mux.HandleFunc("/market", s.marketPage)
 	mux.HandleFunc("/api/market", s.apiMarket)
 	mux.HandleFunc("/convert", s.convertPage)
@@ -190,6 +196,7 @@ func (s *Server) Handler() http.Handler {
 }
 
 func (s *Server) render(w http.ResponseWriter, name string, p page) {
+	p.Public = appenv.PublicHost()
 	if p.Seq == nil {
 		snap := seq.Snap()
 		p.Seq = &snap
@@ -229,8 +236,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	seedSign()
-	s.render(w, "home.html", page{Title: "Gramlane", Active: "home", Query: names.Linked(genesis.HolderAddress)})
+	s.kasdomainPage(w, r)
 }
 
 func (s *Server) jarPage(w http.ResponseWriter, r *http.Request) {
@@ -626,6 +632,19 @@ func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 	if addr == "" {
 		addr = strings.TrimSpace(r.URL.Query().Get("address"))
 	}
+	q := strings.TrimSpace(r.FormValue("q"))
+	if q == "" {
+		q = strings.TrimSpace(r.URL.Query().Get("q"))
+	}
+	p.Inspect = r.URL.Query().Get("inspect") != "" || r.FormValue("inspect") == "1"
+	if q != "" {
+		res, err := names.Resolve(q)
+		p.Result = res
+		p.Query = q
+		if err != nil && p.Error == "" {
+			p.Error = err.Error()
+		}
+	}
 	if r.Method == http.MethodPost {
 		switch r.FormValue("act") {
 		case "pin":
@@ -645,13 +664,32 @@ func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
 			p.ID = id
 			if id.Linked != "" {
 				p.Live = livepage.Get(id.Linked)
-				p.Query = id.Linked
+				if p.Query == "" {
+					p.Query = id.Linked
+				}
 			}
-		} else {
+		} else if p.Error == "" {
 			p.Error = err.Error()
 		}
 	}
 	s.render(w, "kasdomain.html", p)
+}
+
+func (s *Server) apiName(w http.ResponseWriter, r *http.Request) {
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	if q == "" {
+		q = strings.TrimSpace(r.FormValue("q"))
+	}
+	if q == "" {
+		writeJSON(w, 400, map[string]any{"ok": false, "error": "type a word"})
+		return
+	}
+	res, err := names.Resolve(q)
+	if err != nil {
+		writeJSON(w, 502, map[string]any{"ok": false, "error": err.Error(), "result": res})
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "result": res, "usd": "not quoted"})
 }
 
 func (s *Server) marketPage(w http.ResponseWriter, r *http.Request) {
@@ -889,11 +927,27 @@ func (s *Server) apiRun(w http.ResponseWriter, r *http.Request) {
 	if paid == "" {
 		paid = strings.TrimSpace(r.Header.Get("X-Kaspa-Payment"))
 	}
+	if paid == "" {
+		qq, _ := jobs.QuoteJob(j)
+		led := seq.Snap()
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusPaymentRequired)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"error":          "Payment Required",
+			"note":           "HTTP 402. Send header X-Work-Credit. This dApp does not verify a WorkCredit UTXO spend on L1. USD not quoted. No L2.",
+			"quote":          qq,
+			"grams":          j.Grams,
+			"gramsRemaining": led.Remaining,
+			"usd":            "not quoted",
+			"accepts": []map[string]any{
+				{"scheme": "kaspa-work-credit", "asset": "GRAM", "grams": j.Grams, "lane": j.Lane},
+				{"scheme": "kaspa", "asset": "KAS", "sompi": qq.Sompi},
+			},
+		})
+		return
+	}
 	payer := strings.TrimSpace(r.Header.Get("X-Kaspa-Payer"))
 	wallet := strings.TrimSpace(r.Header.Get("X-Kaspa-Wallet"))
-	if paid == "" && payer != "" {
-		paid = wallet + ":" + payer
-	}
 	paid = settlePaid(j, paid)
 	if paid == "" {
 		qq, _ := jobs.QuoteJob(j)
@@ -902,14 +956,10 @@ func (s *Server) apiRun(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusPaymentRequired)
 		_ = json.NewEncoder(w).Encode(map[string]any{
 			"error":          "Payment Required",
-			"note":           "Prepaid grams are spent. Burn WorkCredit grams or pay KAS fallback. Not USD. No L2. Header X-Work-Credit or X-Kaspa-Payment.",
-			"job":            j,
+			"note":           "Bar tab empty. HTTP receipt only. USD not quoted.",
 			"quote":          qq,
 			"gramsRemaining": led.Remaining,
-			"accepts": []map[string]any{
-				{"scheme": "kaspa-work-credit", "asset": "GRAM", "grams": j.Grams, "lane": j.Lane},
-				{"scheme": "kaspa", "asset": "KAS", "sompi": qq.Sompi},
-			},
+			"usd":            "not quoted",
 		})
 		return
 	}
@@ -985,7 +1035,7 @@ func applyBurn(rec *jobs.Receipt, j jobs.Job, paid string) {
 	}
 	rec.Settlement = "prepaid-grams"
 	rec.Remaining = led.Remaining
-	rec.Note = "Sequencer inventory from the 0.5 KAS sale + P2SH UTXO. This burn is operator accounting until consume() spends that UTXO."
+	rec.Note = "HTTP receipt only. This dApp does not verify a WorkCredit UTXO spend on L1. Local bar tab until consume()."
 }
 
 func (s *Server) apiID(w http.ResponseWriter, r *http.Request) {

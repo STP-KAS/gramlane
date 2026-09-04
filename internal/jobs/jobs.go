@@ -11,6 +11,7 @@ import (
 	"gramlane/internal/agent"
 	"gramlane/internal/chain"
 	"gramlane/internal/framing"
+	"gramlane/internal/httpcache"
 	"gramlane/internal/names"
 	"gramlane/internal/post"
 	"gramlane/internal/quote"
@@ -83,24 +84,26 @@ func QuoteJob(j Job) (quote.Quote, error) {
 var httpc = &http.Client{Timeout: 12 * time.Second}
 
 func getJSON(url string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	res, err := httpc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	b, err := io.ReadAll(io.LimitReader(res.Body, 1<<20))
-	if err != nil {
-		return nil, err
-	}
-	if res.StatusCode >= 400 {
-		return nil, fmt.Errorf("%s: %s", res.Status, truncate(string(b), 180))
-	}
-	return b, nil
+	return httpcache.Get(url, func() ([]byte, error) {
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Accept", "application/json")
+		res, err := httpc.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+		b, err := io.ReadAll(io.LimitReader(res.Body, 1<<20))
+		if err != nil {
+			return nil, err
+		}
+		if res.StatusCode >= 400 {
+			return nil, fmt.Errorf("%s: %s", res.Status, truncate(string(b), 180))
+		}
+		return b, nil
+	})
 }
 
 func truncate(s string, n int) string {
@@ -162,13 +165,13 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 		Paid:   paid,
 		Payer:  strings.TrimSpace(payer),
 		Wallet: strings.TrimSpace(wallet),
-		Note:   "WorkCredit consume is not this. KAS fallback is on L1 only if Paid is a real txid Kasware broadcast.",
+		Note:   "HTTP receipt only. This dApp does not verify a WorkCredit UTXO spend on L1.",
 	}
 	switch {
 	case prepaidToken(paid):
 		r.Settlement = "prepaid-grams"
 		r.TxNote = "prepaid sequencer grams — not a new KAS send"
-		r.Note = "Sequencer inventory (sale + later fills) against the P2SH UTXO. This burn is operator accounting until consume() spends that UTXO. Open /jar for the book."
+		r.Note = "HTTP receipt only. This dApp does not verify a WorkCredit UTXO spend on L1. Local bar tab until consume()."
 	case chain.IsTxID(paid):
 		look := chain.Find(paid)
 		r.Explorer = look.Explorer

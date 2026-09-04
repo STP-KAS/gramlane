@@ -2,6 +2,17 @@ package jobs
 
 import "testing"
 
+func TestResolveJobIs12000Grams(t *testing.T) {
+	j, ok := Get("resolve")
+	if !ok || j.Grams != 12_000 {
+		t.Fatalf("%+v", j)
+	}
+	q, err := QuoteJob(j)
+	if err != nil || q.USD != "not quoted" || q.KAS != 0.012 {
+		t.Fatalf("%v %+v", err, q)
+	}
+}
+
 func TestCatalogQuoted(t *testing.T) {
 	if len(Catalog) < 3 {
 		t.Fatal("catalog")
