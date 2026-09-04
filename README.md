@@ -44,6 +44,10 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/pay/{id}` | Pay a ticket from the jar |
 | `/kasdomain` | Get a name (KAS to the P2SH). Dollar shelf. Not KNS. |
 | `/mine` | All kasdomains on a wallet after fund or buy |
+| `/shop` | Hang a page + till on a name you hold |
+| `/s/{name}` | Public shop — menu, grams ticket, KAS walk-up, door QR |
+| `/api/shop/{name}` | Authless shop card for agents |
+| `/.well-known/kasdomain.json` | Discovery card (Kaspa Explained MCP pattern) |
 | `/market` | Buy/sell Kasdomains: USD shelf, settle in KAS |
 | `/kachat` | KaChat: resolve a name, postage, pay that wallet |
 | `/apps` | Apps: KaChat, vault, agent, site, jobs |

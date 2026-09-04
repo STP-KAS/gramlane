@@ -2,7 +2,7 @@
 <main>
   <p class="kicker">names on this wallet · USD shelf · KAS settle</p>
   <h1>Every kasdomain on this wallet.</h1>
-  <p class="lede">Bought or funded names live here. The <strong>face</strong> is the login name. The rest are custody — keep them or sell them in KAS. Desk apps that sequence work stay in grams. A name is a Kaspa output.</p>
+  <p class="lede">Bought or funded names live here. The <strong>face</strong> is the login name. Hang a shop on any of them — a page and a till for the many, not only a nicer kaspa:q…. Desk sequencing stays in grams. The name itself is KAS on L1.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Held}}
@@ -26,6 +26,7 @@
       {{if .Face}}<p class="ok">Face — carries the wallet</p>{{else}}<p class="tiny">Custody — not the login name</p>{{end}}
       <p class="price">{{.USD}} · {{.KAS}} KAS</p>
       <p class="tiny">{{.When}}{{if .Tx}} · <span class="mono">{{.Tx}}</span>{{end}}</p>
+      <p style="margin-top:8px"><a class="btn mint" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Open as a shop</a> <a class="btn ghost" href="/s/{{.Name}}">Public page</a></p>
       {{if not .Face}}
       <form action="/mine" method="post">
         <input type="hidden" name="act" value="face" />

@@ -1,0 +1,76 @@
+{{template "header" .}}
+<main>
+  {{if .Store}}
+  <p class="kicker">kasdomain shop · {{.Store.Evidence}} · not KNS</p>
+  {{if .Store.Shop}}
+  <h1>{{if .Store.Shop.Headline}}{{.Store.Shop.Headline}}{{else}}{{.Store.Name}}{{end}}</h1>
+  <p class="price">{{.Store.Name}}</p>
+  {{if .Store.Shop.About}}<p class="lede">{{.Store.Shop.About}}</p>{{end}}
+  {{if .Store.Shop.PayNote}}<p class="help">{{.Store.Shop.PayNote}}</p>{{end}}
+  {{else}}
+  <h1>{{.Store.Name}}</h1>
+  <p class="lede">{{.Store.Warning}}</p>
+  {{end}}
+  <p class="tiny">{{.Store.Warning}}</p>
+  {{if .Store.P2SH}}<p class="tiny mono">Name output {{.Store.P2SH}}</p>{{end}}
+  {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
+  <p class="tiny" data-pay-status></p>
+
+  {{if and .Store.Shop .Store.Shop.Items}}
+  <h2>Menu</h2>
+  <p class="help">Shelf in USD. You pay grams from the jar (the till keeps sequencing). Or send KAS to the shop. 1 KAS = ${{.Store.Rate}} on this board — a sign, not an oracle.</p>
+  <div class="grid">
+    {{range .Store.Shop.Items}}
+    <article class="card">
+      <h3>{{.Label}}</h3>
+      <p class="price">{{.USD}}</p>
+      <p class="tiny">{{.Grams}} GRAM · {{.KAS}} KAS at the sign</p>
+      <form action="/s/{{$.Store.Name}}" method="post">
+        <input type="hidden" name="act" value="buy" />
+        <input type="hidden" name="item" value="{{.ID}}" />
+        <button class="btn mint" type="submit">Pay {{.USD}} in grams</button>
+      </form>
+      {{if $.Store.Shop.PayTo}}
+      <p style="margin-top:8px">
+        <button class="btn ghost" type="button" data-pay-l1 data-to="{{$.Store.Shop.PayTo}}" data-sompi="{{.PaySompi}}">Or send {{.KAS}} KAS</button>
+      </p>
+      {{end}}
+    </article>
+    {{end}}
+  </div>
+  {{else if .Store.Shop}}
+  <p class="lede">This shop has no items yet. The holder adds them from Names.</p>
+  {{end}}
+
+  <p style="margin-top:22px">
+    {{if not .Store.Hit}}<a class="btn mint" href="/kasdomain?q={{.Store.Name}}">Fund this name in KAS</a>{{end}}
+    <a class="btn ghost" href="/pay">Open a custom ticket</a>
+    <a class="btn ghost" href="/api/shop/{{.Store.Name}}">Agent JSON</a>
+  </p>
+  {{if .Store.Name}}
+  <p class="tiny">Counter QR — print this, not a kaspa:q…</p>
+  <p><img alt="QR for this shop" width="220" height="220" src="/qr/s/{{.Store.Name}}.png" /></p>
+  {{end}}
+  <p class="tiny">Toccata is live (covenant names). vProgs are roadmap. This is not DNS and not a company registry. Claim-check: <a href="https://kaspaexplained.com/toccata-status">Kaspa Explained</a>.</p>
+  {{else}}
+  <p class="kicker">kasdomain shops · for the many</p>
+  <h1>A name is a shop.</h1>
+  <p class="lede">Not only a nicer kaspa:q…. A page people open. A till they pay. No yearly rent. No company in the middle.</p>
+  {{if .Shops}}
+  <div class="grid">
+    {{range .Shops}}
+    <article class="card">
+      <h3>{{.Name}}</h3>
+      <p>{{if .Headline}}{{.Headline}}{{else}}Shop{{end}}</p>
+      <p class="tiny">{{len .Items}} item{{if ne (len .Items) 1}}s{{end}}</p>
+      <a class="btn mint" href="/s/{{.Name}}">Open</a>
+    </article>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="lede">No shops hung on this desk yet. Fund a kasdomain, then open it as a shop from Names.</p>
+  {{end}}
+  <p style="margin-top:18px"><a class="btn mint" href="/kasdomain">Get a name</a> <a class="btn ghost" href="/mine">Your names</a></p>
+  {{end}}
+</main>
+{{template "footer" .}}
