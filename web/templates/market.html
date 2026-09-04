@@ -1,0 +1,56 @@
+{{template "header" .}}
+<main>
+  <div class="kicker">Kasdomain market · grams only</div>
+  <h1>Buy and sell shop signs.</h1>
+  <p class="lede">Price is grams. Not euro, not dollar. You list a Kasdomain you own. Someone pays from their Stablegram jar. Gramlane moves the unique sign to the buyer. The on-chain inscription still needs a name-service transfer to finish — we do not pretend otherwise.</p>
+  {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
+  {{if .Seq}}<p class="lede">Jar: <span class="mono">{{.Seq.Remaining}}</span> GRAM.</p>{{end}}
+
+  <div class="grid">
+    <article class="card">
+      <h3>List a name</h3>
+      <form action="/market" method="post">
+        <input type="hidden" name="act" value="list" />
+        <label>Kasdomain</label>
+        <input name="name" placeholder="bakery.kas" />
+        <label>price (grams)</label>
+        <input name="grams" placeholder="50000" />
+        <label>your Kaspa address (seller)</label>
+        <input class="mono" name="seller" placeholder="kaspa:q…" />
+        <p style="margin-top:12px"><button class="btn mint" type="submit">List for grams</button></p>
+      </form>
+    </article>
+    <article class="card">
+      <h3>Why grams</h3>
+      <p>A name is not a currency. The fee to change hands is work on this rail. Grams do not move when KAS/USD does. USD is not quoted.</p>
+      <p><a href="/kasdomain">Back to your names</a></p>
+    </article>
+  </div>
+
+  <h2>For sale</h2>
+  {{if .Listings}}
+  <table>
+    <tr><th>name</th><th>grams</th><th>status</th><th></th></tr>
+    {{range .Listings}}
+    <tr>
+      <td><a href="/site/{{.Name}}">{{.Name}}</a></td>
+      <td class="price">{{.Grams}}</td>
+      <td>{{.Status}}</td>
+      <td>
+        {{if eq .Status "open"}}
+        <form action="/market" method="post">
+          <input type="hidden" name="act" value="buy" />
+          <input type="hidden" name="id" value="{{.ID}}" />
+          <input class="mono" name="buyer" placeholder="your kaspa:q…" />
+          <button class="btn mint" type="submit">Buy</button>
+        </form>
+        {{end}}
+      </td>
+    </tr>
+    {{end}}
+  </table>
+  {{else}}
+  <p class="lede">Nothing listed yet.</p>
+  {{end}}
+</main>
+{{template "footer" .}}

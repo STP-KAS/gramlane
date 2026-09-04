@@ -1,25 +1,26 @@
 {{template "header" .}}
 <main>
   {{if .Site}}
-  <div class="kicker">generated from KNS indexer · not IPFS</div>
+  <div class="kicker">Kasdomain · this name is a place</div>
   {{if .Site.Avatar}}<img class="site-av" src="{{.Site.Avatar}}" alt="" />{{end}}
-  <h1>{{.Site.Name}}</h1>
+  <h1>{{if .Live}}{{if .Live.Headline}}{{.Live.Headline}}{{else}}{{.Site.Name}}{{end}}{{else}}{{.Site.Name}}{{end}}</h1>
+  <p class="price">{{.Site.Name}}</p>
+  {{if .Live}}{{if .Live.About}}<p class="lede">{{.Live.About}}</p>{{end}}{{end}}
   {{if .Site.Bio}}<p class="lede">{{.Site.Bio}}</p>{{end}}
-  <p class="mono">{{.Site.Owner}}</p>
+  {{if .Live}}{{if .Live.PayNote}}<p>{{.Live.PayNote}}</p>{{end}}{{end}}
+  <p class="tiny mono">Door: {{.Site.Owner}}</p>
   <p>
-    {{if .Site.PayURI}}<button class="btn mint" type="button" data-copy-text="{{.Site.PayURI}}">Copy pay URI</button>{{end}}
+    {{if .Site.PayURI}}<a class="btn mint" href="/pay?merchant={{.Site.Name}}&amp;payTo={{.Site.PayURI}}">Pay this place</a>{{end}}
     {{if .Site.X}}<a class="btn ghost" href="{{.Site.X}}">X</a>{{end}}
-    {{if .Site.GitHub}}<a class="btn ghost" href="{{.Site.GitHub}}">GitHub</a>{{end}}
     {{if .Site.Website}}<a class="btn ghost" href="{{.Site.Website}}">Website</a>{{end}}
-    {{if .Site.Telegram}}<a class="btn ghost" href="{{.Site.Telegram}}">Telegram</a>{{end}}
-    <a class="btn ghost" href="/agent?q={{.Site.Name}}">Agent</a>
-    <a class="btn ghost" href="/site?q={{.Site.Name}}">Rebuild (grams)</a>
+    <a class="btn ghost" href="/kachat?q={{.Site.Name}}">KaChat</a>
+    <a class="btn ghost" href="/kasdomain">Kasdomain</a>
   </p>
-  <p class="tiny">{{.Site.Warning}} Sequenced build: POST /site burns {{if .Job}}{{.Job.Grams}}{{end}} grams.</p>
+  <p class="tiny">A Kasdomain is a shop sign. This page is the shop. Names are looked up on the public index. Not a dollar.</p>
   {{else}}
-  <h1>Name not found.</h1>
+  <h1>No shop here yet.</h1>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
-  <p><a class="btn mint" href="/site">Site builder</a></p>
+  <p><a class="btn mint" href="/kasdomain">Kasdomain</a></p>
   {{end}}
 </main>
 {{template "footer" .}}

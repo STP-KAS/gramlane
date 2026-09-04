@@ -41,7 +41,7 @@ type Receipt struct {
 }
 
 var Catalog = []Job{
-	{ID: "resolve", Name: "Resolve a .kas name", Blurb: "Live KNS indexer lookup. The gram bill is the sequenced call, not the name.", Grams: 12_000, Lane: "KNS1", Kind: "resolve"},
+	{ID: "resolve", Name: "Resolve a Kasdomain", Blurb: "Look up a .kas name. The gram bill is the sequenced call, not the name.", Grams: 12_000, Lane: "KNS1", Kind: "resolve"},
 	{ID: "rank", Name: "L1 balance depth", Blurb: "Owner from indexer, then api.kaspa.org balance. Still grams, still L1.", Grams: 18_000, Lane: "KNS1", Kind: "rank"},
 	{ID: "dag", Name: "BlockDAG heartbeat", Blurb: "Read virtual DAA from api.kaspa.org. Cheap inclusion probe.", Grams: 5_000, Lane: "SEQ1", Kind: "dag"},
 	{ID: "profile", Name: "Pull KNS profile texts", Blurb: "Avatar, x, website if the indexer has them.", Grams: 22_000, Lane: "KNS1", Kind: "profile"},
@@ -49,7 +49,7 @@ var Catalog = []Job{
 	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: 8_000, Lane: "SEQ1", Kind: "vault"},
 	{ID: "postage", Name: "KaChat postage", Blurb: "Sequenced stamp to a .kas contact. Not E2E — KaChat seals ciph_msg in the wallet.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
 	{ID: "agent", Name: "AI agent call", Blurb: "HTTP 402 for a machine. Grok if XAI_API_KEY is set; otherwise local tools. Grams pay the call.", Grams: 25_000, Lane: "AGENT", Kind: "agent"},
-	{ID: "site", Name: ".kas site builder", Blurb: "Generate a web page from a live KNS name. Link-in-bio from indexer texts, not IPFS.", Grams: 15_000, Lane: "KNS1", Kind: "site"},
+	{ID: "site", Name: "Kasdomain page", Blurb: "Hang a living webpage on a name. Prefer /kasdomain to publish headline and about.", Grams: 15_000, Lane: "KNS1", Kind: "site"},
 }
 
 type Fit struct {

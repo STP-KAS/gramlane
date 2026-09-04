@@ -192,7 +192,9 @@
         status(id.linked);
         return;
       }
-      if (id && id.names && id.names.length > 1) openNameModal(id);
+      if (id && id.names && id.names.length > 1) {
+        location.href = "/kasdomain?address=" + encodeURIComponent(r.address);
+      }
     });
     return r;
   }
@@ -227,16 +229,10 @@
   async function clickLogin(btn) {
     if (current().address) {
       if (current().name) {
-        status(current().name + " is pinned. Click Change name to switch.");
-        loadIdentity(current().address).then(function (id) {
-          if (id) window._gramlaneId = id;
-        });
+        status(current().name);
         return;
       }
-      loadIdentity(current().address).then(function (id) {
-        if (id && id.names && id.names.length > 1) openNameModal(id);
-        else status(display(current()));
-      });
+      location.href = "/kasdomain?address=" + encodeURIComponent(current().address);
       return;
     }
     const id = preferredWallet();

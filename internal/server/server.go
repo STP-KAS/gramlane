@@ -18,6 +18,8 @@ import (
 	"gramlane/internal/genesis"
 	"gramlane/internal/jobs"
 	"gramlane/internal/kachat"
+	"gramlane/internal/livepage"
+	"gramlane/internal/market"
 	"gramlane/internal/names"
 	"gramlane/internal/pos"
 	"gramlane/internal/post"
@@ -64,6 +66,9 @@ type page struct {
 	To        string
 	Contact   *kachat.Contact
 	Envelopes []kachat.Envelope
+	ID        *names.Identity
+	Listings  []market.Listing
+	Live      *livepage.Page
 }
 
 func New(addr string) (*Server, error) {
@@ -88,6 +93,10 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/till", s.posPage)
 	mux.HandleFunc("/pay", s.posPage)
 	mux.HandleFunc("/kachat", s.kachatPage)
+	mux.HandleFunc("/kasdomain", s.kasdomainPage)
+	mux.HandleFunc("/kns", s.kasdomainPage)
+	mux.HandleFunc("/market", s.marketPage)
+	mux.HandleFunc("/api/market", s.apiMarket)
 	mux.HandleFunc("/convert", s.convertPage)
 	mux.HandleFunc("/api/convert", s.apiConvert)
 	mux.HandleFunc("/spend", s.spendPage)
@@ -596,6 +605,89 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "kachat.html", p)
 }
 
+func (s *Server) kasdomainPage(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "Kasdomain · Gramlane", Active: "kasdomain", Listings: market.List()}
+	addr := strings.TrimSpace(r.FormValue("address"))
+	if addr == "" {
+		addr = strings.TrimSpace(r.URL.Query().Get("address"))
+	}
+	if r.Method == http.MethodPost {
+		switch r.FormValue("act") {
+		case "pin":
+			if err := names.Link(addr, r.FormValue("name")); err != nil {
+				p.Error = err.Error()
+			}
+		case "live":
+			name := r.FormValue("name")
+			lp := livepage.Save(name, r.FormValue("headline"), r.FormValue("about"), r.FormValue("payNote"))
+			p.Live = &lp
+			http.Redirect(w, r, "/site/"+names.Normalize(name), http.StatusSeeOther)
+			return
+		}
+	}
+	if strings.HasPrefix(addr, "kaspa:") {
+		if id, err := names.ForAddress(addr); err == nil {
+			p.ID = id
+			if id.Linked != "" {
+				p.Live = livepage.Get(id.Linked)
+				p.Query = id.Linked
+			}
+		} else {
+			p.Error = err.Error()
+		}
+	}
+	s.render(w, "kasdomain.html", p)
+}
+
+func (s *Server) marketPage(w http.ResponseWriter, r *http.Request) {
+	p := page{Title: "Kasdomain market · Gramlane", Active: "kasdomain", Listings: market.List()}
+	if r.Method == http.MethodPost {
+		act := r.FormValue("act")
+		if act == "list" {
+			grams := uint64(0)
+			fmt.Sscanf(strings.ReplaceAll(r.FormValue("grams"), ",", ""), "%d", &grams)
+			if _, err := market.Open(r.FormValue("name"), r.FormValue("seller"), grams); err != nil {
+				p.Error = err.Error()
+			}
+		}
+		if act == "buy" {
+			if _, err := market.Buy(r.FormValue("id"), r.FormValue("buyer")); err != nil {
+				p.Error = err.Error()
+			}
+		}
+		p.Listings = market.List()
+	}
+	s.render(w, "market.html", p)
+}
+
+func (s *Server) apiMarket(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		var req struct {
+			Act, Name, Seller, Buyer, ID string
+			Grams                        uint64
+		}
+		body, _ := io.ReadAll(io.LimitReader(r.Body, 1<<16))
+		_ = json.Unmarshal(body, &req)
+		if req.Act == "buy" || req.ID != "" {
+			L, err := market.Buy(req.ID, req.Buyer)
+			if err != nil {
+				writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error(), "listing": L})
+				return
+			}
+			writeJSON(w, 200, map[string]any{"ok": true, "listing": L, "seq": seq.Snap()})
+			return
+		}
+		L, err := market.Open(req.Name, req.Seller, req.Grams)
+		if err != nil {
+			writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
+			return
+		}
+		writeJSON(w, 200, map[string]any{"ok": true, "listing": L})
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "listings": market.List()})
+}
+
 func (s *Server) agentPage(w http.ResponseWriter, r *http.Request) {
 	j, _ := jobs.Get("agent")
 	name := strings.TrimSpace(r.FormValue("name"))
@@ -692,7 +784,8 @@ func (s *Server) siteName(w http.ResponseWriter, r *http.Request) {
 	}
 	j, _ := jobs.Get("site")
 	site, err := names.Lookup(name)
-	p := page{Title: names.Normalize(name) + " · Gramlane", Active: "apps", Job: &j, Site: site, Query: names.Normalize(name)}
+	norm := names.Normalize(name)
+	p := page{Title: norm + " · Kasdomain", Active: "kasdomain", Job: &j, Site: site, Query: norm, Live: livepage.Get(norm)}
 	if err != nil {
 		p.Error = err.Error()
 	}
