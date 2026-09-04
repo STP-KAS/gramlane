@@ -1,21 +1,26 @@
 {{template "header" .}}
 <main id="main">
   <h1>My names</h1>
-  <p class="lede">The face is how you log in. The rest you can sell or hang as shops.</p>
+  <p class="lede">Names you hold. Open a shop from Shops. The face is how you log in.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Held}}
   <p class="help">{{if .Held.Primary}}<strong>{{.Held.Primary}}</strong> · {{end}}{{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}</p>
   <p><input id="kasFilter" placeholder="Filter" style="width:100%;max-width:420px" /></p>
   <div class="grid" id="kasGrid">
-    {{range .Held.Names}}
+    {{range .Choices}}
     <article class="card kas-card" data-name="{{.Name}}">
       <h3>{{.Name}}</h3>
       {{if .Face}}<p class="ok">Face</p>{{else}}<p class="tiny">Extra</p>{{end}}
+      {{if .HasShop}}<p class="ok">Shop open</p>{{else}}<p class="tiny">No shop yet</p>{{end}}
       <p class="price">{{.USD}}</p>
       <p class="actions">
-        <a class="btn mint" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Shop</a>
-        <a class="btn ghost" href="/s/{{.Name}}">Page</a>
+        {{if .HasShop}}
+        <a class="btn mint" href="/{{.Name}}">Page</a>
+        <a class="btn ghost" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Edit shop</a>
+        {{else}}
+        <a class="btn mint" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Open as shop</a>
+        {{end}}
       </p>
       {{if not .Face}}
       <form action="/mine" method="post">

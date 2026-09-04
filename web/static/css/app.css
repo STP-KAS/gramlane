@@ -205,6 +205,16 @@ body.paid { background: #f3faf6; }
 .wmodal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
 .tiny { font-size: 13px; color: var(--muted); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+input.bad, select.bad, textarea.bad { border-color: var(--danger); background: #fff6f5; }
+.choices { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 18px; }
+.choice {
+  display: flex; gap: 10px; align-items: flex-start;
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  cursor: pointer;
+}
+.choice:has(input:checked) { border-color: var(--ink); background: var(--paper); }
+.choice input { margin-top: 4px; min-height: auto; }
+.choice strong { display: block; }
 @media (max-width: 800px) {
   main { padding: 28px 16px 56px; }
   h1 { font-size: 30px; }

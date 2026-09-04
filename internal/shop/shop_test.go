@@ -68,6 +68,60 @@ func TestMenuGramsNotKNS(t *testing.T) {
 	}
 }
 
+func TestHangNamesTheField(t *testing.T) {
+	seller := setup(t)
+	_, err := Hang("", seller, "", "Bread", "We bake.")
+	fe, ok := AsField(err)
+	if !ok || fe.Field != "name" {
+		t.Fatalf("%v", err)
+	}
+	_, err = Hang("bakery", "not-an-addr", "", "Bread", "")
+	fe, ok = AsField(err)
+	if !ok || fe.Field != "address" {
+		t.Fatalf("%v", err)
+	}
+	_, err = AddItem("bakery", seller, "", 100)
+	fe, ok = AsField(err)
+	if !ok || fe.Field != "label" {
+		t.Fatalf("%v", err)
+	}
+}
+
+func TestChoicesMarksShop(t *testing.T) {
+	seller := setup(t)
+	if _, err := names.Record(seller, "extra", "tx2"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Hang("bakery", seller, seller, "Bread", ""); err != nil {
+		t.Fatal(err)
+	}
+	cs := Choices(seller)
+	if len(cs) != 2 {
+		t.Fatalf("%+v", cs)
+	}
+	var bakery, extra Choice
+	for _, c := range cs {
+		if c.Name == "bakery.kas" {
+			bakery = c
+		}
+		if c.Name == "extra.kas" {
+			extra = c
+		}
+	}
+	if !bakery.HasShop || extra.HasShop {
+		t.Fatalf("%+v %+v", bakery, extra)
+	}
+	if FromPath("/bakery.kas") != "bakery.kas" || FromPath("/s/bakery.kas") != "bakery.kas" {
+		t.Fatal(FromPath("/bakery.kas"), FromPath("/s/bakery.kas"))
+	}
+	if FromHost("gramlane.bakery.kas:8081") != "bakery.kas" {
+		t.Fatal(FromHost("gramlane.bakery.kas:8081"))
+	}
+	if PagePath("bakery") != "/bakery.kas" {
+		t.Fatal(PagePath("bakery"))
+	}
+}
+
 func TestViewDoesNotNeedShop(t *testing.T) {
 	setup(t)
 	v := View("ghost")

@@ -15,8 +15,8 @@
   <header class="nav">
     <a class="brand" href="/" title="Home">Gramlane</a>
     <nav>
-      <a href="/kasdomain" class="{{if eq .Active "kasdomain"}}on{{end}}">Name</a>
-      <a href="/s/" class="{{if eq .Active "shop"}}on{{end}}">Shops</a>
+      <a href="/kasdomain" class="{{if eq .Active "kasdomain"}}on{{end}}" title="Create a name">Name</a>
+      <a href="/s/" class="{{if eq .Active "shop"}}on{{end}}" title="Open a name as a shop">Shops</a>
       <a href="/mine" class="{{if eq .Active "mine"}}on{{end}}">My names</a>
       <a href="/pay" class="{{if or (eq .Active "pay") (eq .Active "stablegram")}}on{{end}}">Pay</a>
     </nav>
