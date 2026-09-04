@@ -158,7 +158,7 @@
     try {
       var seq = await fetch("/api/seq").then(function (r) { return r.json(); });
       var left = seq && seq.data && seq.data.remaining;
-      if (gEl && left != null) gEl.textContent = Number(left).toLocaleString("en-US") + " g";
+      if (gEl && left != null) gEl.textContent = "jar " + Number(left).toLocaleString("en-US") + " g";
     } catch (_) {}
     try {
       var sompi = 0;

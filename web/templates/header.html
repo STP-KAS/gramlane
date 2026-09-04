@@ -21,9 +21,9 @@
       <a href="/pay" class="{{if or (eq .Active "pay") (eq .Active "stablegram")}}on{{end}}">Pay</a>
       <a href="/convert" class="{{if eq .Active "convert"}}on{{end}}">Convert</a>
     </nav>
-    <a class="bal" href="/convert" data-balances hidden title="Wallet KAS and jar grams">
+    <a class="bal" href="/convert" data-balances hidden title="This wallet's KAS. Jar grams are the desk prepaid work pile, not this address.">
       <span data-kas-balance>KAS 0.0</span>
-      <span data-gram-balance>0 g</span>
+      <span data-gram-balance>jar 0 g</span>
     </a>
     <div class="who" data-who hidden>
       <button type="button" class="who-name" data-copy-who="name" title="Copy kasname">—</button>
