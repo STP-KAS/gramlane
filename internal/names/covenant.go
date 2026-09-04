@@ -34,6 +34,7 @@ type Result struct {
 	Evidence   string          `json:"evidence"`
 	Warning    string          `json:"warning"`
 	Quote      quote.Quote     `json:"quote"`
+	Mint       Mint            `json:"mint"`
 	Shelf      Ask             `json:"shelf"`
 	Raw        json.RawMessage `json:"raw,omitempty"`
 	ScriptHash string          `json:"scriptHash,omitempty"`
@@ -140,6 +141,7 @@ func ResolveCovenant(raw string) *Result {
 		Name:     disp,
 		Evidence: "compiled",
 		Quote:    FundQuote(),
+		Mint:     FundMint(),
 		Shelf:    AskFor(disp),
 		Layout:   "KasName { label, claimed, owner } — own UTXO only",
 	}

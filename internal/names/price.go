@@ -146,18 +146,56 @@ func AskFor(name string) Ask {
 }
 
 func FundQuote() quote.Quote {
-	pay := quote.KaswareMinSompi
+	m := FundMint()
 	return quote.Quote{
 		Unit:       "KAS",
-		Sompi:      pay,
+		Sompi:      m.NameSompi,
 		KAS:        0.5,
-		PaySompi:   pay,
+		PaySompi:   m.NameSompi,
 		PayKAS:     0.5,
-		PayKASText: "0.5",
+		PayKASText: m.TotalKAS,
 		Lane:       "kasdomain",
 		Scheme:     "kaspa-l1",
 		USD:        "shelf",
-		Note:       "Acquire with a Kaspa transaction to this P2SH. Not grams. Recurrent desk work stays in grams.",
+		Note:       m.Note,
+	}
+}
+
+// AdoptionVault receives half of every name mint. Ideas, dApps, Kaspa growth.
+// Not Gramlane's till. Not a protocol tax. Override with ADOPTION_VAULT.
+const AdoptionVault = "kaspa:qzpvdakagvwfm95g8pv9ndpupjtndgjfhmve08cg3tv5wgfytjzf7e6t4puat"
+
+type Mint struct {
+	NameSompi  uint64 `json:"nameSompi"`
+	VaultSompi uint64 `json:"vaultSompi"`
+	TotalSompi uint64 `json:"totalSompi"`
+	NameKAS    string `json:"nameKas"`
+	VaultKAS   string `json:"vaultKas"`
+	TotalKAS   string `json:"totalKas"`
+	Vault      string `json:"vault"`
+	SharePct   uint64 `json:"sharePct"`
+	Note       string `json:"note"`
+}
+
+func VaultAddress() string {
+	if v := strings.TrimSpace(os.Getenv("ADOPTION_VAULT")); strings.HasPrefix(v, "kaspa:") {
+		return v
+	}
+	return AdoptionVault
+}
+
+func FundMint() Mint {
+	half := quote.KaswareMinSompi
+	return Mint{
+		NameSompi:  half,
+		VaultSompi: half,
+		TotalSompi: half * 2,
+		NameKAS:    "0.5",
+		VaultKAS:   "0.5",
+		TotalKAS:   "1",
+		Vault:      VaultAddress(),
+		SharePct:   50,
+		Note:       "Half funds the name output. Half goes to a Kaspa address for ideas and dApps that grow Kaspa. Not a protocol tax. Not grams.",
 	}
 }
 
