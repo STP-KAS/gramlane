@@ -88,6 +88,28 @@ func Primary(addr string) string {
 	return b.Primary
 }
 
+// HolderOf is the minter wallet this desk recorded for a name. Not the P2SH lock.
+func HolderOf(name string) string {
+	disp := DisplayName(name)
+	if disp == "" {
+		return ""
+	}
+	bookMu.Lock()
+	defer bookMu.Unlock()
+	loadBook()
+	for _, b := range bookLive {
+		if b == nil {
+			continue
+		}
+		for _, h := range b.Names {
+			if h.Name == disp {
+				return b.Address
+			}
+		}
+	}
+	return ""
+}
+
 func Book(addr string) *WalletBook {
 	bookMu.Lock()
 	defer bookMu.Unlock()

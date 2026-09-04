@@ -1,6 +1,9 @@
 package names
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestFirstRegisteredIsFace(t *testing.T) {
 	ResetCovenantForTest()
@@ -78,5 +81,26 @@ func TestVaultFreeMintAndSwitchFace(t *testing.T) {
 	}
 	if err := Pin(other, "bakery"); err == nil {
 		t.Fatal("other wallet")
+	}
+}
+
+func TestHolderOfIsMinterNotLock(t *testing.T) {
+	dir := t.TempDir()
+	ResetCovenantForTest()
+	ResetBookForTest(dir)
+	addr := "kaspa:qtestface0000000000000000000000000000000000000000000000000000000000"
+	if _, err := Record(addr, "bakery", "tx1"); err != nil {
+		t.Fatal(err)
+	}
+	lock, _, _, err := P2SHFor("bakery")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := HolderOf("bakery")
+	if got != addr {
+		t.Fatalf("holder %s", got)
+	}
+	if got == lock || !strings.HasPrefix(lock, "kaspa:p") {
+		t.Fatalf("lock must stay the script %s holder %s", lock, got)
 	}
 }
