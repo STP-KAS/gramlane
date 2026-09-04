@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
-  <h1>{{if .Shop}}{{.Shop.Name}}{{else}}Open a shop{{end}}</h1>
-  <p class="lede">A shop is a name with a page. Get names under Name. Then pick one here.</p>
+  <h1>{{if .Shop}}{{.Shop.Name}}{{else}}Hang a page{{end}}</h1>
+  <p class="lede">A kasdomain is for dApps. This hangs your own site at a separate URL — <span class="mono">bakery.kas</span>.</p>
 
   {{if .Shop}}
   <p class="tiny">Page: <a href="{{printf "/%s" .Shop.Name}}">{{.Shop.Name}}</a>
@@ -59,7 +59,7 @@
         <input type="radio" name="name" value="{{.Name}}" {{if and (eq $.Query .Name) (ne $.Field "name")}}checked{{end}} />
         <span>
           <strong>{{.Name}}</strong>
-          {{if .HasShop}}<span class="ok">shop open</span>{{else}}<span class="tiny">no shop yet</span>{{end}}
+          {{if .HasShop}}<span class="ok">page live</span>{{else}}<span class="tiny">no page yet</span>{{end}}
           {{if .Face}}<span class="tiny">face</span>{{end}}
           {{if .Headline}}<span class="tiny">{{.Headline}}</span>{{end}}
         </span>
@@ -74,7 +74,7 @@
     <input id="shopAbout" name="about" value="{{.DraftAbout}}" placeholder="Bread and coffee." class="{{if eq .Field "about"}}bad{{end}}" />
     {{if eq .Field "about"}}<p class="bad">{{.Error}}</p>{{end}}
     {{if eq .Field "address"}}<p class="bad">{{.Error}}</p>{{end}}
-    <p class="actions"><button class="btn mint" type="submit">Open shop</button></p>
+    <p class="actions"><button class="btn mint" type="submit">Hang page</button></p>
   </form>
   {{else}}
   <p class="help">No names on this wallet yet.</p>
@@ -85,7 +85,7 @@
   </form>
   {{end}}
   {{end}}
-  <p class="actions"><a class="btn ghost" href="/s/">Shops</a> <a class="btn ghost" href="/kasdomain">Get a name</a></p>
+  <p class="actions"><a class="btn ghost" href="/s/">Pages</a> <a class="btn ghost" href="/kasdomain">Get a name</a></p>
 </main>
 <script>
 (function () {

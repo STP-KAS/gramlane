@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
   <h1>A name people can say.</h1>
-  <p class="lede"><span class="chip live">live</span> On Kaspa L1. Get a name. Open it as a shop. Same word — <span class="mono">bakery.kas</span> is the page. Mint is 200 KAS: half the name, half Kaspa growth.</p>
+  <p class="lede"><span class="chip live">live</span> On Kaspa L1. A kasdomain is for dApps. You also get a page at its own URL — <span class="mono">bakery.kas</span>. Mint is 200 KAS: half the name, half Kaspa growth.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="homeQ">Name</label>
@@ -12,8 +12,8 @@
 
   <ol class="steps">
     <li><strong>1 · Name</strong>200 KAS. Half the name, half Kaspa growth.</li>
-    <li><strong>2 · Shop</strong>Pick that name. Share bakery.kas.</li>
-    <li><strong>3 · Pay</strong>Customer sends KAS to the shop. Grams are for apps.</li>
+    <li><strong>2 · Page</strong>Your site at bakery.kas — a separate URL.</li>
+    <li><strong>3 · Apps</strong>Telegram, prior, agent, vault. Grams.</li>
   </ol>
   {{if .Query}}<p class="tiny">Your sign: <a href="/{{.Query}}">{{.Query}}</a></p>{{end}}
 </main>

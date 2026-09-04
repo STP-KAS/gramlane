@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
   <h1>Get a name.</h1>
-  <p class="lede"><span class="chip live">live</span> Covenant on Kaspa L1. 200 KAS. Half funds the name. Half supports Kaspa growth. Forever.</p>
+  <p class="lede"><span class="chip live">live</span> Covenant on Kaspa L1. For dApps. You also get a page at <span class="mono">yourname.kas</span>. 200 KAS. Half the name. Half Kaspa growth. Forever.</p>
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="q">Name</label>
@@ -105,7 +105,7 @@
     {{if .Result.PayURI}}<p class="tiny">Name lock <span class="mono">{{.Result.PayURI}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Result.PayURI}}">Copy lock</button></p>{{end}}
     <p class="actions">
       <a class="btn mint" href="/{{.Result.Name}}">See {{.Result.Name}}</a>
-      {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Open as a shop</a>{{end}}
+      {{if .Held}}<a class="btn ghost" href="/shop?name={{.Result.Name}}&amp;address={{.Held.Address}}">Hang a page</a>{{end}}
     </p>
     {{end}}
     {{if .Inspect}}
@@ -122,7 +122,7 @@
   {{if .Held}}
   <p class="help" style="margin-top:28px">Signed in as {{if .Held.Primary}}<strong>{{.Held.Primary}}</strong> <button type="button" class="btn ghost" data-copy-text="{{.Held.Primary}}">Copy name</button>{{else}}this wallet{{end}}. <span class="mono">{{.Held.Address}}</span> <button type="button" class="btn ghost" data-copy-text="{{.Held.Address}}">Copy address</button>. {{len .Held.Names}} name{{if ne (len .Held.Names) 1}}s{{end}}.</p>
   <p class="actions">
-    <a class="btn mint" href="/s/?address={{.Held.Address}}">Open a shop</a>
+    <a class="btn mint" href="/s/?address={{.Held.Address}}">Your page</a>
     <a class="btn ghost" href="/mine?address={{.Held.Address}}">My names</a>
   </p>
   {{end}}

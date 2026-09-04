@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
   <h1>My names</h1>
-  <p class="lede">Names you hold. Open a shop from Shops. The face is how you log in.</p>
+  <p class="lede">Names you hold. For dApps. Hang a page under Page. The face is how you log in.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Held}}
@@ -19,7 +19,7 @@
         <a class="btn mint" href="/{{.Name}}">Page</a>
         <a class="btn ghost" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Edit shop</a>
         {{else}}
-        <a class="btn mint" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Open as shop</a>
+        <a class="btn mint" href="/shop?name={{.Name}}&amp;address={{$.Held.Address}}">Hang a page</a>
         {{end}}
       </p>
       {{if not .Face}}
