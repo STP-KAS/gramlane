@@ -29,7 +29,7 @@
       <input type="hidden" name="wallet" value="" />
       <div>
         <label>name or query</label>
-        <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+        <input name="q" value="{{if .Query}}{{.Query}}{{else}}kaspadao.kas{{end}}" />
       </div>
       <button class="btn mint" type="submit">Run — burn {{.Job.Grams}} grams</button>
     </form>
@@ -51,7 +51,7 @@
         <input type="hidden" name="job" value="{{.Job.ID}}" />
         <input type="hidden" name="payer" value="" />
         <input type="hidden" name="wallet" value="" />
-        <input type="hidden" name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+        <input type="hidden" name="q" value="{{if .Query}}{{.Query}}{{else}}kaspadao.kas{{end}}" />
         <div>
           <label>paste Kasware txid</label>
           <input name="payment" placeholder="64-character txid" autocomplete="off" />
@@ -84,7 +84,7 @@
     <input type="hidden" name="wallet" value="" />
     <div>
       <label>name or query</label>
-      <input name="q" value="{{if .Query}}{{.Query}}{{else}}kns.kas{{end}}" />
+      <input name="q" value="{{if .Query}}{{.Query}}{{else}}kaspadao.kas{{end}}" />
     </div>
     <div>
       <label>paste Kasware txid</label>
@@ -94,7 +94,7 @@
   </form>
   {{end}}
 
-  <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kns.kas</span> burns prepaid grams while remaining covers the bill. 402 only after inventory is spent. Header <span class="mono">X-Work-Credit: grams</span> is also accepted.</p>
+  <p class="lede">API: <span class="mono">GET /api/run?job={{.Job.ID}}&q=kaspadao.kas</span> burns prepaid grams while remaining covers the bill. 402 only after inventory is spent. Header <span class="mono">X-Work-Credit: grams</span> is also accepted.</p>
   {{end}}
 </main>
 {{template "footer" .}}

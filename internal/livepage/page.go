@@ -11,7 +11,7 @@ import (
 	"gramlane/internal/names"
 )
 
-const path = "data/live-pages.json"
+var path = "data/live-pages.json"
 
 type Page struct {
 	Name     string `json:"name"`
@@ -36,6 +36,14 @@ func Get(name string) *Page {
 	}
 	cp := p
 	return &cp
+}
+
+// Ensure writes a first living page only when the name has none.
+func Ensure(name, headline, about, payNote string) Page {
+	if p := Get(name); p != nil && (p.Headline != "" || p.About != "") {
+		return *p
+	}
+	return Save(name, headline, about, payNote)
 }
 
 func Save(name, headline, about, payNote string) Page {

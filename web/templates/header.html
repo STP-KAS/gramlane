@@ -23,6 +23,6 @@
     </nav>
     <button class="btn ghost" type="button" data-wallet-connect data-idle-label="Log in">Log in</button>
     <button class="btn ghost" type="button" data-wallet-logout hidden>Log out</button>
-    {{if .Seq}}<span class="chip">{{.Seq.Remaining}} GRAM</span>{{end}}
+    {{if .Seq}}<a class="chip" href="/jar" title="jar receipts">{{.Seq.Remaining}} GRAM</a>{{end}}
   </header>
 {{end}}

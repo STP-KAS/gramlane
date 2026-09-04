@@ -3,7 +3,7 @@ package quote
 import "testing"
 
 func TestMillionGramsIsOneKAS(t *testing.T) {
-	q, err := Grams(1_000_000, "KNS1")
+	q, err := Grams(1_000_000, "SIGN1")
 	if err != nil {
 		t.Fatal(err)
 	}
