@@ -241,6 +241,12 @@ input.bad, select.bad, textarea.bad { border-color: var(--danger); background: #
 .choice:has(input:checked) { border-color: var(--ink); background: var(--paper); }
 .choice input { margin-top: 4px; min-height: auto; }
 .choice strong { display: block; }
+.chat-desk {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+  align-items: start; margin-top: 8px;
+}
+.picks { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.picks .btn { min-height: 40px; padding: 8px 12px; font-size: 14px; width: auto; }
 @media (max-width: 800px) {
   main { padding: 28px 16px 56px; }
   h1 { font-size: 30px; }
@@ -251,4 +257,5 @@ input.bad, select.bad, textarea.bad { border-color: var(--danger); background: #
   .nav .btn { width: auto; }
   .who { max-width: 100%; margin-left: 0; }
   .who-addr { max-width: 140px; }
+  .chat-desk { grid-template-columns: 1fr; }
 }

@@ -654,7 +654,7 @@ func (s *Server) postagePage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) priorPage(w http.ResponseWriter, r *http.Request) {
 	j, _ := jobs.Get("prior")
-	p := page{Title: "Prior art · Gramlane", Active: "apps", Job: &j, PayTo: desk.PayTo()}
+	p := page{Title: "Prior art · Gramlane", Active: "prior", Job: &j, PayTo: desk.PayTo()}
 	hash := strings.TrimSpace(r.FormValue("hash"))
 	if hash == "" {
 		hash = strings.TrimSpace(r.URL.Query().Get("q"))
@@ -694,27 +694,45 @@ func (s *Server) kachatPage(w http.ResponseWriter, r *http.Request) {
 	if q == "" {
 		q = strings.TrimSpace(r.URL.Query().Get("q"))
 	}
+	addr := walletAddr(r)
 	p := page{
-		Title: "KaChat · Gramlane", Active: "apps", Job: &j, Query: q,
-		Envelopes: kachat.Envelopes(q),
+		Title: "Chat · Gramlane", Active: "kachat", Job: &j, Query: names.DisplayName(q), Address: addr,
 	}
-	if q != "" {
-		site, err := names.Lookup(q)
-		if err != nil {
-			p.Error = err.Error()
-			p.Envelopes = kachat.Envelopes(q)
-		} else {
-			c := kachat.ContactFrom(site.Name, site.Owner)
-			p.Contact = &c
-			p.Envelopes = kachat.Envelopes(site.Name)
+	if strings.HasPrefix(addr, "kaspa:") {
+		p.Held = names.Book(addr)
+		p.Choices = shop.Choices(addr)
+	}
+	if disp := names.DisplayName(q); disp != "" {
+		p.Query = disp
+		who := names.HolderOf(disp)
+		if who == "" {
+			if sh := shop.Get(disp); sh != nil {
+				who = sh.PayTo
+				if who == "" {
+					who = sh.Owner
+				}
+			}
 		}
+		if who != "" {
+			c := kachat.ContactFrom(disp, who)
+			p.Contact = &c
+		} else if site, err := names.Lookup(disp); err == nil && site.Owner != "" {
+			c := kachat.ContactFrom(site.Name, site.Owner)
+			c.Note = "Indexer name, not kasdomain. Encryption still stays in KaChat."
+			p.Contact = &c
+		} else if err != nil {
+			p.Error = "No wallet on this desk for " + disp + ". Fund it under Name, or they need a kaspa: address."
+		}
+		p.Envelopes = kachat.Envelopes(disp)
+	} else {
+		p.Envelopes = kachat.Envelopes("")
 	}
 	if r.Method == http.MethodPost {
 		text := strings.TrimSpace(r.FormValue("text"))
 		if text == "" {
-			text = q
+			text = p.Query
 		}
-		_, rec, err := s.burnJob("postage", text, r.FormValue("payer"))
+		_, rec, err := s.burnJob("postage", text, addr)
 		p.Run = &rec
 		if err != nil {
 			p.Error = err.Error()
