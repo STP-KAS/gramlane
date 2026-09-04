@@ -1,11 +1,11 @@
 {{template "header" .}}
 <main>
   <h1>Fill the jar</h1>
-  <p class="lede">Keep some KAS. Put a share aside as grams. One send, many payments later.</p>
-  {{if .Seq}}<p class="tiny">In the jar: {{.Seq.Remaining}} grams · <a href="/pay">Pay</a></p>{{end}}
+  <p class="lede">This is a sale, not a wrap. KAS leaves your wallet and pays this desk. You get prepaid grams on this desk’s book. No convert-back.</p>
+  {{if .Seq}}<p class="tiny">In the jar: {{.Seq.Remaining}} grams · <a href="/jar">Book</a> · <a href="/pay">Pay</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
-  <form class="row" action="/stablegram" method="post">
+  <form class="row" action="/spend" method="post">
     <div>
       <label for="totalKas">How much KAS do you have?</label>
       <input id="totalKas" name="total" value="{{if .Query}}{{.Query}}{{else}}1{{end}}" inputmode="decimal" />
@@ -30,30 +30,31 @@
     <article class="card">
       <h3>Spend {{.Aside.Percent}}%</h3>
       <p class="price">{{.Aside.Spend.Grams}} GRAM</p>
-      <p>{{.Aside.Spend.KASText}} KAS at policy. This is the till unit. It does not reprice when KAS moves.</p>
+      <p>{{.Aside.Spend.KASText}} KAS at policy. Till unit. Same grams tomorrow. Not a dollar.</p>
     </article>
   </div>
   {{if .Aside.FloorNote}}<p class="warn">{{.Aside.FloorNote}}</p>{{end}}
   <div class="card" style="margin:18px 0">
-    <h3>Fund the spend pile on L1</h3>
-    <p class="lede">Kasware sends <strong>{{.Aside.PayKASText}} KAS</strong> to the desk — not your login. That mints grams at 100 sompi/gram into this sequencer’s spend pile.</p>
-    <label>desk</label>
-    <input class="mono" id="pay-to" value="{{.PayTo}}" />
+    <h3>Pay the desk</h3>
+    <p class="lede">Kasware sends <strong>{{.Aside.PayKASText}} KAS</strong> to the address below. <strong>Not your login. Not yours. Not a vault you can withdraw.</strong> This desk then writes grams into the jar at 100 sompi/gram.</p>
+    <label for="pay-to">Desk (operator) — not your address</label>
+    <input class="mono" id="pay-to" value="{{.PayTo}}" readonly />
     <p>
-      <button class="btn mint" type="button" data-pay-l1 data-after="/stablegram" data-sompi="{{.Aside.PaySompi}}">Set aside {{.Aside.PayKASText}} KAS</button>
+      <button type="button" class="btn ghost" data-copy-text="{{.PayTo}}">Copy desk address</button>
+      <button class="btn mint" type="button" data-pay-l1 data-after="/spend" data-sompi="{{.Aside.PaySompi}}">Pay {{.Aside.PayKASText}} KAS to the desk</button>
     </p>
     <p class="tiny" data-pay-status></p>
     <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
   </div>
   {{end}}
 
-  <h2>How this is worldwide POS without a dollar</h2>
+  <h2>What happens to the KAS</h2>
   <ol>
-    <li>Set aside a share of KAS once. Grams are the spend inventory.</li>
-    <li>A merchant opens a till in grams — digital link or on-location QR.</li>
-    <li>You burn grams. No new volatile KAS send per sale.</li>
-    <li>Merchant is owed grams on this rail (operator settlement) or takes KAS fallback to their <span class="mono">kaspa:</span>.</li>
+    <li>It lands in the desk wallet. The operator can spend it.</li>
+    <li>This desk credits grams in <a href="/jar">the jar book</a>. That is a work tab, not a KAS balance.</li>
+    <li>Jobs and tills burn grams. Miners still get paid in KAS by the operator later.</li>
+    <li>There is no button to turn grams back into your KAS.</li>
   </ol>
-  <p class="lede">Not USDT. If a cafe chases dollars they will reprice grams. Your jar still holds the same grams. <a href="/pay">Pay</a></p>
+  <p class="lede">Not USDT. Not a wrap. If a cafe chases dollars they reprice grams. Remaining grams stay grams. <a href="/pay">Pay</a></p>
 </main>
 {{template "footer" .}}

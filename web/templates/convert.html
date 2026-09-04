@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main id="main">
   <h1>Convert</h1>
-  <p class="lede">KAS to grams at a fixed rate. Not Tether. Not a dollar. dApps bill work in grams today.</p>
+  <p class="lede">A meter. It does not send KAS and does not wrap your wallet. 1.0 KAS of work = 1 000 000 grams at policy. To actually fill, you pay the desk.</p>
 
   <div class="split">
     <article class="card">
@@ -14,11 +14,11 @@
     </article>
   </div>
   <p class="price" id="cOut">1.0 KAS = 1 000 000 grams</p>
-  <p class="tiny">1 000 000 grams = 1.0 KAS. Rate is policy, not a market. USD is not quoted.</p>
+  <p class="tiny">1 000 000 grams = 1.0 KAS. Policy, not a market. USD not quoted. No convert-back.</p>
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
   <p class="actions">
-    <a class="btn mint" href="/stablegram">Fill the jar</a>
+    <a class="btn mint" href="/spend">Fill the jar</a>
     <a class="btn ghost" href="/docs">dApp API</a>
   </p>
 
