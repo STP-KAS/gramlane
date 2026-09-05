@@ -22,7 +22,7 @@ type Job struct {
 	Name  string `json:"name"`
 	Blurb string `json:"blurb"`
 	Grams uint64 `json:"grams"`
-	Lane  string `json:"lane"`
+	Lane  string `json:"lane"` // Desk stamp (MSG1, SEQ1, …). Not a KIP-21 subnetwork_id.
 	Kind  string `json:"kind"`
 	Tag   string `json:"tag,omitempty"`
 }
@@ -42,18 +42,21 @@ type Receipt struct {
 	Note       string      `json:"note"`
 }
 
+// Floor is the desk minimum per action. Not 1 gram (spam). L1 meter stays 100 sompi/gram.
+const Floor uint64 = 1_000
+
 var Catalog = []Job{
-	{ID: "resolve", Name: "Resolve a KNS name", Blurb: "Look up an inscription on the public name index. Not a kasdomain covenant.", Grams: 12_000, Lane: "SIGN1", Kind: "resolve", Tag: "indexer · not kasdomain"},
-	{ID: "rank", Name: "L1 balance depth", Blurb: "KNS owner from indexer, then api.kaspa.org balance. Not kasdomain.", Grams: 18_000, Lane: "SIGN1", Kind: "rank", Tag: "indexer · not kasdomain"},
-	{ID: "dag", Name: "BlockDAG heartbeat", Blurb: "Read virtual DAA from api.kaspa.org. Cheap inclusion probe.", Grams: 5_000, Lane: "SEQ1", Kind: "dag"},
-	{ID: "profile", Name: "Pull KNS profile texts", Blurb: "Avatar, x, website if the public name index has them. Not kasdomain.", Grams: 22_000, Lane: "SIGN1", Kind: "profile", Tag: "indexer · not kasdomain"},
-	{ID: "batch", Name: "Batch three KNS resolves", Blurb: "Three inscription lookups. Indexer · not kasdomain.", Grams: 40_000, Lane: "SIGN1", Kind: "batch", Tag: "indexer · not kasdomain"},
-	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: 8_000, Lane: "SEQ1", Kind: "vault"},
-	{ID: "postage", Name: "KaChat postage", Blurb: "Sequenced stamp to a .kas contact. Not E2E — KaChat seals ciph_msg in the wallet.", Grams: 9_000, Lane: "MSG1", Kind: "postage"},
-	{ID: "telegram", Name: "Telegram note", Blurb: "Encrypted note in the browser. Grams pay the desk. Not Telegram Inc. Not KaChat.", Grams: 2_000, Lane: "MSG1", Kind: "telegram"},
-	{ID: "prior", Name: "Stamp prior art", Blurb: "Hash a work. Desk stamp in grams. Optional KAS to the hash lock on L1. Not a patent office.", Grams: 14_000, Lane: "SEQ1", Kind: "prior"},
-	{ID: "agent", Name: "AI agent call", Blurb: "HTTP 402 for a machine. Grok if XAI_API_KEY is set; otherwise local tools. Grams pay the call.", Grams: 25_000, Lane: "AGENT", Kind: "agent"},
-	{ID: "site", Name: "KNS generated page", Blurb: "Indexer profile → a page. Not a kasdomain covenant UTXO.", Grams: 15_000, Lane: "SIGN1", Kind: "site", Tag: "indexer · not kasdomain"},
+	{ID: "resolve", Name: "Resolve a KNS name", Blurb: "Look up an inscription on the public name index. Not a kasdomain covenant.", Grams: Floor, Lane: "SIGN1", Kind: "resolve", Tag: "indexer · not kasdomain"},
+	{ID: "rank", Name: "L1 balance depth", Blurb: "KNS owner from indexer, then api.kaspa.org balance. Not kasdomain.", Grams: Floor, Lane: "SIGN1", Kind: "rank", Tag: "indexer · not kasdomain"},
+	{ID: "dag", Name: "BlockDAG heartbeat", Blurb: "Read virtual DAA from api.kaspa.org. Cheap inclusion probe.", Grams: Floor, Lane: "SEQ1", Kind: "dag"},
+	{ID: "profile", Name: "Pull KNS profile texts", Blurb: "Avatar, x, website if the public name index has them. Not kasdomain.", Grams: Floor, Lane: "SIGN1", Kind: "profile", Tag: "indexer · not kasdomain"},
+	{ID: "batch", Name: "Batch three KNS resolves", Blurb: "Three inscription lookups. Indexer · not kasdomain.", Grams: Floor, Lane: "SIGN1", Kind: "batch", Tag: "indexer · not kasdomain"},
+	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: Floor, Lane: "SEQ1", Kind: "vault"},
+	{ID: "postage", Name: "KaChat postage", Blurb: "Sequenced stamp to a .kas contact. Not E2E — KaChat seals ciph_msg in the wallet.", Grams: Floor, Lane: "MSG1", Kind: "postage"},
+	{ID: "telegram", Name: "Telegram note", Blurb: "AES-GCM in the browser. Text and sender in the box. Grams pay the desk. Not Telegram Inc. Not KaChat.", Grams: Floor, Lane: "MSG1", Kind: "telegram"},
+	{ID: "prior", Name: "Stamp prior art", Blurb: "Hash a work. Desk stamp in grams. Optional KAS to the hash lock on L1. Not a patent office.", Grams: Floor, Lane: "SEQ1", Kind: "prior"},
+	{ID: "agent", Name: "AI agent call", Blurb: "HTTP 402 for a machine. Grok if XAI_API_KEY is set; otherwise local tools. Grams pay the call.", Grams: Floor, Lane: "AGENT", Kind: "agent"},
+	{ID: "site", Name: "KNS generated page", Blurb: "Indexer profile → a page. Not a kasdomain covenant UTXO.", Grams: Floor, Lane: "SIGN1", Kind: "site", Tag: "indexer · not kasdomain"},
 }
 
 type Fit struct {

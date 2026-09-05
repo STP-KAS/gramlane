@@ -5,7 +5,7 @@
 
   <form class="search" action="/kasdomain" method="get" role="search">
     <label class="sr" for="homeQ">Name</label>
-    <input id="homeQ" name="q" placeholder="bakery" autocomplete="off" spellcheck="false" />
+    <input id="homeQ" name="q" placeholder="bakery or opus.dei" autocomplete="off" spellcheck="false" />
     <span class="tld" aria-hidden="true">.kas</span>
     <button class="btn mint" type="submit">Get it</button>
   </form>
@@ -16,6 +16,6 @@
     <li><strong>3 · Apps</strong>Telegram, prior, agent, vault. Grams.</li>
   </ol>
   {{if .Query}}<p class="tiny">Your sign: <a href="/{{.Query}}">{{.Query}}</a></p>{{end}}
-  <p class="actions"><a class="btn ghost" href="/app">iPhone &amp; Android</a></p>
+  <p class="actions"><a class="btn ghost" href="/app">iPhone &amp; Android</a> <a class="btn ghost" href="/sources">KIPs &amp; sources</a></p>
 </main>
 {{template "footer" .}}

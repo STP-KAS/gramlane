@@ -1,6 +1,7 @@
 // Package gramchat is encrypted notes paid in grams.
-// Ciphertext only. The passphrase never leaves the browser.
-// Not Telegram Messenger. Not KaChat E2E.
+// Ciphertext only: nonce + box. Sender and text live inside the box.
+// The passphrase never leaves the browser. Room, time, and grams stay
+// on the desk (routing + bill). Not Telegram Messenger. Not KaChat E2E.
 package gramchat
 
 import (
@@ -20,7 +21,6 @@ import (
 type Note struct {
 	Room  string `json:"room"`
 	When  string `json:"when"`
-	From  string `json:"from,omitempty"`
 	Nonce string `json:"nonce"`
 	Box   string `json:"box"`
 	Grams uint64 `json:"grams"`
@@ -52,7 +52,7 @@ func Room(raw string) string {
 	return n + ".kas"
 }
 
-func Put(room, from, nonce, box string, grams uint64) (*Note, error) {
+func Put(room, nonce, box string, grams uint64) (*Note, error) {
 	room = Room(room)
 	nonce = strings.ToLower(strings.TrimSpace(nonce))
 	box = strings.ToLower(strings.TrimSpace(box))
@@ -69,7 +69,6 @@ func Put(room, from, nonce, box string, grams uint64) (*Note, error) {
 	n := Note{
 		Room:  room,
 		When:  time.Now().UTC().Format(time.RFC3339),
-		From:  strings.TrimSpace(from),
 		Nonce: nonce,
 		Box:   box,
 		Grams: grams,
@@ -112,6 +111,9 @@ func loadLocked() {
 		return
 	}
 	_ = json.Unmarshal(b, &live)
+	if strings.Contains(string(b), `"from"`) {
+		_ = saveLocked()
+	}
 }
 
 func saveLocked() error {

@@ -1,0 +1,22 @@
+{{template "header" .}}
+<main>
+  <h1>{{.Master.Title}}</h1>
+  <p class="lede"><span class="chip">{{.Master.Updated}}</span> {{.Master.Disclaimer}} Public GitHub: <a href="{{.Master.Repo}}">{{.Master.Repo}}</a></p>
+  <p class="tiny">Gramlane pins stay on <a href="/sources">/sources</a>. This tab is the Kaspa map: GitHubs, KIPs, X, Discord, Telegram APIs. Not a live fetch.</p>
+
+  {{range .Master.Sections}}
+  <h2>{{.Title}}</h2>
+  <table>
+    <tr><th>Name</th><th></th><th>Note</th></tr>
+    {{range .Rows}}
+    <tr>
+      <td><a href="{{.URL}}">{{.Name}}</a></td>
+      <td class="chip">{{.Chip}}</td>
+      <td>{{.Note}}</td>
+    </tr>
+    {{end}}
+  </table>
+  {{end}}
+  <p class="tiny">Gramlane Telegram notes are not Telegram Inc. Discord widget is optional public JSON. This site never DMs you. <a href="/kips">KIPs this desk uses</a></p>
+</main>
+{{template "footer" .}}

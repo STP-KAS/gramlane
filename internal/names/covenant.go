@@ -60,12 +60,10 @@ func LabelBytes(name string) []byte {
 func apex(raw string) string {
 	n := strings.ToLower(strings.TrimSpace(raw))
 	n = strings.TrimPrefix(n, "kas://")
+	n = strings.TrimPrefix(n, "did:kas:")
 	n = strings.TrimSuffix(n, "/")
 	n = strings.TrimSuffix(n, ".kas")
-	if i := strings.IndexByte(n, '.'); i >= 0 {
-		n = n[:i]
-	}
-	return n
+	return strings.Trim(n, ".")
 }
 
 func DisplayName(raw string) string {

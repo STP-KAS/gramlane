@@ -130,7 +130,7 @@ L2 (Igra, bridges, wrapped USDC) is out of scope for both.
 
 ## Covenants — Silverscript v1-rc1
 
-Official compiler: kaspanet `v1-rc1` (30 Aug 2026, @OriNewman). RC ≠ tagged `v1`. Windows `silverc.exe` SHA256 `fbf75851e8d1c97e1982e72cb26e8b8f6417fa5a6ed99d58693d6314890619c3`. Clone: `C:\Users\Remco\silverscript` @ `c7d17a1`.
+Official compiler: kaspanet `v1-rc1` (30 Aug 2026, @OriNewman) from [silverscript releases](https://github.com/kaspanet/silverscript/releases). Only tag as of 5 Sep 2026. RC ≠ tagged `v1`. Windows `silverc.exe` SHA256 `fbf75851e8d1c97e1982e72cb26e8b8f6417fa5a6ed99d58693d6314890619c3` (`silverc-windows-x86_64.zip`). Clone: `C:\Users\Remco\silverscript` @ `c7d17a1`.
 
 Portable ABI JSON: [silverscript#232](https://github.com/kaspanet/silverscript/pull/232) merged. `WorkCredit-live.json` is `schema_version: 1`; loader accepts map or array `contracts`. Do not recompile onto silverc master. Foreign `readInputState` framing: [silverscript#234](https://github.com/kaspanet/silverscript/pull/234) **closed unmerged**. Compute budget is not in the artifact ([#243](https://github.com/kaspanet/silverscript/issues/243)).
 
@@ -167,7 +167,7 @@ Portable ABI JSON: [silverscript#232](https://github.com/kaspanet/silverscript/p
 
 | Surface | What it is | Status |
 | --- | --- | --- |
-| Toccata | 30 Jun 2026, DAA `474_165_565`, KIPs 16/17/20/21 Active | **live** |
+| Toccata | 30 Jun 2026, DAA `474_165_565`, KIPs 16/17/20/21 Active ([kaspanet/kips](https://github.com/kaspanet/kips); tracker [kaspaexplained.com/kips](https://kaspaexplained.com/kips)) | **live** |
 | rusty-kaspa v2.0.1 | Node that activated Toccata | **live** |
 | Igra | EVM L2 sequenced on Kaspa; Hyperlane USDC/iKAS/cbBTC/wstETH | **external live** |
 | Kaskad etc. | Igra DeFi using those assets | **external** |

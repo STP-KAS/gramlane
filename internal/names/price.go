@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode"
-	"unicode/utf8"
 
 	"gramlane/internal/appenv"
 	"gramlane/internal/quote"
@@ -62,7 +61,7 @@ func SuggestUSDCents(name string) uint64 {
 	if n == "" {
 		return 15
 	}
-	L := utf8.RuneCountInString(n)
+	L := coreLen(n)
 	var base uint64
 	switch {
 	case L <= 1:

@@ -14,7 +14,7 @@ const InscribeFeeAddress = "kaspa:qyp4nvaq3pdq7609z09fvdgwtc9c7rg07fuw5zgeee7xpr
 // Official inscriber. Gramlane checks and explains; it does not broadcast.
 const InscribeURL = "https://app.knsdomains.org/"
 
-var labelRe = regexp.MustCompile(`^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`)
+var labelRe = regexp.MustCompile(`^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$`)
 
 // Want is a name someone is trying to get. Plain fields for the Kasdomain tab.
 type Want struct {
@@ -36,35 +36,37 @@ type Want struct {
 }
 
 func labelOf(raw string) string {
-	n := strings.ToLower(strings.TrimSpace(raw))
-	n = strings.TrimPrefix(n, "kas://")
-	n = strings.TrimPrefix(n, "did:kas:")
-	n = strings.TrimSuffix(n, "/")
-	n = strings.TrimSuffix(n, ".kas")
-	if i := strings.IndexByte(n, '.'); i >= 0 {
-		n = n[:i]
+	return apex(raw)
+}
+
+func coreLen(label string) int {
+	n := 0
+	for _, r := range label {
+		if r != '.' {
+			n++
+		}
 	}
 	return n
 }
 
 func ValidLabel(label string) (bool, string) {
 	if label == "" {
-		return false, "Type a word. Example: bakery"
+		return false, "Type a word. Example: bakery or opus.dei"
 	}
-	if strings.ContainsAny(label, " .") {
-		return false, "One word only. No spaces and no extra dots. Try bakery, not pay.bakery"
+	if strings.ContainsAny(label, " ") {
+		return false, "No spaces. Use a hyphen or a dot: opus-dei or opus.dei"
 	}
 	if utf8.RuneCountInString(label) > 63 {
 		return false, "That word is too long. Keep it under 64 letters."
 	}
 	if !labelRe.MatchString(label) {
-		return false, "Use letters and numbers. You may put a hyphen in the middle. No emoji here — keep it easy to type."
+		return false, "Use letters and numbers. Dots and hyphens can sit between words. No emoji here — keep it easy to type."
 	}
 	return true, ""
 }
 
 func PriceKAS(label string) int {
-	n := utf8.RuneCountInString(label)
+	n := coreLen(label)
 	switch {
 	case n <= 2:
 		return 4200
@@ -78,7 +80,7 @@ func PriceKAS(label string) int {
 }
 
 func priceNote(label string) string {
-	n := utf8.RuneCountInString(label)
+	n := coreLen(label)
 	switch {
 	case n <= 2:
 		return "Very short names cost more — like a short car plate. Paid once. No yearly bill."
@@ -99,12 +101,6 @@ func ParseWant(raw string) *Want {
 		Note:        "Gramlane does not mint the name. The official name shop writes it to Kaspa. First person to pay wins. Not a unique lock in consensus.",
 	}
 	w.Label = labelOf(raw)
-	core := strings.TrimSuffix(strings.ToLower(strings.TrimSpace(raw)), ".kas")
-	if strings.Contains(core, ".") {
-		w.Valid = false
-		w.Why = "One word only. No spaces and no extra dots. Try bakery, not pay.bakery"
-		return w
-	}
 	ok, why := ValidLabel(w.Label)
 	w.Valid = ok
 	w.Why = why

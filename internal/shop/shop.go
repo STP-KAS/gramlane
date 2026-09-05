@@ -115,11 +115,7 @@ func FromHost(host string) string {
 	if !strings.HasSuffix(h, ".kas") {
 		return ""
 	}
-	parts := strings.Split(h, ".")
-	if len(parts) < 2 {
-		return ""
-	}
-	return names.DisplayName(parts[len(parts)-2] + ".kas")
+	return names.DisplayName(h)
 }
 
 type Storefront struct {

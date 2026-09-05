@@ -6,7 +6,7 @@ Human steps for **grams** live on the dApp: http://127.0.0.1:8081/guide
 
 - App source: `C:\Users\Remco\kns`
 - This map: `C:\Users\Remco\Documents\kaspa\superapp`
-- Compiler: `C:\Users\Remco\tools\silverc\silverc.exe` (official v1-rc1 zip)
+- Compiler: `C:\Users\Remco\tools\silverc\silverc.exe` (official [v1-rc1](https://github.com/kaspanet/silverscript/releases/tag/v1-rc1) zip). List: https://github.com/kaspanet/silverscript/releases — only that tag as of 5 Sep 2026. Not master.
 - Language clone: `C:\Users\Remco\silverscript` @ `c7d17a1`
 - Live names: KNS indexer, not this disk
 

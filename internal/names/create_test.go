@@ -16,14 +16,24 @@ func TestParseWantRejectsJunk(t *testing.T) {
 	if ParseWant("").Valid {
 		t.Fatal("empty")
 	}
-	if ParseWant("pay.bakery").Valid {
-		t.Fatal("subname")
-	}
 	if ParseWant("hello world").Valid {
 		t.Fatal("space")
 	}
 	if ParseWant("A_B").Valid {
 		t.Fatal("underscore")
+	}
+	if ParseWant("opus..dei").Valid {
+		t.Fatal("double dot")
+	}
+}
+
+func TestParseWantDotted(t *testing.T) {
+	w := ParseWant("opus.dei")
+	if !w.Valid || w.Label != "opus.dei" || w.Name != "opus.dei.kas" {
+		t.Fatalf("%+v", w)
+	}
+	if ParseWant("opus.dei.kas").Name != "opus.dei.kas" {
+		t.Fatal(ParseWant("opus.dei.kas").Name)
 	}
 }
 
@@ -36,5 +46,8 @@ func TestPriceKASTiers(t *testing.T) {
 	}
 	if PriceKAS("abcde") != 35 {
 		t.Fatal("long")
+	}
+	if PriceKAS("opus.dei") != 35 {
+		t.Fatal("dotted")
 	}
 }

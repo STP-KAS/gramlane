@@ -22,6 +22,7 @@ import (
 	"gramlane/internal/kachat"
 	"gramlane/internal/livepage"
 	"gramlane/internal/market"
+	"gramlane/internal/masterfile"
 	"gramlane/internal/names"
 	"gramlane/internal/pos"
 	"gramlane/internal/post"
@@ -29,6 +30,7 @@ import (
 	"gramlane/internal/quote"
 	"gramlane/internal/seq"
 	"gramlane/internal/shop"
+	"gramlane/internal/sources"
 	"gramlane/internal/wallets"
 	"gramlane/web"
 
@@ -93,6 +95,9 @@ type page struct {
 	Prior         *prior.Record
 	Priors        []prior.Record
 	Notes         []gramchat.Note
+	Pins          []sources.Pin
+	Refuse        []sources.Pin
+	Master        *masterfile.File
 }
 
 func New(addr string) (*Server, error) {
@@ -172,6 +177,18 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/job/", s.job)
 	mux.HandleFunc("/run", s.runPage)
 	mux.HandleFunc("/honest", s.honest)
+	mux.HandleFunc("/kips", s.kipsPage)
+	mux.HandleFunc("/sources", s.kipsPage)
+	mux.HandleFunc("/masterfile", s.masterfilePage)
+	mux.HandleFunc("/master", s.masterfilePage)
+	mux.HandleFunc("/api/masterfile", s.apiMasterfile)
+	mux.HandleFunc("/api/sources", s.apiSources)
+	for _, pin := range sources.Used {
+		if pin.Local == "" {
+			continue
+		}
+		mux.HandleFunc(pin.Local, s.sourceRedirect)
+	}
 	mux.HandleFunc("/docs", s.docs)
 	mux.HandleFunc("/guide", s.guidePage)
 	mux.HandleFunc("/steps", s.guidePage)
@@ -237,7 +254,13 @@ func (s *Server) Handler() http.Handler {
 			"kns":            false,
 			"kasdomain":      "live",
 			"toccata":        "live",
-			"explained":      "https://remote-mcp-server-authless.parker2017.workers.dev/mcp",
+			"kips":           "https://github.com/kaspanet/kips",
+			"kip21":          "https://github.com/kaspanet/kips/blob/master/kip-0021.md",
+			"kccs":           "https://github.com/kaspanet/kccs",
+			"silverscript":   "https://github.com/kaspanet/silverscript/releases",
+			"explained":      "https://kaspaexplained.com/kips",
+			"claims":         "https://kaspaexplained.com/toccata-status",
+			"sources":        "/sources",
 			"sompiPerGram":   quote.SompiPerGram,
 			"grok":           agent.HasKey(),
 			"gramsRemaining": led.Remaining, "credits": led.Credits,
@@ -613,6 +636,32 @@ func (s *Server) honest(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "honest.html", page{Title: "Claims · Gramlane", Active: "honest"})
 }
 
+func (s *Server) masterfilePage(w http.ResponseWriter, r *http.Request) {
+	f := masterfile.Live()
+	s.render(w, "masterfile.html", page{Title: "Kaspa master file · Gramlane", Active: "master", Master: &f})
+}
+
+func (s *Server) apiMasterfile(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, 200, map[string]any{"ok": true, "data": masterfile.Live()})
+}
+
+func (s *Server) kipsPage(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "kips.html", page{Title: "Sources · Gramlane", Active: "honest", Pins: sources.Used, Refuse: sources.Refuse})
+}
+
+func (s *Server) apiSources(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, 200, map[string]any{"ok": true, "used": sources.Used, "refuse": sources.Refuse})
+}
+
+func (s *Server) sourceRedirect(w http.ResponseWriter, r *http.Request) {
+	p, ok := sources.ByLocal(r.URL.Path)
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	http.Redirect(w, r, p.URL, http.StatusFound)
+}
+
 func (s *Server) docs(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "docs.html", page{Title: "Docs · Gramlane", Active: "docs"})
 }
@@ -822,7 +871,7 @@ func (s *Server) apiTelegram(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 402, map[string]any{"ok": false, "error": err.Error(), "remaining": rec.Remaining})
 		return
 	}
-	n, err := gramchat.Put(req.Room, req.From, req.Nonce, req.Box, j.Grams)
+	n, err := gramchat.Put(req.Room, req.Nonce, req.Box, j.Grams)
 	if err != nil {
 		writeJSON(w, 400, map[string]any{"ok": false, "error": err.Error()})
 		return
@@ -1099,6 +1148,10 @@ func (s *Server) wellKnownKasdomain(w http.ResponseWriter, r *http.Request) {
 		"pay":         "POST /api/shop/{name} with item and X-Work-Credit",
 		"explained":   "https://remote-mcp-server-authless.parker2017.workers.dev/mcp",
 		"claims":      "https://kaspaexplained.com/toccata-status",
+		"kips":        "https://github.com/kaspanet/kips",
+		"kccs":        "https://github.com/kaspanet/kccs",
+		"sources":     "/sources",
+		"apiSources":  "/api/sources",
 		"note":        "The calling agent supplies the model. This desk only hangs signs on covenant names.",
 	})
 }

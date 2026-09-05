@@ -1,6 +1,8 @@
 pragma silverscript ^0.1.0;
 
 // kasdomain name. Compiled silverc v1-rc1.
+// https://github.com/kaspanet/silverscript/releases/tag/v1-rc1
+// Official list: https://github.com/kaspanet/silverscript/releases — only v1-rc1 as of 5 Sep 2026. Not master.
 // A name is this output. Label is baked into the redeem script, so the P2SH
 // is determined by the label alone. First UTXO at that address is the name.
 // Own UTXO only: validateOutputState. No foreign input state. No KNS inscription.

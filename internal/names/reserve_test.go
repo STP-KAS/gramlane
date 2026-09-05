@@ -15,6 +15,12 @@ func TestSalePriceByLength(t *testing.T) {
 	if SalePriceKAS("bakery") != 30 {
 		t.Fatal("rest")
 	}
+	if SalePriceKAS("opus.dei") != 30 {
+		t.Fatal("dotted rest")
+	}
+	if SalePriceKAS("a.b") != 500 {
+		t.Fatal("two letters with a dot still count as two")
+	}
 }
 
 func TestSeedVaultShortAndRetailer(t *testing.T) {

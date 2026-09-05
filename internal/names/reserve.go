@@ -8,7 +8,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode/utf8"
 
 	"gramlane/internal/appenv"
 	"gramlane/internal/quote"
@@ -56,7 +55,7 @@ func ResetReserveForTest(dir string) {
 
 func SalePriceKAS(name string) uint64 {
 	n := apex(name)
-	L := utf8.RuneCountInString(n)
+	L := coreLen(n)
 	switch {
 	case L <= 1:
 		return 1000

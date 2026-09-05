@@ -1,0 +1,32 @@
+{{template "header" .}}
+<main>
+  <h1>Sources</h1>
+  <p class="lede">Every pin this desk uses. Local URL on this host, then the canonical one. Not a live GitHub fetch. JSON: <a href="/api/sources"><span class="mono">/api/sources</span></a>.</p>
+
+  <table>
+    <tr><th>On this host</th><th>Source</th><th></th><th>Why</th></tr>
+    {{range .Pins}}
+    <tr>
+      <td class="mono"><a href="{{.Local}}">{{.Local}}</a></td>
+      <td><a href="{{.URL}}">{{.Title}}</a></td>
+      <td class="chip">{{.Chip}}</td>
+      <td>{{.Use}}</td>
+    </tr>
+    {{end}}
+  </table>
+
+  <h2>Not a pin</h2>
+  <table>
+    <tr><th>Source</th><th></th><th>Why</th></tr>
+    {{range .Refuse}}
+    <tr>
+      <td><a href="{{.URL}}">{{.Title}}</a></td>
+      <td class="chip bad">{{.Chip}}</td>
+      <td>{{.Use}}</td>
+    </tr>
+    {{end}}
+  </table>
+  <p class="tiny">Merged Active KIP = law. Desk lanes are book stamps, not KIP-21 <span class="mono">subnetwork_id</span>. 100 sompi/gram is min-relay, not a KIP. <a href="/honest">Honest</a> · <a href="/234">#234</a></p>
+</main>
+{{template "footer" .}}
+

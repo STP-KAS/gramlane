@@ -27,6 +27,7 @@
       <a href="/desk" class="{{if eq .Active "apps"}}on{{end}}" title="Vault, agent, postage, prior — grams">Apps</a>
       <a href="/pay" class="{{if or (eq .Active "pay") (eq .Active "jar")}}on{{end}}">Pay</a>
       <a href="/convert" class="{{if eq .Active "convert"}}on{{end}}">Convert</a>
+      <a href="/masterfile" class="{{if eq .Active "master"}}on{{end}}" title="Kaspa master file — GitHubs, KIPs, X, Discord, Telegram">Master file</a>
     </nav>
     <a class="bal" href="/convert" data-balances hidden title="This wallet's KAS. Jar grams are the desk prepaid work pile, not this address.">
       <span data-kas-balance>KAS 0.0</span>
