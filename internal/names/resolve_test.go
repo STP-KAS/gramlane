@@ -46,4 +46,22 @@ func TestDisplayName(t *testing.T) {
 	if DisplayName("Bakery") != "bakery.kas" || DisplayName("google.kas") != "google.kas" {
 		t.Fatal(DisplayName("Bakery"), DisplayName("google.kas"))
 	}
+	if DisplayName("opus.dei") != "opus.dei.kas" || DisplayName("opus.dei.kas") != "opus.dei.kas" {
+		t.Fatal(DisplayName("opus.dei"), DisplayName("opus.dei.kas"))
+	}
+}
+
+func TestP2SHKeepsDottedLabel(t *testing.T) {
+	ResetCovenantForTest()
+	a, _, _, err := P2SHFor("opus")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, _, _, err := P2SHFor("opus.dei")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if a == b {
+		t.Fatal("opus.dei must not collapse to opus")
+	}
 }

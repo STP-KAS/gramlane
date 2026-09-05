@@ -1,6 +1,6 @@
 {{template "header" .}}
 <main id="main" class="kc-wrap" data-telegram data-room="{{.Query}}" data-from="{{.Address}}">
-  <p class="tiny kc-honest">Telegram here is a joke name. Encrypted in this browser (AES-GCM). Grams pay the desk. Not Telegram Messenger. Not KaChat. The secret never goes to the server.</p>
+  <p class="tiny kc-honest">Telegram here is a joke name. Text and sender are AES-GCM in this browser. The secret never goes to the server. Room, time, and grams stay on the desk (routing + bill). Not Telegram Messenger. Not KaChat.</p>
   {{if .Error}}<p class="bad" role="alert">{{.Error}}</p>{{end}}
   {{if .Job}}<p class="tiny">{{.Job.Grams}} grams a note · jar {{if .Seq}}{{.Seq.Remaining}}{{end}}</p>{{end}}
 
@@ -26,14 +26,15 @@
         <span class="kc-av">{{printf "%.1s" .Query}}</span>
         <div class="kc-who">
           <strong>{{.Query}}</strong>
-          <div class="tiny">Same secret on both sides. Desk stores boxes only.</div>
+          <div class="tiny">Same secret on both sides. Desk stores ciphertext only.</div>
         </div>
         <label class="sr" for="tgSecret">Secret</label>
         <input id="tgSecret" type="password" placeholder="shared secret" autocomplete="off" style="max-width:180px;min-height:36px" />
       </header>
       <div class="kc-msgs" id="tgMsgs">
         {{range .Notes}}
-        <div class="kc-bubble" data-nonce="{{.Nonce}}" data-box="{{.Box}}" data-from="{{.From}}" data-when="{{.When}}" data-grams="{{.Grams}}">
+        <div class="kc-bubble" data-nonce="{{.Nonce}}" data-box="{{.Box}}" data-when="{{.When}}" data-grams="{{.Grams}}">
+          <div class="tg-who tiny" hidden></div>
           <div class="tg-plain tiny">locked</div>
           <div class="tiny">{{.When}} · {{.Grams}} g</div>
         </div>

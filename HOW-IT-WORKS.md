@@ -21,22 +21,16 @@ GET /name/example.kas
 
 You get owner, pay URI, records, evidence tag `indexer`.
 
-## 2. A name, after Toccata (not deployed)
+## 2. A name on Toccata (kasdomain, live)
 
-Toccata made covenants real (KIP-16/17/20/21). A Name *can* be a UTXO whose script is `KasName.sil`:
+Toccata made covenants real ([KIP-16/17/20/21](https://github.com/kaspanet/kips), Active). A name *is* a UTXO whose script is `KasName.sil`:
 
-- `owner`, `labelHash`, `kasPkh`, `vaultCommit`
-- entries: `setKas`, `bindVault`, `transfer`
+- `label`, `claimed`, `owner` — own UTXO only (`validateOutputState`)
+- entries: `claim()`, `transfer()`
 
-That UTXO is unique because its **outpoint** is unique (KIP-20 `covenant_id` = BLAKE2b of that outpoint). It is **not** unique because the label is `alice`. Anyone can genesis another covenant and write the same label. Nodes accept both.
+That UTXO is unique because its **outpoint** is unique (KIP-20 `covenant_id`). It is **not** unique because the string is `alice`. Anyone can genesis another covenant and write the same label. Nodes accept both. First funded P2SH at this template+label is the name this desk treats as live.
 
-So a real naming product still needs one of:
-
-1. A **root registrar** that is the only minter of global `.kas` children, or
-2. **Parent-issued subnames** (`pay.shop.kas` only by `shop.kas`), or
-3. A **based ZK set** on a KIP-21 lane with a proof the name was free.
-
-This app compiles `KasName.sil`. It does not submit the registrar.
+There is no root registrar and no DNS subname tree. Dots in a label (`opus.dei.kas`) are one name, one lock.
 
 ## 3. Web4.0 loop (agent)
 

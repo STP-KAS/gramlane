@@ -114,8 +114,14 @@ func TestChoicesMarksShop(t *testing.T) {
 	if FromPath("/bakery.kas") != "bakery.kas" || FromPath("/s/bakery.kas") != "bakery.kas" {
 		t.Fatal(FromPath("/bakery.kas"), FromPath("/s/bakery.kas"))
 	}
-	if FromHost("gramlane.bakery.kas:8081") != "bakery.kas" {
-		t.Fatal(FromHost("gramlane.bakery.kas:8081"))
+	if FromHost("bakery.kas:8081") != "bakery.kas" {
+		t.Fatal(FromHost("bakery.kas:8081"))
+	}
+	if FromHost("opus.dei.kas:8081") != "opus.dei.kas" {
+		t.Fatal(FromHost("opus.dei.kas:8081"))
+	}
+	if FromPath("/opus.dei.kas") != "opus.dei.kas" {
+		t.Fatal(FromPath("/opus.dei.kas"))
 	}
 	if PagePath("bakery") != "/bakery.kas" {
 		t.Fatal(PagePath("bakery"))

@@ -2,6 +2,7 @@ pragma silverscript ^0.1.0;
 
 // Compiled with official silverc v1-rc1
 // https://github.com/kaspanet/silverscript/releases/tag/v1-rc1
+// Official list: https://github.com/kaspanet/silverscript/releases — only v1-rc1 as of 5 Sep 2026. Not master.
 //
 // WorkCredit is a prepaid *work voucher*, not a dollar.
 // 1 credit = 1 gram of named-lane mass (KIP-21 compute/storage/transient).

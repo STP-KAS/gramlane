@@ -2,14 +2,19 @@ package jobs
 
 import "testing"
 
-func TestResolveJobIs12000Grams(t *testing.T) {
+func TestResolveJobIsFloorGrams(t *testing.T) {
 	j, ok := Get("resolve")
-	if !ok || j.Grams != 12_000 {
+	if !ok || j.Grams != Floor {
 		t.Fatalf("%+v", j)
 	}
 	q, err := QuoteJob(j)
-	if err != nil || q.USD != "not quoted" || q.KAS != 0.012 {
+	if err != nil || q.USD != "not quoted" || q.KAS != 0.001 {
 		t.Fatalf("%v %+v", err, q)
+	}
+	for _, c := range Catalog {
+		if c.Grams != Floor {
+			t.Fatalf("%s %d", c.ID, c.Grams)
+		}
 	}
 }
 
@@ -38,8 +43,11 @@ func TestFits(t *testing.T) {
 	if len(f) < 2 {
 		t.Fatalf("%d", len(f))
 	}
-	if Fits(4_000) != nil && len(Fits(4_000)) != 0 {
-		t.Fatal("under heartbeat")
+	if len(Fits(Floor-1)) != 0 {
+		t.Fatal("under floor")
+	}
+	if len(Fits(Floor)) != len(Catalog) {
+		t.Fatalf("floor fits %d want %d", len(Fits(Floor)), len(Catalog))
 	}
 }
 

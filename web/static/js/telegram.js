@@ -64,19 +64,52 @@
     return new TextDecoder().decode(pt);
   }
 
+  function showPayload(el, raw) {
+    var line = el.querySelector(".tg-plain");
+    var who = el.querySelector(".tg-who");
+    var text = raw;
+    var from = "";
+    try {
+      var o = JSON.parse(raw);
+      if (o && typeof o.t === "string") {
+        text = o.t;
+        from = typeof o.f === "string" ? o.f : "";
+      }
+    } catch (_) {}
+    if (line) line.textContent = text;
+    if (who) {
+      if (from) {
+        who.hidden = false;
+        who.textContent = from;
+      } else {
+        who.hidden = true;
+        who.textContent = "";
+      }
+    }
+  }
+
   async function paint() {
     var pass = secret();
     document.querySelectorAll(".kc-bubble[data-box]").forEach(async function (el) {
       var line = el.querySelector(".tg-plain");
+      var who = el.querySelector(".tg-who");
       if (!line) return;
       if (!pass) {
         line.textContent = "locked — type the shared secret";
+        if (who) {
+          who.hidden = true;
+          who.textContent = "";
+        }
         return;
       }
       try {
-        line.textContent = await openBox(pass, room, el.getAttribute("data-nonce"), el.getAttribute("data-box"));
+        showPayload(el, await openBox(pass, room, el.getAttribute("data-nonce"), el.getAttribute("data-box")));
       } catch (_) {
         line.textContent = "wrong secret";
+        if (who) {
+          who.hidden = true;
+          who.textContent = "";
+        }
       }
     });
   }
@@ -102,7 +135,7 @@
       if (!text) return;
       var from = (fromEl && (fromEl.value || fromEl.textContent) ? fromEl.value || fromEl.textContent : "").trim();
       try {
-        var sealed = await seal(pass, room, text);
+        var sealed = await seal(pass, room, JSON.stringify({ t: text, f: from }));
         var res = await fetch("/api/telegram", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
