@@ -62,8 +62,7 @@
         {"name": "@Kaspa_Commons", "url": "https://x.com/Kaspa_Commons", "chip": "community", "note": "Relays Discord. Not core."},
         {"name": "@StppStp", "url": "https://x.com/StppStp", "chip": "this", "note": "This project. Never DMs you."},
         {"name": "@elldeeone", "url": "https://x.com/elldeeone", "chip": "ss", "note": "Luke Dunshea. GitHub elldeeone. v1-rc1 credit. Groth16 PR 138."},
-        {"name": "@manyfest_", "url": "https://x.com/manyfest_", "chip": "ss", "note": "Sivan Helfer. GitHub Manyfestation. Compiler + KCC-0020."},
-        {"name": "@parker2017", "url": "https://x.com/parker2017", "chip": "explained", "note": "kaspaexplained.com / parker2017code."}
+        {"name": "@manyfest_", "url": "https://x.com/manyfest_", "chip": "ss", "note": "Sivan Helfer. GitHub Manyfestation. Compiler + KCC-0020."}
       ]
     },
     {
@@ -147,7 +146,7 @@
       "id": "intel-people",
       "title": "Extra people (intel pack)",
       "rows": [
-        {"name": "@parker2017", "url": "https://x.com/parker2017", "chip": "explained", "note": "kaspaexplained.com / parker2017code."},
+        {"name": "parker2017code/kaspa-explained", "url": "https://github.com/parker2017code/kaspa-explained", "chip": "explained", "note": "Site source for kaspaexplained.com."},
         {"name": "progdoc.izio.fr", "url": "https://progdoc.izio.fr", "chip": "izio", "note": "IzioDev programmability tree."},
         {"name": "kas-smiths.org", "url": "https://kas-smiths.org", "chip": "workshop", "note": "Manyfestation KCC workshop. Not a KIP."},
         {"name": "portrait.kaspa-kii.org", "url": "https://portrait.kaspa-kii.org", "chip": "testnet", "note": "Canonical Portrait site. Opaque paste URLs 404."},
