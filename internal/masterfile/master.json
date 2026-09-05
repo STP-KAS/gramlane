@@ -155,6 +155,32 @@
         {"name": "Knitser", "url": "https://github.com/kaspanet/kccs/issues/14", "chip": "kccs", "note": "Issue #14 + KCC-0021."},
         {"name": "biryukovmaxim", "url": "https://github.com/biryukovmaxim", "chip": "vprogs", "note": "vProgs + rusty Toccata cleanup."}
       ]
+    },
+    {
+      "id": "corpus-jul2026",
+      "title": "Discord Kaspa dump (cut 26 Jul 2026)",
+      "rows": [
+        {"name": "CAT Protocol", "url": "https://catprotocol.org/", "chip": "covenants", "note": "Ori in #covenants: token uniqueness via parent UTXO. Later: KIP-20."},
+        {"name": "silverscript#122", "url": "https://github.com/kaspanet/silverscript/issues/122", "chip": "discord", "note": "OpCheckSigFromStack + OpZkPrecompile builtins. Discord → issue."},
+        {"name": "workshop-london-2026", "url": "https://github.com/IzioDev/workshop-london-2026", "chip": "izio", "note": "IzioDev: use TN10, not TN12."},
+        {"name": "kaspa-rest-server", "url": "https://github.com/lAmeR1/kaspa-rest-server", "chip": "indexer", "note": "#explorer-and-rest-api."},
+        {"name": "KaspaNodeMonitor", "url": "https://github.com/imalfect/KaspaNodeMonitor", "chip": "ops", "note": "#ecosystem-projects."},
+        {"name": "kaspa-transaction-report", "url": "https://github.com/coderofstuff/kaspa-transaction-report", "chip": "wallet", "note": "Tax CSV. Discord demand."},
+        {"name": "kaspa.org/contributors", "url": "https://kaspa.org/contributors/", "chip": "people", "note": "#who-what-where + rusty-kaspa graphs."},
+        {"name": "kastle", "url": "https://github.com/forbole/kastle", "chip": "wallet", "note": "Inject wallet. Not a clone target."},
+        {"name": "kasplex indexer", "url": "https://github.com/kasplex/indexer-executor", "chip": "l2", "note": "#layer-2s. Out of Gramlane path."}
+      ]
+    },
+    {
+      "id": "agenc-export",
+      "title": "Telegram ChatExport 2026-07-27 is AgenC, not kasparnd",
+      "rows": [
+        {"name": "tetsuo-ai/AgenC", "url": "https://github.com/tetsuo-ai/AgenC", "chip": "solana", "note": "Export title AGENC DEV. Not Kaspa R&D. Not integrated."},
+        {"name": "agenc-core", "url": "https://github.com/tetsuo-ai/agenc-core", "chip": "solana", "note": "Protocol bugs/PRs in that export."},
+        {"name": "agenc-protocol", "url": "https://github.com/tetsuo-ai/agenc-protocol", "chip": "solana", "note": "x402 / agent marketplace."},
+        {"name": "agenc-marketplace-agent-kit", "url": "https://github.com/tetsuo-ai/agenc-marketplace-agent-kit", "chip": "solana", "note": "Kit + MCP. Solana."},
+        {"name": "docs.agenc.tech", "url": "https://docs.agenc.tech", "chip": "solana", "note": "Their docs. Not a Kaspa pin."}
+      ]
     }
   ]
 }
