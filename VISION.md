@@ -1,38 +1,43 @@
-# Skip centralized stablecoins for dapps
+# Skip centralised stablecoins for dapps
 
-**project delusional.** A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. It is still a delusional idea.
+**project delusional.** A cheap L1 alternative to USDC-for-dApps. **Intelligent people should look.** It is still a delusional idea.
 
 Kaspa stays issuer-free. Gramlane does not mint a dollar and does not replace USDT. dApps invoice **work** in **grams** (KIP-21 mass). The named job stays the same number of grams when KAS moves. That is the cheap meter Circle does not give you on L1.
 
-Centralized stables can exist on L2. They do not sit in this path. No Tether mint. No Circle freeze. No FX cell in the fee.
+Centralised stables can exist on L2. They do not sit in this path. No Tether mint. No Circle freeze. No FX cell in the fee.
 
 ## The cheap thing (look here)
 
 USDC-for-dApps is easy because someone else is the bank. Grams are prepaid **work**. Fill is one Kaspa L1 tx. Jobs after that do not open Kasware. That is the experiment: **skip the bank, keep a boring bill.**
 
+## The threat
+
+Once a desk is a public URL, every fill is a Kaspa transaction to **that** PayTo. Grams live on **that** process’s `ledger.json`. One popular host is a centralisation hole. Not Circle. Also not Nakamoto.
+
 ## Fill is not Nakamoto for the jar
 
-Convert is a **meter**. Fill (`/spend`) is a **sale**: KAS to this desk’s `PayTo`. Grams land on **this process’s book** (`ledger.json`). Another host is another jar.
+Convert is a **meter**. Fill (`/spend`) is a **sale**: KAS to this desk’s `PayTo`. Grams land on **this process’s book**. Another host is another jar.
 
-| Who gets what on a fill | |
-| --- | --- |
-| **Miners (security budget)** | The **transaction fee** on that L1 send. Real Nakamoto. Tiny. |
-| **This desk** | The **amount** (0.5 KAS min). Operator inventory. Not a miner reward. |
-| **You** | Grams on this book. No convert-back. |
-
-Dumping the fill *amount* into miner fees would burn the cheap meter. Not worth it. The fee is the security budget; the amount is whoever **hosts**.
+| Who gets what on a fill | | Worth? |
+| --- | --- | --- |
+| **Miners (security budget)** | The **transaction fee** on that L1 send. Real Nakamoto. Tiny. | Yes. Kaspa has no other “security budget address.” |
+| **This desk** | The **amount** (0.5 KAS min). Operator inventory. | Yes — that is why someone hosts. |
+| **Dump amount as extra miner fee** | Burns the cheap meter. | **Not worth it.** |
+| **You** | Grams on this book. No convert-back. | The work tab. |
 
 ## Anyone can host (the actual decentralisation)
 
 Nakamoto consensus already runs on PCs (rusty-kaspa). It will **not** replicate this jar. Do not pretend `ledger.json` is GHOSTDAG.
 
-The same principle as a node: **the software is public; you run it.**
+The same principle as a node: **the software is public; you run it worldwide.**
 
 - PC: `.\gramlane.exe` — set `GRAMLANE_PAYTO` to *your* address, `PUBLIC_BASE` to *your* URL.
 - Phone: PWA of **that** host, not a second database. Kasware/Kastle sign the fill on L1.
 - Hardware: the wallet signs the fill tx. The desk is still a computer.
 
 Many hosts worldwide = many desks, many jars. That is **not** one global Circle. It is also **not** one global gram ledger. The L1 protection for grams is later `consume()` on WorkCredit — until then this book is one operator. That is the honest hole. The delusional bet: enough people run desks that dApp fees never need a USDC issuer.
+
+How: `/host`. Source: [STP-KAS/gramlane](https://github.com/STP-KAS/gramlane).
 
 ## Use it where the scarce thing is work, not rent
 
@@ -50,7 +55,7 @@ Vaults still lock KAS. Grams pay the **action**.
 
 - A dollar. A covenant cannot peg `$1`.
 - Nakamoto consensus for the jar.
-- A claim that miners take grams. They take KAS **fees**.
+- A claim that miners take the fill amount. They take KAS **fees**.
 - A claim that stables are banned.
 
-**One line:** skip centralized stablecoins for dapps.
+**One line:** skip centralised stablecoins for dapps. Intelligent people should look. Still a delusional idea.

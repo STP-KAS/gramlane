@@ -1,3 +1,5 @@
 # Copy to payto.txt (not committed). A kaspa: address that is NOT your Kasware login.
+# This is the FILL AMOUNT (host inventory). Miners already get the L1 fee —
+# that fee is Kaspa's security budget. Do not dump the amount into extra fees.
 # Kasware shows a high warning if the output is the current account.
 # kaspa:q...
