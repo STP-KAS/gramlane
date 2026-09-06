@@ -18,3 +18,7 @@ const FillAmount = "kaspa-growth-vault"
 
 // FillIsBusiness is false. Hosting is not how you collect convert KAS.
 const FillIsBusiness = false
+
+// FillBurnsKAS is false. Kaspa is PoW. Fill is a normal spendable UTXO plus a miner fee.
+// Grams on the book can burn. KAS is not destroyed.
+const FillBurnsKAS = false
