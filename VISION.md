@@ -1,6 +1,8 @@
-# Skip centralised stablecoins for dapps
+# project delusional
 
-**project delusional.** A cheap L1 alternative to USDC-for-dApps. **Intelligent people should look.** It is still a delusional idea.
+Kaspa master file. Ideas and principles. Still a delusional idea.
+
+One principle: skip centralised stablecoins for dapps. Cheap L1 grams instead of USDC-for-dApps. Not a dollar. Not an L2.
 
 Kaspa stays issuer-free. Gramlane does not mint a dollar and does not replace USDT. dApps invoice **work** in **grams** (KIP-21 mass). The named job stays the same number of grams when KAS moves. That is the cheap meter Circle does not give you on L1.
 
@@ -59,4 +61,4 @@ Vaults still lock KAS. Grams pay the **action**.
 - A claim that miners take the fill amount. They take KAS **fees**.
 - A claim that stables are banned.
 
-**One line:** skip centralised stablecoins for dapps. Intelligent people should look. Still a delusional idea.
+**Headline:** project delusional. **Brief:** Kaspa master file, ideas and principles. One principle: skip centralised stablecoins for dapps.
