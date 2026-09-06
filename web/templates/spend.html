@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   <h1>Fill the jar</h1>
-  <p class="lede">This is a sale, not a wrap. KAS leaves your wallet and pays this desk. You get prepaid grams on this desk’s book. No convert-back.</p>
+  <p class="lede">This is a sale, not a wrap. KAS pays this desk. Grams land on <em>this</em> book. Miners get the L1 <strong>fee</strong> (security budget), not the fill amount. Run your own host to be the desk. No convert-back. <a href="/vision">Vision</a></p>
   {{if .Seq}}<p class="tiny">In the jar: {{.Seq.Remaining}} grams · <a href="/jar">Book</a> · <a href="/pay">Pay</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 

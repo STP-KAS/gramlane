@@ -1,54 +1,42 @@
 {{template "header" .}}
 <main>
-  <h1>Vision</h1>
-  <p class="lede">Stable work price on L1, not a synthetic dollar. Jobs cost grams. KAS is the fallback.</p>
+  <h1>Skip centralized stablecoins for dapps</h1>
+  <p class="lede"><span class="chip">project delusional</span> A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. It is still a delusional idea.</p>
+  <p>dApps invoice <strong>work</strong> in grams (KIP-21 mass), not USD. Fill is one Kaspa tx. Jobs after that do not open Kasware. Centralized stables can sit on L2. They do not sit here.</p>
 
-  <h2>Use it where the scarce thing is work, not rent</h2>
+  <h2>Fill is not Nakamoto for the jar</h2>
+  <p class="lede">Convert is a meter. Fill is a sale to <span class="mono">this</span> desk. Grams live on this process’s book. Another host is another jar.</p>
+  <table>
+    <tr><th>On a fill</th><th>Who gets it</th></tr>
+    <tr><td>L1 <strong>fee</strong></td><td>Miners. That is Kaspa’s security budget. Real. Small.</td></tr>
+    <tr><td>L1 <strong>amount</strong></td><td>This desk’s PayTo. Operator inventory. Not a miner reward.</td></tr>
+    <tr><td>Grams</td><td>Your jar here. No convert-back.</td></tr>
+  </table>
+  <p class="tiny">Sending the fill amount to miners as extra fee would kill the cheap meter. Not worth it. The fee is the security contribution. The amount belongs to whoever hosts.</p>
+
+  <h2>Anyone can host</h2>
+  <p>Nakamoto already runs on PCs. It will not copy <span class="mono">ledger.json</span>. The public move is the same as a node: <strong>run the software</strong>.</p>
+  <ul>
+    <li>PC: <span class="mono">gramlane.exe</span> · set <span class="mono">GRAMLANE_PAYTO</span> to your address · <span class="mono">PUBLIC_BASE</span> to your URL.</li>
+    <li>Phone: PWA of <em>that</em> host. No second database. Wallet signs the fill on L1.</li>
+    <li>Hardware: the wallet signs. The desk is still a computer.</li>
+  </ul>
+  <p>Many hosts = many desks. Not one Circle. Also not one global gram ledger. L1 protection for grams is later <span class="mono">consume()</span> on WorkCredit. Until then this book is one operator. That hole is the idea. Source: <a href="https://github.com/STP-KAS/gramlane">STP-KAS/gramlane</a>.</p>
+
+  <h2>Use it where the scarce thing is work</h2>
   <table>
     <tr><th>Work</th><th>Grams pay</th><th>Grams are not</th></tr>
-    <tr><td>AI bots / HTTP 402</td><td>The sequenced call</td><td>The model, or the dollar the bot might later spend</td></tr>
-    <tr><td>Messaging postage</td><td>Inclusion of the envelope</td><td>The chat app, the plaintext, encryption</td></tr>
-    <tr><td>Data transfer</td><td>The pull or the write</td><td>The dataset’s market price</td></tr>
-    <tr><td>Vault operations</td><td>The bump, the pin, the spend path</td><td>The KAS locked in the vault</td></tr>
+    <tr><td>AI / HTTP 402</td><td>The call</td><td>The model, or a dollar</td></tr>
+    <tr><td>Postage / Telegram notes</td><td>The stamp</td><td>The chat app</td></tr>
+    <tr><td>Vault bump</td><td>The action</td><td>The locked KAS</td></tr>
   </table>
-  <p class="lede">Vaults still lock KAS. Grams pay the <strong>action</strong>.</p>
 
-  <div class="grid">
-    <article class="card">
-      <h3>402 / agent</h3>
-      <p>Ask the agent. Grok if a key is set; local tools if not. Grams pay the call.</p>
-      <a class="btn ghost" href="/agent">Open agent</a>
-    </article>
-    <article class="card">
-      <h3>Postage</h3>
-      <p>Stamp a sequenced envelope. Not KaChat. Not broadcast.</p>
-      <a class="btn ghost" href="/postage">Open postage</a>
-    </article>
-    <article class="card">
-      <h3>.kas site</h3>
-      <p>Build a page from a live name. Link-in-bio from indexer texts, not IPFS.</p>
-      <a class="btn ghost" href="/site">Open builder</a>
-    </article>
-    <article class="card">
-      <h3>Vault bump</h3>
-      <p>Grams pay the framing action. The vault still locks KAS. Worked #234.</p>
-      <a class="btn ghost" href="/vault">Open vault</a>
-    </article>
-  </div>
-
-  <h2>What this is not</h2>
-  <ul>
-    <li>A unit of account for humans — nobody prices coffee in grams.</li>
-    <li>A savings asset — credits are inventory of work, not a store of value.</li>
-    <li>A claim that “stables are banned.” Liquidity will still touch USDT off to the side. Gramlane just refuses to make that the meter.</li>
-  </ul>
-  <p class="lede">A Toccata covenant can conserve grams. It cannot peg $1. The operator who sold the voucher ate the KAS inventory. That is a business, not a mint.</p>
-
-  {{if .Seq}}<p class="lede">Prepaid now: <strong class="mono">{{.Seq.Remaining}}</strong> / {{.Seq.Credits}} grams{{if .Seq.OnChain}} · voucher UTXO on L1{{end}}. Jobs burn grams. USD is not quoted.</p>{{end}}
-
-  <p class="row">
-    <a class="btn mint" href="/desk">Open the desk</a>
-    <a class="btn ghost" href="/honest">Claims</a>
+  <p class="lede">One line: <strong>skip centralized stablecoins for dapps.</strong></p>
+  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} / {{.Seq.Credits}} g · desk <span class="mono">{{.PayTo}}</span></p>{{end}}
+  <p class="actions">
+    <a class="btn mint" href="/spend">Fill the jar</a>
+    <a class="btn ghost" href="/convert">Meter</a>
+    <a class="btn ghost" href="/honest">Honest</a>
     <a class="btn ghost" href="/why">Why</a>
   </p>
 </main>

@@ -14,6 +14,7 @@ import (
 	"gramlane/internal/agent"
 	"gramlane/internal/appenv"
 	"gramlane/internal/desk"
+	"gramlane/internal/ethos"
 	"gramlane/internal/feedback"
 	"gramlane/internal/framing"
 	"gramlane/internal/genesis"
@@ -212,7 +213,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/safety", func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, "safety.html", page{Title: "Safety · Gramlane", Active: "safety"})
 	})
-	mux.HandleFunc("/vision", s.whyPage)
+	mux.HandleFunc("/vision", s.visionPage)
 	mux.HandleFunc("/explain", s.whyPage)
 	mux.HandleFunc("/idea", s.whyPage)
 	mux.HandleFunc("/why", s.whyPage)
@@ -246,7 +247,8 @@ func (s *Server) Handler() http.Handler {
 		writeJSON(w, 200, map[string]any{
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
-			"vision":         "stable work price on L1, not a synthetic dollar",
+			"vision":         ethos.Vision,
+			"visionLine":     ethos.Line,
 			"products":       []string{"kasdomain", "shop", "spend", "pos", "vault", "postage", "agent", "site", "convert", "jar"},
 			"nameSettle":     "kas",
 			"tillUnit":       "gram",
@@ -348,6 +350,10 @@ func (s *Server) jarPage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) whyPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "why.html", page{Title: "Why · Gramlane", Active: "why"})
+}
+
+func (s *Server) visionPage(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "vision.html", page{Title: ethos.Vision + " · Gramlane", Active: "why", PayTo: desk.PayTo()})
 }
 
 func (s *Server) desk(w http.ResponseWriter, r *http.Request) {
