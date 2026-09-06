@@ -20,9 +20,10 @@ Convert is a **meter**. Fill (`/spend`) is **not a business**. Grams land on **t
 
 | Who gets what on a fill | | Worth? |
 | --- | --- | --- |
-| **Miners (fee market)** | As much as Kasware allows (fee must stay smaller than the output). ~half on a 1 KAS fill. | Yes. That is Kaspa’s security budget. |
-| **Kaspa growth vault** | The leftover output Kasware still requires. Same vault as name mint. | Not this desk. |
-| **This desk** | **0 KAS.** | Hosting is not how you collect convert coins. |
+| **Any Kaspa wallet** | Sends the fill amount to Kaspa growth (QR / `kaspa:` URI / paste txid). | Universal path. |
+| **Kasware / Kastle in this tab** | Optional one-click of that same send. | Not required. Not iOS Kasware. |
+| **Miners** | Whatever network fee that wallet attaches. Cannot set from a QR. | Security budget. Small. |
+| **This desk** | **0 KAS.** | Not a business. |
 | **You** | Grams on this book. No convert-back. | The work tab. |
 
 ## Anyone can host (the actual decentralisation)

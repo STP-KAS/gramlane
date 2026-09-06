@@ -448,12 +448,13 @@ func (s *Server) spendPage(w http.ResponseWriter, r *http.Request) {
 	if n, err := strconv.ParseUint(r.FormValue("pct"), 10, 64); err == nil {
 		pct = n
 	}
-	p := page{Title: "Fill the jar · Gramlane", Active: "jar", Query: total, PayTo: desk.PayTo()}
+	p := page{Title: "Fill the jar · Gramlane", Active: "jar", Query: total, PayTo: names.VaultAddress()}
 	a, err := quote.SetAside(total, pct)
 	if err != nil {
 		p.Error = err.Error()
 	} else {
 		p.Aside = &a
+		p.PayURL = quote.URI(names.VaultAddress(), a.PaySompi)
 	}
 	if r.Method == http.MethodPost {
 		tx := strings.TrimSpace(r.FormValue("payment"))
@@ -563,6 +564,23 @@ func (s *Server) counterPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) qrPNG(w http.ResponseWriter, r *http.Request) {
+	if to := strings.TrimSpace(r.URL.Query().Get("to")); strings.HasPrefix(to, "kaspa:") {
+		sompi, _ := strconv.ParseUint(strings.TrimSpace(r.URL.Query().Get("sompi")), 10, 64)
+		u := quote.URI(to, sompi)
+		if u == "" {
+			http.Error(w, "pay uri", 400)
+			return
+		}
+		png, err := qrcode.Encode(u, qrcode.Medium, 256)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.Header().Set("Content-Type", "image/png")
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = w.Write(png)
+		return
+	}
 	id := strings.TrimPrefix(r.URL.Path, "/qr/")
 	id = strings.TrimSuffix(id, ".png")
 	var u string
@@ -641,11 +659,12 @@ func (s *Server) job(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	q, err := jobs.QuoteJob(j)
-	p := page{Title: j.Name + " · Gramlane", Active: "apps", Job: &j, Query: r.URL.Query().Get("q"), PayTo: desk.PayTo()}
+	p := page{Title: j.Name + " · Gramlane", Active: "apps", Job: &j, Query: r.URL.Query().Get("q"), PayTo: names.VaultAddress()}
 	if err != nil {
 		p.Error = err.Error()
 	} else {
 		p.Quote = &q
+		p.PayURL = quote.URI(names.VaultAddress(), q.PaySompi)
 	}
 	s.render(w, "job.html", p)
 }

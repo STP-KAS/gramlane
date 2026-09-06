@@ -4,7 +4,7 @@
 
 **Skip centralised stablecoins for dapps.** A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. Still a delusional idea.
 
-A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Fill is **not a business**: this desk keeps 0. Converter does not get the KAS back. Leftover output is Kaspa growth (Kasware still needs an output). The rest is miner fee. Anyone can run this binary worldwide (`/host`). The jar is not Nakamoto. Vaults still lock KAS; grams pay the action.
+A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Fill is **not a business**: this desk keeps 0. Pay from **any Kaspa wallet** (QR / `kaspa:` URI / paste txid). In-page one-click is only Kasware or Kastle. Amount goes to Kaspa growth. Anyone can run this binary worldwide (`/host`). The jar is not Nakamoto. Vaults still lock KAS; grams pay the action.
 
 Sister dApp (when the invoice really is money):  
 `C:\Users\Remco\Documents\kaspa\superappstablesalternative` — Kaspa Till on `:8082`.
