@@ -255,6 +255,7 @@ func (s *Server) Handler() http.Handler {
 			"securityBudget": ethos.SecurityBudget,
 			"fillAmount":     ethos.FillAmount,
 			"fillIsBusiness": ethos.FillIsBusiness,
+			"fillBurnsKas":   ethos.FillBurnsKAS,
 			"payTo":          desk.PayTo(),
 			"host":           "/host",
 			"products":       []string{"kasdomain", "shop", "spend", "pos", "vault", "postage", "agent", "site", "convert", "jar"},

@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   <h1>Fill the jar</h1>
-  <p class="lede">Not a business. Send KAS from <strong>any Kaspa wallet</strong> — phone, desktop, hardware. This desk keeps 0. Grams land on this book. No convert-back. <a href="/wallets">Wallets</a> · <a href="/host">Host</a></p>
+  <p class="lede">Not a business. <strong>No KAS is burned.</strong> Kaspa is PoW, not PoS — fill is a normal spendable UTXO plus the miner fee your wallet already pays. Grams land on this book. No convert-back. <a href="/wallets">Wallets</a> · <a href="/host">Host</a></p>
   {{if .Seq}}<p class="tiny">In the jar: {{.Seq.Remaining}} grams · <a href="/jar">Book</a> · <a href="/pay">Pay</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
@@ -37,7 +37,7 @@
 
   <div class="card" style="margin:18px 0">
     <h3>Any Kaspa wallet</h3>
-    <p class="lede">Pay <strong>{{.Aside.PayKASText}} KAS</strong> to Kaspa growth (not this desk). Kaspium, Kastle, Tangem, Kaspa NG, OneKey, Zelcore, Ledger/KasVault, web wallet — if it can send KAS, it works. Miners get whatever network fee <em>your</em> wallet attaches. We cannot set that fee from a QR.</p>
+    <p class="lede">Pay <strong>{{.Aside.PayKASText}} KAS</strong> to a <em>spendable</em> Kaspa address (growth vault — not this desk, not a burn). Kaspium, Kastle, Tangem, Kaspa NG, OneKey, Zelcore, Ledger/KasVault, web wallet — if it can send KAS, it works. Miners get the network fee your wallet already attaches. That fee is PoW pay, still spendable KAS in the miner’s wallet.</p>
     <label for="pay-to">Send to</label>
     <input class="mono" id="pay-to" value="{{.Vault}}" readonly />
     {{if .PayURL}}
@@ -73,8 +73,10 @@
 
   <h2>What this is not</h2>
   <ul>
+    <li>A KAS burn. The output is a live <span class="mono">kaspa:q…</span> UTXO. The miner fee is PoW pay to miners. Nothing is destroyed. Grams on the book can burn; KAS does not.</li>
+    <li>PoS lockup. Kaspa is proof of work.</li>
     <li>We do not inject Tangem, Kaspium, Ledger Live, Zelcore, OKX, KasKeeper, … Those wallets send to the address. That is enough.</li>
-    <li>We cannot dump the convert amount into the miner fee from a <span class="mono">kaspa:</span> URI. Your wallet chooses its own fee. The amount goes to Kaspa growth.</li>
+    <li>We cannot dump the convert amount into extra miner fees from a <span class="mono">kaspa:</span> URI. Your wallet chooses its own fee. The amount stays a spendable UTXO at Kaspa growth.</li>
     <li>This desk gets 0 KAS. Hosting is not a till.</li>
   </ul>
   <p class="lede">Not USDT. Not a wrap. <a href="/pay">Pay</a> · <a href="/app">Phone</a></p>

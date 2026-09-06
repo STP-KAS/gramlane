@@ -20,9 +20,9 @@ Convert is a **meter**. Fill (`/spend`) is **not a business**. Grams land on **t
 
 | Who gets what on a fill | | Worth? |
 | --- | --- | --- |
-| **Any Kaspa wallet** | Sends the fill amount to Kaspa growth (QR / `kaspa:` URI / paste txid). | Universal path. |
+| **Any Kaspa wallet** | Sends the fill amount to a **spendable** Kaspa growth UTXO (QR / `kaspa:` URI / paste txid). | Not a burn. |
 | **Kasware / Kastle in this tab** | Optional one-click of that same send. | Not required. Not iOS Kasware. |
-| **Miners** | Whatever network fee that wallet attaches. Cannot set from a QR. | Security budget. Small. |
+| **Miners** | The wallet’s own PoW network fee. Still KAS they can spend. | Security budget. Not destroyed. |
 | **This desk** | **0 KAS.** | Not a business. |
 | **You** | Grams on this book. No convert-back. | The work tab. |
 
