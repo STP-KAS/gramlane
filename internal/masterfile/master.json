@@ -1,9 +1,18 @@
 {
   "title": "Kaspa master file",
   "repo": "https://github.com/STP-KAS/kaspa-master-file",
-  "updated": "2026-09-05",
+  "updated": "2026-09-06",
   "disclaimer": "Not Kaspa core. Not official KNS. @StppStp. Merged Active KIP is law. Open PR is not.",
   "sections": [
+    {
+      "id": "vision",
+      "title": "Gramlane vision",
+      "rows": [
+        {"name": "skip centralised stablecoins for dapps", "url": "https://github.com/STP-KAS/gramlane", "chip": "delusional", "note": "Cheap L1 grams vs USDC-for-dApps. Intelligent people should look. Still a delusional idea."},
+        {"name": "Fill fee = miners", "url": "https://github.com/STP-KAS/gramlane", "chip": "security", "note": "Kaspa’s security budget is the L1 fee. The fill amount is whoever hosts. Dumping the amount to miners is not worth it."},
+        {"name": "Anyone hosts", "url": "https://github.com/STP-KAS/gramlane", "chip": "host", "note": "Same principle as a node: PC binary, PWA of that host, hardware signs the fill. Many desks ≠ Circle. The jar is not Nakamoto."}
+      ]
+    },
     {
       "id": "sites",
       "title": "Official sites",
@@ -86,7 +95,7 @@
         {"name": "OpenSilver", "url": "https://github.com/trillskillz/OpenSilver", "chip": "community", "note": "22 SilverScript patterns. Not kaspanet. Not audited."},
         {"name": "kaspa-pqv", "url": "https://github.com/aglov413/kaspa-pqv", "chip": "TN10", "note": "Posted Core R&D 27 Aug. Hash-based PQ vault. Unaudited."},
         {"name": "Argent", "url": "https://github.com/argent-lang/argent", "chip": "external", "note": "Not this desk."},
-        {"name": "gramlane", "url": "https://github.com/STP-KAS/gramlane", "chip": "this", "note": "L1 grams dApp."},
+        {"name": "gramlane", "url": "https://github.com/STP-KAS/gramlane", "chip": "this", "note": "skip centralised stablecoins for dapps. Cheap grams. Still delusional."},
         {"name": "KaChat", "url": "https://github.com/vsmirn0v/KaChat", "chip": "other", "note": "Not cloned."},
         {"name": "coderofstuff dk-wiki", "url": "https://github.com/coderofstuff/dk-wiki", "chip": "wrong", "note": "Unofficial. Not a pin."}
       ]

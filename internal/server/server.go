@@ -214,6 +214,8 @@ func (s *Server) Handler() http.Handler {
 		s.render(w, "safety.html", page{Title: "Safety · Gramlane", Active: "safety"})
 	})
 	mux.HandleFunc("/vision", s.visionPage)
+	mux.HandleFunc("/host", s.hostPage)
+	mux.HandleFunc("/run-a-desk", s.hostPage)
 	mux.HandleFunc("/explain", s.whyPage)
 	mux.HandleFunc("/idea", s.whyPage)
 	mux.HandleFunc("/why", s.whyPage)
@@ -249,6 +251,11 @@ func (s *Server) Handler() http.Handler {
 			"unit": "gram", "l2": false, "stablecoin": false,
 			"vision":         ethos.Vision,
 			"visionLine":     ethos.Line,
+			"jarNakamoto":    ethos.JarIsNakamoto,
+			"securityBudget": ethos.SecurityBudget,
+			"fillAmount":     "host-payto",
+			"payTo":          desk.PayTo(),
+			"host":           "/host",
 			"products":       []string{"kasdomain", "shop", "spend", "pos", "vault", "postage", "agent", "site", "convert", "jar"},
 			"nameSettle":     "kas",
 			"tillUnit":       "gram",
@@ -354,6 +361,10 @@ func (s *Server) whyPage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) visionPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "vision.html", page{Title: ethos.Vision + " · Gramlane", Active: "why", PayTo: desk.PayTo()})
+}
+
+func (s *Server) hostPage(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "host.html", page{Title: "Host a desk · Gramlane", Active: "why", PayTo: desk.PayTo()})
 }
 
 func (s *Server) desk(w http.ResponseWriter, r *http.Request) {

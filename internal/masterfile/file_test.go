@@ -7,9 +7,12 @@ func TestLiveHasKIP21AndDiscord(t *testing.T) {
 	if f.Title == "" || f.Updated == "" || len(f.Sections) < 4 {
 		t.Fatalf("%+v", f)
 	}
-	var kip, disc, tg bool
+	var kip, disc, tg, vision bool
 	for _, s := range f.Sections {
 		for _, r := range s.Rows {
+			if r.Name == "skip centralised stablecoins for dapps" {
+				vision = true
+			}
 			if r.Name == "KIP-21" {
 				kip = true
 			}
@@ -21,7 +24,7 @@ func TestLiveHasKIP21AndDiscord(t *testing.T) {
 			}
 		}
 	}
-	if !kip || !disc || !tg {
-		t.Fatalf("kip=%v disc=%v tg=%v", kip, disc, tg)
+	if !kip || !disc || !tg || !vision {
+		t.Fatalf("kip=%v disc=%v tg=%v vision=%v", kip, disc, tg, vision)
 	}
 }

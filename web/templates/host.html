@@ -1,0 +1,48 @@
+{{template "header" .}}
+<main>
+  <h1>Host a desk</h1>
+  <p class="lede"><span class="chip">project delusional</span> Same principle as a Kaspa node: anyone can run this. Not Nakamoto for the jar. <a href="/vision">Vision</a></p>
+
+  <h2>Why this page exists</h2>
+  <p>Once a desk is public, every convert/fill is a Kaspa L1 tx to that host’s PayTo. Grams live on that host’s book. One popular URL is a centralisation threat. The honest fix that ships today is not “send the KAS to miners.” It is: <strong>run your own</strong>, on a PC, with a hardware wallet signing the fill, and a phone talking to <em>your</em> URL.</p>
+
+  <h2>What is worth (security budget)</h2>
+  <table>
+    <tr><th>Piece</th><th>Who</th><th>Worth?</th></tr>
+    <tr><td>L1 fee on the fill</td><td>Miners</td><td>Yes. This is Kaspa’s security budget. Already happens.</td></tr>
+    <tr><td>L1 amount</td><td>Whoever set <span class="mono">GRAMLANE_PAYTO</span></td><td>Yes. Inventory for hosting. That is the join-in.</td></tr>
+    <tr><td>Dump the amount into extra miner fees</td><td>Miners</td><td>Not worth it. The cheap meter dies. Kaspa has no treasury address for “security.”</td></tr>
+  </table>
+  <p class="tiny">Name minting is a different split: 50% funds the name, 50% Kaspa growth vault. Fill is not that. Fill is fee → miners, amount → host.</p>
+
+  <h2>PC</h2>
+  <pre>cd C:\Users\Remco\Documents\kaspa\superapp
+$env:GRAMLANE_PAYTO = "kaspa:q…"   # your address, not the login you fill from
+$env:PUBLIC_BASE = "https://your.example"   # the URL phones will use
+$env:GRAMLANE_ADDR = "0.0.0.0:8081"         # optional; default is 127.0.0.1:8081
+go test ./...
+go build -o gramlane.exe ./cmd/gramlane
+.\gramlane.exe</pre>
+  <p>Or write the address in <span class="mono">payto.txt</span> (not committed). Another host is another <span class="mono">ledger.json</span>. Copying this exact process does not merge jars.</p>
+
+  <h2>Phone</h2>
+  <p>Install the PWA of <em>that</em> host. iPhone: Safari → Share → Add to Home Screen. Android: Chrome → Install app. Needs https. The phone does not hold a second gram book. <a href="/app">Phone steps</a></p>
+
+  <h2>Hardware</h2>
+  <p>A hardware wallet (KasVault / Ledger path) signs the fill tx on L1. The desk is still a computer running this binary. Signing is not hosting.</p>
+
+  <h2>What this is not</h2>
+  <ul>
+    <li>Nakamoto consensus for grams. That is later <span class="mono">consume()</span> on WorkCredit.</li>
+    <li>One global Circle-style issuer. Many desks ≠ one issuer. Many desks ≠ one ledger.</li>
+    <li>A claim that miners take the fill amount.</li>
+  </ul>
+  <p class="lede">One line: <strong>skip centralised stablecoins for dapps.</strong> Intelligent people should look. Still a delusional idea.</p>
+  <p class="tiny">This desk PayTo: <span class="mono">{{.PayTo}}</span></p>
+  <p class="actions">
+    <a class="btn mint" href="/spend">Fill this jar</a>
+    <a class="btn ghost" href="/vision">Vision</a>
+    <a class="btn ghost" href="https://github.com/STP-KAS/gramlane">Source</a>
+  </p>
+</main>
+{{template "footer" .}}

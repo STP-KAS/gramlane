@@ -2,9 +2,9 @@
 
 **project delusional** · [@StppStp](https://x.com/StppStp)
 
-**Skip centralized stablecoins for dapps.** A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. Still a delusional idea.
+**Skip centralised stablecoins for dapps.** A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. Still a delusional idea.
 
-A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Fill is one L1 tx: miners get the fee; the amount is whoever hosts. Anyone can run this binary. Vaults still lock KAS; grams pay the action.
+A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Fill is one L1 tx: miners get the **fee** (Kaspa’s security budget); the amount is whoever hosts. Dumping the amount to miners is not worth it — it kills the cheap meter. Anyone can run this binary worldwide (`/host`). The jar is not Nakamoto. Vaults still lock KAS; grams pay the action.
 
 Sister dApp (when the invoice really is money):  
 `C:\Users\Remco\Documents\kaspa\superappstablesalternative` — Kaspa Till on `:8082`.
@@ -53,6 +53,8 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/kachat` | KaChat: resolve a name, postage, pay that wallet |
 | `/apps` | Apps: KaChat, vault, agent, site, jobs |
 | `/convert` | KAS ↔ grams at policy 100 sompi/gram. Not a KCC-20 |
+| `/vision` | Skip centralised stablecoins for dapps |
+| `/host` | Anyone runs this binary. Fill amount is the host. Fee is miners. |
 | `/desk` | Job catalog in GRAM |
 | `/job/resolve` | Quote + burn prepaid grams |
 | `/api/run?job=dag` | Burns prepaid grams; 402 only after inventory is spent |
@@ -67,7 +69,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | File | What |
 | --- | --- |
-| [VISION.md](VISION.md) | Skip centralized stablecoins for dapps |
+| [VISION.md](VISION.md) | Skip centralised stablecoins for dapps |
 | [DIFF-MAP.md](DIFF-MAP.md) | Live / local / wrong |
 | [HOW-IT-WORKS.md](HOW-IT-WORKS.md) | Stack |
 | [WORK-CREDITS.md](WORK-CREDITS.md) | Why grams, not USD |

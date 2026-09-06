@@ -1,27 +1,31 @@
 {{template "header" .}}
 <main>
-  <h1>Skip centralized stablecoins for dapps</h1>
-  <p class="lede"><span class="chip">project delusional</span> A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. It is still a delusional idea.</p>
-  <p>dApps invoice <strong>work</strong> in grams (KIP-21 mass), not USD. Fill is one Kaspa tx. Jobs after that do not open Kasware. Centralized stables can sit on L2. They do not sit here.</p>
+  <h1>Skip centralised stablecoins for dapps</h1>
+  <p class="lede"><span class="chip">project delusional</span> A cheap L1 alternative to USDC-for-dApps. <strong>Intelligent people should look.</strong> It is still a delusional idea.</p>
+  <p>dApps invoice <strong>work</strong> in grams (KIP-21 mass), not USD. Fill is one Kaspa tx. Jobs after that do not open Kasware. Centralised stables can sit on L2. They do not sit here.</p>
+
+  <h2>The threat (one public host)</h2>
+  <p class="lede">After this desk is on a URL, every fill is a Kaspa L1 transaction to <span class="mono">this</span> PayTo. Grams land on this process’s <span class="mono">ledger.json</span>. That is one operator book. That is a centralisation hole. Not Circle. Also not Nakamoto.</p>
 
   <h2>Fill is not Nakamoto for the jar</h2>
-  <p class="lede">Convert is a meter. Fill is a sale to <span class="mono">this</span> desk. Grams live on this process’s book. Another host is another jar.</p>
+  <p>Convert is a meter. Fill is a sale to this desk. Another host is another jar.</p>
   <table>
-    <tr><th>On a fill</th><th>Who gets it</th></tr>
-    <tr><td>L1 <strong>fee</strong></td><td>Miners. That is Kaspa’s security budget. Real. Small.</td></tr>
-    <tr><td>L1 <strong>amount</strong></td><td>This desk’s PayTo. Operator inventory. Not a miner reward.</td></tr>
-    <tr><td>Grams</td><td>Your jar here. No convert-back.</td></tr>
+    <tr><th>On a fill</th><th>Who gets it</th><th>Worth?</th></tr>
+    <tr><td>L1 <strong>fee</strong></td><td>Miners. That <em>is</em> Kaspa’s security budget.</td><td>Yes. Real. Small. Keep it.</td></tr>
+    <tr><td>L1 <strong>amount</strong></td><td>This desk’s PayTo. Operator inventory.</td><td>Yes — that is why someone hosts.</td></tr>
+    <tr><td>Dump the amount as extra miner fee</td><td>Miners, as a burn of the meter</td><td><strong>Not worth it.</strong> Grams stop being cheap.</td></tr>
+    <tr><td>Grams</td><td>Your jar here. No convert-back.</td><td>The work tab.</td></tr>
   </table>
-  <p class="tiny">Sending the fill amount to miners as extra fee would kill the cheap meter. Not worth it. The fee is the security contribution. The amount belongs to whoever hosts.</p>
+  <p class="tiny">Kaspa has no “security budget address.” The security budget is miner fees. Sending the fill amount to miners as extra fee would kill the cheap alternative. The fee is the security contribution. The amount belongs to whoever hosts.</p>
 
-  <h2>Anyone can host</h2>
-  <p>Nakamoto already runs on PCs. It will not copy <span class="mono">ledger.json</span>. The public move is the same as a node: <strong>run the software</strong>.</p>
+  <h2>The solution that exists: anyone hosts</h2>
+  <p>Nakamoto already runs on PCs (rusty-kaspa). It will not copy <span class="mono">ledger.json</span>. The same principle as a node: the software is public; you run it worldwide.</p>
   <ul>
-    <li>PC: <span class="mono">gramlane.exe</span> · set <span class="mono">GRAMLANE_PAYTO</span> to your address · <span class="mono">PUBLIC_BASE</span> to your URL.</li>
+    <li>PC: <span class="mono">gramlane.exe</span> · <span class="mono">GRAMLANE_PAYTO</span> = your address · <span class="mono">PUBLIC_BASE</span> = your URL.</li>
     <li>Phone: PWA of <em>that</em> host. No second database. Wallet signs the fill on L1.</li>
     <li>Hardware: the wallet signs. The desk is still a computer.</li>
   </ul>
-  <p>Many hosts = many desks. Not one Circle. Also not one global gram ledger. L1 protection for grams is later <span class="mono">consume()</span> on WorkCredit. Until then this book is one operator. That hole is the idea. Source: <a href="https://github.com/STP-KAS/gramlane">STP-KAS/gramlane</a>.</p>
+  <p>Many hosts worldwide = many desks. Not one Circle. Also not one global gram ledger. L1 protection for grams is later <span class="mono">consume()</span> on WorkCredit. Until then this book is one operator. That hole is the idea. <a href="/host">How to host</a> · source <a href="https://github.com/STP-KAS/gramlane">STP-KAS/gramlane</a>.</p>
 
   <h2>Use it where the scarce thing is work</h2>
   <table>
@@ -31,13 +35,13 @@
     <tr><td>Vault bump</td><td>The action</td><td>The locked KAS</td></tr>
   </table>
 
-  <p class="lede">One line: <strong>skip centralized stablecoins for dapps.</strong></p>
+  <p class="lede">One line: <strong>skip centralised stablecoins for dapps.</strong> Intelligent people should look. Still a delusional idea.</p>
   {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} / {{.Seq.Credits}} g · desk <span class="mono">{{.PayTo}}</span></p>{{end}}
   <p class="actions">
     <a class="btn mint" href="/spend">Fill the jar</a>
+    <a class="btn ghost" href="/host">Host a desk</a>
     <a class="btn ghost" href="/convert">Meter</a>
     <a class="btn ghost" href="/honest">Honest</a>
-    <a class="btn ghost" href="/why">Why</a>
   </p>
 </main>
 {{template "footer" .}}
