@@ -8,7 +8,8 @@
       "id": "vision",
       "title": "Gramlane vision",
       "rows": [
-        {"name": "skip centralised stablecoins for dapps", "url": "https://github.com/STP-KAS/gramlane", "chip": "delusional", "note": "Cheap L1 grams vs USDC-for-dApps. Intelligent people should look. Still a delusional idea."},
+        {"name": "project delusional", "url": "https://github.com/STP-KAS/project-delusional", "chip": "headline", "note": "Kaspa master file, ideas and principles. Still a delusional idea."},
+        {"name": "skip centralised stablecoins for dapps", "url": "https://github.com/STP-KAS/gramlane", "chip": "principle", "note": "One principle. Cheap L1 grams vs USDC-for-dApps. Not the headline."},
         {"name": "Fill is not a business", "url": "https://github.com/STP-KAS/gramlane", "chip": "security", "note": "This desk keeps 0. Any Kaspa wallet: QR / kaspa: URI / paste txid. Inject is only Kasware or Kastle."},
         {"name": "Anyone hosts", "url": "https://github.com/STP-KAS/gramlane", "chip": "host", "note": "Same principle as a node: PC binary, PWA of that host, hardware signs the fill. Many desks ≠ Circle. The jar is not Nakamoto."}
       ]

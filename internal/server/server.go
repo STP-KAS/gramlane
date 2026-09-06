@@ -249,6 +249,7 @@ func (s *Server) Handler() http.Handler {
 		writeJSON(w, 200, map[string]any{
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
+			"headline":       ethos.Headline,
 			"vision":         ethos.Vision,
 			"visionLine":     ethos.Line,
 			"jarNakamoto":    ethos.JarIsNakamoto,
@@ -362,7 +363,7 @@ func (s *Server) whyPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) visionPage(w http.ResponseWriter, r *http.Request) {
-	s.render(w, "vision.html", page{Title: ethos.Vision + " · Gramlane", Active: "why", PayTo: desk.PayTo()})
+	s.render(w, "vision.html", page{Title: ethos.Headline + " · Gramlane", Active: "why", PayTo: desk.PayTo()})
 }
 
 func (s *Server) hostPage(w http.ResponseWriter, r *http.Request) {

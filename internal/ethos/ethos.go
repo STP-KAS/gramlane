@@ -1,11 +1,14 @@
 // Package ethos is the public one-liner. Still a delusional idea.
 package ethos
 
-// Vision is the GitHub / dApp name of the idea.
+// Headline is the project name. Delusional stays the headline.
+const Headline = "project delusional"
+
+// Vision is one principle, not the headline.
 const Vision = "skip centralised stablecoins for dapps"
 
-// Line is the short claim. Cheap grams. Intelligent people should look. Still delusional.
-const Line = "Cheap L1 grams instead of USDC-for-dApps. Intelligent people should look. Still a delusional idea."
+// Line is the brief: master file, ideas, principles. Still delusional.
+const Line = "Kaspa master file, ideas and principles. Still a delusional idea."
 
 // JarIsNakamoto is false on purpose. Fill is one L1 tx; grams live on this host's book.
 const JarIsNakamoto = false

@@ -2,7 +2,7 @@
 
 **project delusional** · [@StppStp](https://x.com/StppStp)
 
-**Skip centralised stablecoins for dapps.** A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. Still a delusional idea.
+**project delusional.** Kaspa master file, ideas and principles. One principle: skip centralised stablecoins for dapps. Still a delusional idea.
 
 A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Fill is **not a business**: this desk keeps 0. Pay from **any Kaspa wallet** (QR / `kaspa:` URI / paste txid). In-page one-click is only Kasware or Kastle. Amount goes to Kaspa growth. Anyone can run this binary worldwide (`/host`). The jar is not Nakamoto. Vaults still lock KAS; grams pay the action.
 

@@ -10,7 +10,7 @@ func TestLiveHasKIP21AndDiscord(t *testing.T) {
 	var kip, disc, tg, vision bool
 	for _, s := range f.Sections {
 		for _, r := range s.Rows {
-			if r.Name == "skip centralised stablecoins for dapps" {
+			if r.Name == "project delusional" {
 				vision = true
 			}
 			if r.Name == "KIP-21" {
