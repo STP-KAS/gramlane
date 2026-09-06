@@ -13,8 +13,8 @@ const JarIsNakamoto = false
 // SecurityBudget is miner fees. Fill is not a business: this desk does not keep the amount.
 const SecurityBudget = "l1-fee"
 
-// FillAmount is where convert KAS goes. Not this desk. Kasware still needs an output.
-const FillAmount = "fee-market-plus-growth"
+// FillAmount is where convert KAS goes. Not this desk. Any wallet can send it.
+const FillAmount = "kaspa-growth-vault"
 
 // FillIsBusiness is false. Hosting is not how you collect convert KAS.
 const FillIsBusiness = false

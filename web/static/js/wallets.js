@@ -321,7 +321,7 @@
         '<div id="walletModal" class="wmodal" hidden><div class="wmodal-card">' +
         '<div class="wmodal-head"><strong>Log in with a Kaspa wallet</strong>' +
         '<button type="button" class="btn ghost" data-wallet-close>Close</button></div>' +
-        '<p class="tiny">Kasware or Kastle. This site never asks for a seed.</p>' +
+        '<p class="tiny">Log in: Kasware or Kastle. Pay: any Kaspa wallet (QR / kaspa: URI on Fill). Never a seed.</p>' +
         '<div class="row" style="margin-top:12px">' +
         '<button type="button" class="btn mint" data-wallet-id="kasware">Kasware</button>' +
         '<button type="button" class="btn mint" data-wallet-id="kastle">Kastle</button>' +

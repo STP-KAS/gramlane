@@ -62,9 +62,33 @@
     return w.requestAccounts();
   }
 
+  function injectedSender() {
+    if (window.kasware && typeof window.kasware.sendKaspa === "function") return window.kasware;
+    if (window.kastle && typeof window.kastle.sendKaspa === "function") return window.kastle;
+    return null;
+  }
+
+  async function sendKaspaAny(to, sompi, opts) {
+    opts = opts || { priorityFee: 10000 };
+    var last = null;
+    var order = [];
+    if (window.kasware && typeof window.kasware.sendKaspa === "function") order.push(window.kasware);
+    if (window.kastle && typeof window.kastle.sendKaspa === "function") order.push(window.kastle);
+    for (var i = 0; i < order.length; i++) {
+      try {
+        return await order[i].sendKaspa(to, sompi, opts);
+      } catch (e) {
+        last = e;
+      }
+    }
+    throw last || new Error("No in-page wallet. Open the kaspa: link, scan the QR, or paste a txid from any Kaspa wallet (Kaspium, Tangem, Kaspa NG, …).");
+  }
+
   async function sendKaspaMaybePair(nameTo, nameSompi, vaultTo, vaultSompi) {
+    var w = injectedSender();
+    if (!w) throw new Error("No in-page wallet. Pay the name lock and growth vault from any Kaspa wallet, then paste the txid.");
     try {
-      return await window.kasware.sendKaspa(
+      return await w.sendKaspa(
         [
           { address: nameTo, amount: nameSompi },
           { address: vaultTo, amount: vaultSompi },
@@ -73,16 +97,16 @@
       );
     } catch (_) {}
     try {
-      return await window.kasware.sendKaspa(nameTo, nameSompi, {
+      return await w.sendKaspa(nameTo, nameSompi, {
         priorityFee: 10000,
         outputs: [{ address: vaultTo, amount: vaultSompi }],
       });
     } catch (_) {}
     say("Name first (100 KAS). Then confirm the Kaspa growth share.");
-    var nameTx = await window.kasware.sendKaspa(nameTo, nameSompi, { priorityFee: 10000 });
+    var nameTx = await w.sendKaspa(nameTo, nameSompi, { priorityFee: 10000 });
     say("Name on L1. Confirm 100 KAS to the growth vault.");
     try {
-      await window.kasware.sendKaspa(vaultTo, vaultSompi, { priorityFee: 10000 });
+      await w.sendKaspa(vaultTo, vaultSompi, { priorityFee: 10000 });
     } catch (e) {
       say("Name is funded. Growth share failed — send 100 KAS to the vault when you can. " + (e && e.message ? e.message : ""));
     }
@@ -97,8 +121,8 @@
   }
 
   async function sendWithPayload(to, sompi, payload) {
-    var w = window.kasware;
-    if (!w || typeof w.sendKaspa !== "function") throw new Error("Kasware is not in this tab. Log in here first.");
+    var w = injectedSender();
+    if (!w) throw new Error("No in-page wallet. Open the kaspa: link, scan the QR, or paste a txid.");
     var attempts = [
       { priorityFee: 10000, payload: payload },
       { priorityFee: 10000, payload: toHex(payload) },
@@ -193,7 +217,7 @@
       var payer = $('input[name="payer"]');
       var wallet = $('input[name="wallet"]');
       if (payer) payer.value = acc[0];
-      if (wallet) wallet.value = "kasware";
+      if (wallet) wallet.value = window.kastle && !window.kasware ? "kastle" : (window.kasware ? "kasware" : "uri");
       var vault = (btn.getAttribute("data-vault") || "").trim();
       var vaultSompi = Number(btn.getAttribute("data-vault-sompi") || "0");
       var raw;
@@ -203,19 +227,9 @@
           return;
         }
         raw = await sendKaspaMaybePair(to, sompi, vault, vaultSompi);
-      } else if (btn.getAttribute("data-fee-market") === "1") {
-        var out = Number(btn.getAttribute("data-out") || "0");
-        var fee = Number(btn.getAttribute("data-fee") || "0");
-        if (!out) out = sompi;
-        if (!fee) fee = 10000;
-        if (fee >= out) {
-          say("Kasware rejects a miner fee as big as the send. Leftover output goes to Kaspa growth.");
-          return;
-        }
-        say("Not this desk. Miner fee " + fee + " sompi. Leftover " + out + " sompi to Kaspa growth. Stay here.");
-        raw = await window.kasware.sendKaspa(to, out, { priorityFee: fee });
       } else {
-        raw = await window.kasware.sendKaspa(to, sompi, { priorityFee: 10000 });
+        say("Confirm in Kasware or Kastle if this tab has one. Otherwise use the kaspa: link / QR.");
+        raw = await sendKaspaAny(to, sompi, { priorityFee: 10000 });
       }
       var txid = parseTxid(raw);
       if (!txid) throw new Error("Kasware returned no txid.");

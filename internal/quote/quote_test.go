@@ -105,6 +105,16 @@ func TestSetAsideHalf(t *testing.T) {
 	}
 }
 
+func TestURI(t *testing.T) {
+	u := URI("kaspa:qzpvdakagvwfm95g8pv9ndpupjtndgjfhmve08cg3tv5wgfytjzf7e6t4puat", SompiPerKAS)
+	if !strings.Contains(u, "?amount=1") || strings.Contains(u, "100000000") {
+		t.Fatal(u)
+	}
+	if URI("", 1) != "" || URI("not-kaspa", SompiPerKAS) != "" {
+		t.Fatal("bad addr")
+	}
+}
+
 func TestSplitFeeMarket(t *testing.T) {
 	out, fee, note := SplitFeeMarket(SompiPerKAS)
 	if out != 50_000_001 || fee != 49_999_999 || note == "" {

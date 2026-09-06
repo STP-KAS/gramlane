@@ -72,6 +72,19 @@ func Grams(n uint64, lane string) (Quote, error) {
 	}, nil
 }
 
+// URI is a BIP-21-style kaspa: payment. Any wallet that can send KAS can open it.
+// In-page inject is only Kasware/Kastle. Amount is KAS, not sompi.
+func URI(addr string, sompi uint64) string {
+	addr = strings.TrimSpace(addr)
+	if addr == "" || !strings.HasPrefix(addr, "kaspa:") {
+		return ""
+	}
+	if sompi == 0 {
+		return addr
+	}
+	return addr + "?amount=" + kasText(sompi)
+}
+
 func kasText(sompi uint64) string {
 	s := fmt.Sprintf("%.8f", float64(sompi)/float64(SompiPerKAS))
 	s = strings.TrimRight(s, "0")

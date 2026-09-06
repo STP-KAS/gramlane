@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   <h1>Fill the jar</h1>
-  <p class="lede">Not a business. The converter does <strong>not</strong> get this KAS back. This desk does <strong>not</strong> keep it. Kasware still needs an output (fee cannot be ≥ the send). Leftover output is Kaspa growth. The rest is miner fee. Grams land on this book. No convert-back. <a href="/host">Host</a> · <a href="/vision">Vision</a></p>
+  <p class="lede">Not a business. Send KAS from <strong>any Kaspa wallet</strong> — phone, desktop, hardware. This desk keeps 0. Grams land on this book. No convert-back. <a href="/wallets">Wallets</a> · <a href="/host">Host</a></p>
   {{if .Seq}}<p class="tiny">In the jar: {{.Seq.Remaining}} grams · <a href="/jar">Book</a> · <a href="/pay">Pay</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
@@ -34,30 +34,49 @@
     </article>
   </div>
   {{if .Aside.FloorNote}}<p class="warn">{{.Aside.FloorNote}}</p>{{end}}
+
   <div class="card" style="margin:18px 0">
-    <h3>Pay into the fee market</h3>
-    <p class="lede">Kasware sends <strong>{{.Aside.FillFeeText}} KAS</strong> as miner fee and <strong>{{.Aside.FillOutText}} KAS</strong> to Kaspa growth (an output is required). <strong>This desk gets 0.</strong> Then grams are written at 100 sompi/gram.</p>
-    <p class="tiny">{{.Aside.FillNote}}</p>
-    <label for="pay-to">Kaspa growth vault — leftover output, not this desk</label>
+    <h3>Any Kaspa wallet</h3>
+    <p class="lede">Pay <strong>{{.Aside.PayKASText}} KAS</strong> to Kaspa growth (not this desk). Kaspium, Kastle, Tangem, Kaspa NG, OneKey, Zelcore, Ledger/KasVault, web wallet — if it can send KAS, it works. Miners get whatever network fee <em>your</em> wallet attaches. We cannot set that fee from a QR.</p>
+    <label for="pay-to">Send to</label>
     <input class="mono" id="pay-to" value="{{.Vault}}" readonly />
+    {{if .PayURL}}
+    <p class="tiny mono">{{.PayURL}}</p>
     <p>
-      <button type="button" class="btn ghost" data-copy-text="{{.Vault}}">Copy growth vault</button>
-      <button class="btn mint" type="button" data-pay-l1 data-fee-market="1" data-to="{{.Vault}}" data-after="/spend" data-sompi="{{.Aside.PaySompi}}" data-out="{{.Aside.FillOutSompi}}" data-fee="{{.Aside.FillFeeSompi}}">Pay {{.Aside.PayKASText}} KAS (not this desk)</button>
+      <img alt="QR — scan with any Kaspa wallet" width="220" height="220" src="/qr/pay.png?to={{.Vault}}&amp;sompi={{.Aside.PaySompi}}" />
     </p>
+    <p>
+      <a class="btn mint" href="{{.PayURL}}">Open in a Kaspa wallet</a>
+      <button type="button" class="btn ghost" data-copy-text="{{.Vault}}">Copy address</button>
+      <button type="button" class="btn ghost" data-copy-text="{{.Aside.PayKASText}}">Copy amount</button>
+      <button type="button" class="btn ghost" data-copy-text="{{.PayURL}}">Copy kaspa: URI</button>
+    </p>
+    {{end}}
+    <p>
+      <button class="btn ghost" type="button" data-pay-l1 data-to="{{.Vault}}" data-after="/spend" data-sompi="{{.Aside.PaySompi}}">One-click (Kasware / Kastle in this tab)</button>
+    </p>
+    <p class="tiny">One-click needs an in-page provider. Kasware is a desktop extension (not iOS). Kastle is extension + iOS/Android; it only injects if this page is open inside that wallet. Everyone else: Open / QR / copy, then paste the txid.</p>
     <p class="tiny" data-pay-status></p>
     <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
   </div>
+
+  <form class="row" action="/spend" method="post">
+    <input type="hidden" name="total" value="{{.Query}}" />
+    <input type="hidden" name="pct" value="{{.Aside.Percent}}" />
+    <div>
+      <label for="payment">Paste txid after you send</label>
+      <input class="mono" id="payment" name="payment" placeholder="64-character txid" autocomplete="off" />
+    </div>
+    <button class="btn mint" type="submit">Credit grams</button>
+  </form>
   {{end}}
 
-  <h2>What happens to the KAS</h2>
-  <table>
-    <tr><th>Who</th><th>What they get</th></tr>
-    <tr><td>The person who converts</td><td>Grams on this book. <strong>Not</strong> the KAS back. There is no convert-back.</td></tr>
-    <tr><td>Miners (fee market)</td><td>As much of the fill as Kasware allows (fee must stay <em>smaller</em> than the output). On a 1 KAS fill that is about half.</td></tr>
-    <tr><td>Kaspa growth vault</td><td>The leftover output Kasware still requires. Same address as name-mint 50%. Not this desk.</td></tr>
-    <tr><td>This desk</td><td><strong>0 KAS.</strong> Not a business. Hosting is not how you collect convert coins.</td></tr>
-  </table>
-  <p>Kasware <em>sendKaspa</em> refuses a miner fee as big as the send. We cannot put 100% of a fill into the fee market without you paying about 2×. So we maximize the fee under that rule and send the leftover to Kaspa growth — not to this operator wallet.</p>
-  <p class="lede">Not USDT. Not a wrap. If a cafe chases dollars they reprice grams. Remaining grams stay grams. <a href="/pay">Pay</a></p>
+  <h2>What this is not</h2>
+  <ul>
+    <li>We do not inject Tangem, Kaspium, Ledger Live, Zelcore, OKX, KasKeeper, … Those wallets send to the address. That is enough.</li>
+    <li>We cannot dump the convert amount into the miner fee from a <span class="mono">kaspa:</span> URI. Your wallet chooses its own fee. The amount goes to Kaspa growth.</li>
+    <li>This desk gets 0 KAS. Hosting is not a till.</li>
+  </ul>
+  <p class="lede">Not USDT. Not a wrap. <a href="/pay">Pay</a> · <a href="/app">Phone</a></p>
 </main>
 {{template "footer" .}}
