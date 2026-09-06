@@ -37,13 +37,13 @@
   <details>
     <summary class="tiny">KAS fallback if prepaid is ever empty</summary>
     <div class="card" style="margin:18px 0">
-      <p class="lede">Only if remaining grams cannot cover this job. Desk address must not be your login.</p>
+      <p class="lede">Only if remaining grams cannot cover this job. Fill is not this desk’s money.</p>
       <p class="tiny">Connected: <span class="mono" data-wallet-addr>(connect in the header)</span></p>
-      <label>desk address</label>
-      <input class="mono" id="pay-to" value="{{.PayTo}}" placeholder="kaspa:q… not your Logged in address" />
+      <label>Kaspa growth vault — leftover output</label>
+      <input class="mono" id="pay-to" value="{{.Vault}}" readonly />
       {{if .Quote}}
       <p>
-        <button class="btn ghost" type="button" data-pay-l1 data-after="run" data-sompi="{{.Quote.PaySompi}}">Pay {{.Quote.PayKASText}} KAS</button>
+        <button class="btn ghost" type="button" data-pay-l1 data-fee-market="1" data-to="{{.Vault}}" data-after="run" data-sompi="{{.Quote.PaySompi}}" data-out="{{.Quote.FillOutSompi}}" data-fee="{{.Quote.FillFeeSompi}}">Pay {{.Quote.PayKASText}} KAS (not this desk)</button>
       </p>
       {{end}}
       <p class="tiny" data-pay-status></p>
@@ -65,14 +65,15 @@
   <p class="tiny" data-origin-note></p>
   <div class="card" style="margin:18px 0">
     <h3>Pay on this page</h3>
-    <p class="lede">Prepaid remaining cannot cover this job. <strong>Pay 0.5 KAS</strong> asks Kasware to confirm over this tab — do not open the extension Send screen. Desk address must not be your login (Kasware blocks self-send).</p>
+    <p class="lede">Prepaid remaining cannot cover this job. Fill is not this desk’s money. Kasware leftover output is Kaspa growth; the rest is miner fee. Stay on this tab.</p>
     <p class="tiny">Your login (do not pay this): <span class="mono" data-wallet-addr></span></p>
-    <label>desk address</label>
-    <input class="mono" id="pay-to" value="{{.PayTo}}" placeholder="kaspa:q… not your Logged in address" />
+    <label>Kaspa growth vault — leftover output, not this desk</label>
+    <input class="mono" id="pay-to" value="{{.Vault}}" readonly />
     <p class="tiny" data-origin-note></p>
     {{if .Quote}}
+    <p class="tiny">{{.Quote.FillNote}}</p>
     <p>
-      <button class="btn mint" type="button" data-pay-l1 data-after="run" data-sompi="{{.Quote.PaySompi}}">Pay {{.Quote.PayKASText}} KAS</button>
+      <button class="btn mint" type="button" data-pay-l1 data-fee-market="1" data-to="{{.Vault}}" data-after="run" data-sompi="{{.Quote.PaySompi}}" data-out="{{.Quote.FillOutSompi}}" data-fee="{{.Quote.FillFeeSompi}}">Pay {{.Quote.PayKASText}} KAS (not this desk)</button>
     </p>
     {{end}}
     <p class="tiny" data-pay-status></p>

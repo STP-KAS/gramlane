@@ -9,7 +9,7 @@
       "title": "Gramlane vision",
       "rows": [
         {"name": "skip centralised stablecoins for dapps", "url": "https://github.com/STP-KAS/gramlane", "chip": "delusional", "note": "Cheap L1 grams vs USDC-for-dApps. Intelligent people should look. Still a delusional idea."},
-        {"name": "Fill fee = miners", "url": "https://github.com/STP-KAS/gramlane", "chip": "security", "note": "Kaspa’s security budget is the L1 fee. The fill amount is whoever hosts. Dumping the amount to miners is not worth it."},
+        {"name": "Fill is not a business", "url": "https://github.com/STP-KAS/gramlane", "chip": "security", "note": "This desk keeps 0. Kasware leftover output is Kaspa growth. The rest is miner fee."},
         {"name": "Anyone hosts", "url": "https://github.com/STP-KAS/gramlane", "chip": "host", "note": "Same principle as a node: PC binary, PWA of that host, hardware signs the fill. Many desks ≠ Circle. The jar is not Nakamoto."}
       ]
     },

@@ -30,6 +30,11 @@ type Quote struct {
 	Scheme       string  `json:"scheme"`
 	USD          string  `json:"usd"`
 	Note         string  `json:"note"`
+	FillOutSompi uint64  `json:"fillOutSompi,omitempty"`
+	FillFeeSompi uint64  `json:"fillFeeSompi,omitempty"`
+	FillOutText  string  `json:"fillOutText,omitempty"`
+	FillFeeText  string  `json:"fillFeeText,omitempty"`
+	FillNote     string  `json:"fillNote,omitempty"`
 }
 
 func Grams(n uint64, lane string) (Quote, error) {
@@ -44,6 +49,7 @@ func Grams(n uint64, lane string) (Quote, error) {
 	if pay < KaswareMinSompi {
 		pay = KaswareMinSompi
 	}
+	out, fee, fillNote := SplitFeeMarket(pay)
 	return Quote{
 		Grams:        n,
 		Credits:      n,
@@ -57,7 +63,12 @@ func Grams(n uint64, lane string) (Quote, error) {
 		Lane:         lane,
 		Scheme:       "kaspa-work-credit",
 		USD:          "not quoted",
-		Note:         "Prepaid L1 grams. Kasware send is 0.5 KAS to the desk address, not to yourself.",
+		Note:         "Prepaid L1 grams. Fill is not this desk’s money. Leftover output is Kaspa growth; the rest is miner fee.",
+		FillOutSompi: out,
+		FillFeeSompi: fee,
+		FillOutText:  kasText(out),
+		FillFeeText:  kasText(fee),
+		FillNote:     fillNote,
 	}, nil
 }
 

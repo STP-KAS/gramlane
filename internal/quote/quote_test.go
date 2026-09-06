@@ -100,4 +100,21 @@ func TestSetAsideHalf(t *testing.T) {
 	if a.Spend.Grams != 1_000_000 || a.Hold.Grams != 1_000_000 {
 		t.Fatalf("%+v", a)
 	}
+	if a.FillOutSompi != 50_000_001 || a.FillFeeSompi != 49_999_999 {
+		t.Fatalf("fee market %+v", a)
+	}
+}
+
+func TestSplitFeeMarket(t *testing.T) {
+	out, fee, note := SplitFeeMarket(SompiPerKAS)
+	if out != 50_000_001 || fee != 49_999_999 || note == "" {
+		t.Fatalf("1 KAS out=%d fee=%d %s", out, fee, note)
+	}
+	if fee >= out {
+		t.Fatal("Kasware rejects fee >= output")
+	}
+	out, fee, _ = SplitFeeMarket(KaswareMinSompi)
+	if out != KaswareMinSompi || fee != KaswarePriorityFloor {
+		t.Fatalf("0.5 KAS out=%d fee=%d", out, fee)
+	}
 }

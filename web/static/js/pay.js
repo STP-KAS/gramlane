@@ -171,11 +171,11 @@
     var sompi = Number(btn.getAttribute("data-sompi") || "0");
     var me = loginAddr();
     if (!to || to.indexOf("kaspa:") !== 0) {
-      say("Paste a desk kaspa: address first (not your login).");
+      say("Need a kaspa: output address (Kaspa growth vault for fill — not your login).");
       return;
     }
     if (me && to === me) {
-      say("Desk address is your login. Kasware will block it. Use a different kaspa:.");
+      say("Output address is your login. Kasware will block it.");
       return;
     }
     if (!sompi) {
@@ -203,6 +203,17 @@
           return;
         }
         raw = await sendKaspaMaybePair(to, sompi, vault, vaultSompi);
+      } else if (btn.getAttribute("data-fee-market") === "1") {
+        var out = Number(btn.getAttribute("data-out") || "0");
+        var fee = Number(btn.getAttribute("data-fee") || "0");
+        if (!out) out = sompi;
+        if (!fee) fee = 10000;
+        if (fee >= out) {
+          say("Kasware rejects a miner fee as big as the send. Leftover output goes to Kaspa growth.");
+          return;
+        }
+        say("Not this desk. Miner fee " + fee + " sompi. Leftover " + out + " sompi to Kaspa growth. Stay here.");
+        raw = await window.kasware.sendKaspa(to, out, { priorityFee: fee });
       } else {
         raw = await window.kasware.sendKaspa(to, sompi, { priorityFee: 10000 });
       }

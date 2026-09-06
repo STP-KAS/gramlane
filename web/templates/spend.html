@@ -1,7 +1,7 @@
 {{template "header" .}}
 <main>
   <h1>Fill the jar</h1>
-  <p class="lede">This is a sale, not a wrap. KAS pays this desk. Grams land on <em>this</em> book. Miners get the L1 <strong>fee</strong> (Kaspa’s security budget), not the fill amount — dumping the amount to miners is not worth it. Run your own host to be the desk. No convert-back. <a href="/host">Host</a> · <a href="/vision">Vision</a></p>
+  <p class="lede">Not a business. The converter does <strong>not</strong> get this KAS back. This desk does <strong>not</strong> keep it. Kasware still needs an output (fee cannot be ≥ the send). Leftover output is Kaspa growth. The rest is miner fee. Grams land on this book. No convert-back. <a href="/host">Host</a> · <a href="/vision">Vision</a></p>
   {{if .Seq}}<p class="tiny">In the jar: {{.Seq.Remaining}} grams · <a href="/jar">Book</a> · <a href="/pay">Pay</a></p>{{end}}
   {{if .Error}}<p class="bad">{{.Error}}</p>{{end}}
 
@@ -35,13 +35,14 @@
   </div>
   {{if .Aside.FloorNote}}<p class="warn">{{.Aside.FloorNote}}</p>{{end}}
   <div class="card" style="margin:18px 0">
-    <h3>Pay the desk</h3>
-    <p class="lede">Kasware sends <strong>{{.Aside.PayKASText}} KAS</strong> to the address below. <strong>Not your login. Not yours. Not a vault you can withdraw.</strong> This desk then writes grams into the jar at 100 sompi/gram.</p>
-    <label for="pay-to">Desk (operator) — not your address</label>
-    <input class="mono" id="pay-to" value="{{.PayTo}}" readonly />
+    <h3>Pay into the fee market</h3>
+    <p class="lede">Kasware sends <strong>{{.Aside.FillFeeText}} KAS</strong> as miner fee and <strong>{{.Aside.FillOutText}} KAS</strong> to Kaspa growth (an output is required). <strong>This desk gets 0.</strong> Then grams are written at 100 sompi/gram.</p>
+    <p class="tiny">{{.Aside.FillNote}}</p>
+    <label for="pay-to">Kaspa growth vault — leftover output, not this desk</label>
+    <input class="mono" id="pay-to" value="{{.Vault}}" readonly />
     <p>
-      <button type="button" class="btn ghost" data-copy-text="{{.PayTo}}">Copy desk address</button>
-      <button class="btn mint" type="button" data-pay-l1 data-after="/spend" data-sompi="{{.Aside.PaySompi}}">Pay {{.Aside.PayKASText}} KAS to the desk</button>
+      <button type="button" class="btn ghost" data-copy-text="{{.Vault}}">Copy growth vault</button>
+      <button class="btn mint" type="button" data-pay-l1 data-fee-market="1" data-to="{{.Vault}}" data-after="/spend" data-sompi="{{.Aside.PaySompi}}" data-out="{{.Aside.FillOutSompi}}" data-fee="{{.Aside.FillFeeSompi}}">Pay {{.Aside.PayKASText}} KAS (not this desk)</button>
     </p>
     <p class="tiny" data-pay-status></p>
     <p><a class="mono" data-explorer hidden href="#" target="_blank" rel="noopener"></a></p>
@@ -49,13 +50,14 @@
   {{end}}
 
   <h2>What happens to the KAS</h2>
-  <ol>
-    <li>The L1 <strong>fee</strong> goes to miners. That is Kaspa’s security budget. Small. Real.</li>
-    <li>The <strong>amount</strong> lands in the desk wallet. The operator can spend it. Not a miner reward.</li>
-    <li>This desk credits grams in <a href="/jar">the jar book</a>. That is a work tab, not a KAS balance.</li>
-    <li>Jobs and tills burn grams. There is no button to turn grams back into your KAS.</li>
-    <li>Want the amount yourself? <a href="/host">Host a desk</a>. Another host is another jar.</li>
-  </ol>
+  <table>
+    <tr><th>Who</th><th>What they get</th></tr>
+    <tr><td>The person who converts</td><td>Grams on this book. <strong>Not</strong> the KAS back. There is no convert-back.</td></tr>
+    <tr><td>Miners (fee market)</td><td>As much of the fill as Kasware allows (fee must stay <em>smaller</em> than the output). On a 1 KAS fill that is about half.</td></tr>
+    <tr><td>Kaspa growth vault</td><td>The leftover output Kasware still requires. Same address as name-mint 50%. Not this desk.</td></tr>
+    <tr><td>This desk</td><td><strong>0 KAS.</strong> Not a business. Hosting is not how you collect convert coins.</td></tr>
+  </table>
+  <p>Kasware <em>sendKaspa</em> refuses a miner fee as big as the send. We cannot put 100% of a fill into the fee market without you paying about 2×. So we maximize the fee under that rule and send the leftover to Kaspa growth — not to this operator wallet.</p>
   <p class="lede">Not USDT. Not a wrap. If a cafe chases dollars they reprice grams. Remaining grams stay grams. <a href="/pay">Pay</a></p>
 </main>
 {{template "footer" .}}
