@@ -5,6 +5,19 @@
   "disclaimer": "Not Kaspa core. Not official KNS. @StppStp. Merged Active KIP is law. Open PR is not.",
   "sections": [
     {
+      "id": "learn",
+      "title": "If you just showed up",
+      "rows": [
+        {"name": "Kaspa Explained — start here", "url": "https://kaspaexplained.com/start-here", "chip": "read", "note": "Two doors: new to crypto, or you already know it. Independent. Not kaspanet. Not this desk."},
+        {"name": "What is Kaspa?", "url": "https://kaspaexplained.com/what-is-kaspa", "chip": "read", "note": "Proof of Work. BlockDAG: honest parallel blocks are kept. GHOSTDAG orders them. What is live vs still a plan."},
+        {"name": "Kaspa Explained", "url": "https://kaspaexplained.com/", "chip": "read", "note": "Same idea in a short page. Miners hash like Bitcoin. Kaspa does not throw away the extra honest blocks."},
+        {"name": "FAQ", "url": "https://kaspaexplained.com/faq", "chip": "read", "note": "Is it PoW? What is 10 blocks/s? Is Toccata live? Answers with links so you can check."},
+        {"name": "kaspa.org", "url": "https://kaspa.org", "chip": "official", "note": "Official site. Fair launch. No premine."},
+        {"name": "Wallets", "url": "https://wiki.kaspa.org/wallet", "chip": "wiki", "note": "How to hold KAS. Nobody from a website should ask for your seed."},
+        {"name": "Video (community)", "url": "https://x.com/kaspaunchained/status/2096211914825285808", "chip": "watch", "note": "@kaspaunchained, 5 Sep 2026. “Only gets better with age.” Older clip (Odie). Not a spec. Not core. Watch, then read the pages above."}
+      ]
+    },
+    {
       "id": "vision",
       "title": "Gramlane vision",
       "rows": [
@@ -28,6 +41,7 @@
         {"name": "Kaspalytics", "url": "https://www.kaspalytics.com", "chip": "learn", "note": "Toccata / SilverScript explainers. Not core."},
         {"name": "Explorer", "url": "https://explorer.kaspa.org", "chip": "live", "note": "L1 txs."},
         {"name": "api.kaspa.org", "url": "https://api.kaspa.org", "chip": "live", "note": "Public node REST. Not kasdomain."},
+        {"name": "kaspaexplained.com", "url": "https://kaspaexplained.com/", "chip": "explained", "note": "Independent explainer. Start-here, FAQ, status. Not kaspanet."},
         {"name": "kaspaexplained.com/kips", "url": "https://kaspaexplained.com/kips", "chip": "tracker", "note": "Human map. Not law."},
         {"name": "Toccata status", "url": "https://kaspaexplained.com/toccata-status", "chip": "tracker", "note": "Live claims."}
       ]
