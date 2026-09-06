@@ -11,8 +11,8 @@ const Env = "GRAMLANE_PAYTO"
 // (txid c1799b0de40f71cfd7a153684ef22326ad920d0dca2a8b519ce2c8379c4f7bc2).
 const DefaultPayTo = "kaspa:qpjm8kzpcj5he3hg9msrdc78a3k46zda866pucwetprgtgc7s3ry2kq38atpq"
 
-// PayTo is the KAS fill destination (the amount). Miners get the L1 fee, not
-// this amount — dumping fill into extra miner fees would kill the cheap meter.
+// PayTo is shop tills and other KAS doors — not jar fill.
+// Fill is not a business: leftover output is Kaspa growth; the rest is miner fee.
 // Must not be the connected Kasware account. Override with GRAMLANE_PAYTO or payto.txt.
 func PayTo() string {
 	if v := strings.TrimSpace(os.Getenv(Env)); v != "" {

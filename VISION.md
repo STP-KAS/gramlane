@@ -12,17 +12,17 @@ USDC-for-dApps is easy because someone else is the bank. Grams are prepaid **wor
 
 ## The threat
 
-Once a desk is a public URL, every fill is a Kaspa transaction to **that** PayTo. Grams live on **that** process’s `ledger.json`. One popular host is a centralisation hole. Not Circle. Also not Nakamoto.
+Once a desk is a public URL, grams live on **that** process’s `ledger.json`. One popular host is a centralisation hole. Not Circle. Also not Nakamoto. Fill is **not** that host’s business.
 
 ## Fill is not Nakamoto for the jar
 
-Convert is a **meter**. Fill (`/spend`) is a **sale**: KAS to this desk’s `PayTo`. Grams land on **this process’s book**. Another host is another jar.
+Convert is a **meter**. Fill (`/spend`) is **not a business**. Grams land on **this process’s book**. Another host is another jar. Converted KAS does not pay this desk.
 
 | Who gets what on a fill | | Worth? |
 | --- | --- | --- |
-| **Miners (security budget)** | The **transaction fee** on that L1 send. Real Nakamoto. Tiny. | Yes. Kaspa has no other “security budget address.” |
-| **This desk** | The **amount** (0.5 KAS min). Operator inventory. | Yes — that is why someone hosts. |
-| **Dump amount as extra miner fee** | Burns the cheap meter. | **Not worth it.** |
+| **Miners (fee market)** | As much as Kasware allows (fee must stay smaller than the output). ~half on a 1 KAS fill. | Yes. That is Kaspa’s security budget. |
+| **Kaspa growth vault** | The leftover output Kasware still requires. Same vault as name mint. | Not this desk. |
+| **This desk** | **0 KAS.** | Hosting is not how you collect convert coins. |
 | **You** | Grams on this book. No convert-back. | The work tab. |
 
 ## Anyone can host (the actual decentralisation)
@@ -31,7 +31,7 @@ Nakamoto consensus already runs on PCs (rusty-kaspa). It will **not** replicate 
 
 The same principle as a node: **the software is public; you run it worldwide.**
 
-- PC: `.\gramlane.exe` — set `GRAMLANE_PAYTO` to *your* address, `PUBLIC_BASE` to *your* URL.
+- PC: `.\gramlane.exe` — `PUBLIC_BASE` is *your* URL. `GRAMLANE_PAYTO` is shops, not fill.
 - Phone: PWA of **that** host, not a second database. Kasware/Kastle sign the fill on L1.
 - Hardware: the wallet signs the fill tx. The desk is still a computer.
 

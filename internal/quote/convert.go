@@ -118,13 +118,49 @@ func ParseKAS(s string) (uint64, error) {
 
 // Aside splits a KAS pile: hold (volatile) vs spend (prepaid grams).
 type Aside struct {
-	Percent    uint64  `json:"percent"`
-	TotalSompi uint64  `json:"totalSompi"`
-	Hold       Convert `json:"hold"`
-	Spend      Convert `json:"spend"`
-	PaySompi   uint64  `json:"paySompi"`
-	PayKASText string  `json:"payKasText"`
-	FloorNote  string  `json:"floorNote,omitempty"`
+	Percent      uint64  `json:"percent"`
+	TotalSompi   uint64  `json:"totalSompi"`
+	Hold         Convert `json:"hold"`
+	Spend        Convert `json:"spend"`
+	PaySompi     uint64  `json:"paySompi"`
+	PayKASText   string  `json:"payKasText"`
+	FloorNote    string  `json:"floorNote,omitempty"`
+	FillOutSompi uint64  `json:"fillOutSompi"`
+	FillFeeSompi uint64  `json:"fillFeeSompi"`
+	FillOutText  string  `json:"fillOutText"`
+	FillFeeText  string  `json:"fillFeeText"`
+	FillNote     string  `json:"fillNote,omitempty"`
+}
+
+// KaswarePriorityFloor is the tiny extra fee when the whole fill must be an output.
+const KaswarePriorityFloor uint64 = 10_000
+
+// SplitFeeMarket splits a fill so this desk gets 0. Not a business.
+// Kasware refuses miner fee ≥ the send amount, so leftover output goes to
+// Kaspa growth (same vault as name mint). The rest is the fee market.
+func SplitFeeMarket(total uint64) (out, fee uint64, note string) {
+	if total < KaswareMinSompi {
+		total = KaswareMinSompi
+	}
+	out = total/2 + 1
+	if out < KaswareMinSompi {
+		out = KaswareMinSompi
+	}
+	if out >= total {
+		return KaswareMinSompi, KaswarePriorityFloor,
+			"Kasware min send is 0.5 KAS, so a 0.5 KAS fill is almost all an output. That output is Kaspa growth, not this desk. Miners get only the tiny extra fee."
+	}
+	fee = total - out
+	if fee >= out {
+		out = fee + 1
+		if out >= total {
+			return KaswareMinSompi, KaswarePriorityFloor,
+				"Kasware min send is 0.5 KAS, so a 0.5 KAS fill is almost all an output. That output is Kaspa growth, not this desk. Miners get only the tiny extra fee."
+		}
+		fee = total - out
+	}
+	return out, fee,
+		"Not a business. This desk gets 0. Kasware refuses a miner fee as big as the send, so leftover KAS goes to Kaspa growth (same vault as name mint). The rest is miner fee."
 }
 
 func SetAside(totalKAS string, pct uint64) (Aside, error) {
@@ -151,14 +187,20 @@ func SetAside(totalKAS string, pct uint64) (Aside, error) {
 		pay = KaswareMinSompi
 		note = "Kasware min send is 0.5 KAS. Your share at policy is smaller; sending 0.5 KAS mints 500000 grams into the spend pile."
 	}
+	out, fee, fillNote := SplitFeeMarket(pay)
 	return Aside{
-		Percent:    pct,
-		TotalSompi: tot,
-		Hold:       hold,
-		Spend:      spend,
-		PaySompi:   pay,
-		PayKASText: kasText(pay),
-		FloorNote:  note,
+		Percent:      pct,
+		TotalSompi:   tot,
+		Hold:         hold,
+		Spend:        spend,
+		PaySompi:     pay,
+		PayKASText:   kasText(pay),
+		FloorNote:    note,
+		FillOutSompi: out,
+		FillFeeSompi: fee,
+		FillOutText:  kasText(out),
+		FillFeeText:  kasText(fee),
+		FillNote:     fillNote,
 	}, nil
 }
 

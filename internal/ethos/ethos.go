@@ -10,5 +10,11 @@ const Line = "Cheap L1 grams instead of USDC-for-dApps. Intelligent people shoul
 // JarIsNakamoto is false on purpose. Fill is one L1 tx; grams live on this host's book.
 const JarIsNakamoto = false
 
-// SecurityBudget is what miners actually get on a fill: the transaction fee, not the amount.
+// SecurityBudget is miner fees. Fill is not a business: this desk does not keep the amount.
 const SecurityBudget = "l1-fee"
+
+// FillAmount is where convert KAS goes. Not this desk. Kasware still needs an output.
+const FillAmount = "fee-market-plus-growth"
+
+// FillIsBusiness is false. Hosting is not how you collect convert KAS.
+const FillIsBusiness = false
