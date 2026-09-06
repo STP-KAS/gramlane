@@ -2,9 +2,9 @@
 
 **project delusional** · [@StppStp](https://x.com/StppStp)
 
-**Stable work price on L1, not a synthetic dollar.**
+**Skip centralized stablecoins for dapps.** A cheap L1 alternative to USDC-for-dApps. Intelligent people should look. Still a delusional idea.
 
-A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Vaults still lock KAS; grams pay the action.
+A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Fill is one L1 tx: miners get the fee; the amount is whoever hosts. Anyone can run this binary. Vaults still lock KAS; grams pay the action.
 
 Sister dApp (when the invoice really is money):  
 `C:\Users\Remco\Documents\kaspa\superappstablesalternative` — Kaspa Till on `:8082`.
@@ -67,7 +67,7 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 
 | File | What |
 | --- | --- |
-| [VISION.md](VISION.md) | Work-credit lane: grams meter work, not USD |
+| [VISION.md](VISION.md) | Skip centralized stablecoins for dapps |
 | [DIFF-MAP.md](DIFF-MAP.md) | Live / local / wrong |
 | [HOW-IT-WORKS.md](HOW-IT-WORKS.md) | Stack |
 | [WORK-CREDITS.md](WORK-CREDITS.md) | Why grams, not USD |
