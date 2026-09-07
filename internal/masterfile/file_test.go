@@ -7,7 +7,7 @@ func TestLiveHasKIP21AndDiscord(t *testing.T) {
 	if f.Title == "" || f.Updated == "" || len(f.Sections) < 4 {
 		t.Fatalf("%+v", f)
 	}
-	var kip, disc, tg, vision, explained, video bool
+	var kip, disc, tg, vision, explained, video, research, kurrent bool
 	for _, s := range f.Sections {
 		for _, r := range s.Rows {
 			if r.Name == "project delusional" {
@@ -28,9 +28,15 @@ func TestLiveHasKIP21AndDiscord(t *testing.T) {
 			if r.Name == "Telegram Bot API" {
 				tg = true
 			}
+			if r.URL == "https://research.kas.pa" {
+				research = true
+			}
+			if r.URL == "https://research.kas.pa/t/kurrent-an-eltoo-inspired-latest-state-channel-on-kaspa/494" {
+				kurrent = true
+			}
 		}
 	}
-	if !kip || !disc || !tg || !vision || !explained || !video {
-		t.Fatalf("kip=%v disc=%v tg=%v vision=%v explained=%v video=%v", kip, disc, tg, vision, explained, video)
+	if !kip || !disc || !tg || !vision || !explained || !video || !research || !kurrent {
+		t.Fatalf("kip=%v disc=%v tg=%v vision=%v explained=%v video=%v research=%v kurrent=%v", kip, disc, tg, vision, explained, video, research, kurrent)
 	}
 }
