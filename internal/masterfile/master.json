@@ -1,7 +1,7 @@
 {
   "title": "Kaspa master file",
   "repo": "https://github.com/STP-KAS/kaspa-master-file",
-  "updated": "2026-09-06",
+  "updated": "2026-09-07",
   "disclaimer": "Not Kaspa core. Not official KNS. @StppStp. Merged Active KIP is law. Open PR is not.",
   "sections": [
     {
@@ -36,7 +36,7 @@
         {"name": "Wiki", "url": "https://wiki.kaspa.org", "chip": "wiki", "note": "Wallets: wiki.kaspa.org/wallet"},
         {"name": "kaspanet/docs", "url": "https://github.com/kaspanet/docs", "chip": "docs", "note": "Core docs repo."},
         {"name": "docs.kaspa.org/toccata", "url": "https://docs.kaspa.org/toccata", "chip": "official", "note": "Toccata guide. Consensus live; tooling young."},
-        {"name": "research.kas.pa", "url": "https://research.kas.pa", "chip": "forum", "note": "vProgs, sequencing, bridges."},
+        {"name": "research.kas.pa", "url": "https://research.kas.pa", "chip": "forum", "note": "Official Discourse. Threads ≠ KIPs. Catalog below."},
         {"name": "kaspa.news", "url": "https://kaspa.news", "chip": "recap", "note": "Public recaps of Core R&D Telegram."},
         {"name": "Kaspalytics", "url": "https://www.kaspalytics.com", "chip": "learn", "note": "Toccata / SilverScript explainers. Not core."},
         {"name": "Explorer", "url": "https://explorer.kaspa.org", "chip": "live", "note": "L1 txs."},
@@ -44,6 +44,56 @@
         {"name": "kaspaexplained.com", "url": "https://kaspaexplained.com/", "chip": "explained", "note": "Independent explainer. Start-here, FAQ, status. Not kaspanet."},
         {"name": "kaspaexplained.com/kips", "url": "https://kaspaexplained.com/kips", "chip": "tracker", "note": "Human map. Not law."},
         {"name": "Toccata status", "url": "https://kaspaexplained.com/toccata-status", "chip": "tracker", "note": "Live claims."}
+      ]
+    },
+    {
+      "id": "research",
+      "title": "research.kas.pa (forum, not law)",
+      "rows": [
+        {"name": "Forum home", "url": "https://research.kas.pa", "chip": "forum", "note": "~50 public topics. A thread is not a KIP. Freeze 7 Sep 2026."},
+        {"name": "latest.json", "url": "https://research.kas.pa/latest.json", "chip": "api", "note": "Discourse list. Re-check before quoting."},
+        {"name": "L1/L2", "url": "https://research.kas.pa/c/l1-l2/11", "chip": "forum", "note": "17 topics. vProgs, sequencing, DA, Kurrent. Out of Gramlane path."},
+        {"name": "Consensus", "url": "https://research.kas.pa/c/consensus/9", "chip": "forum", "note": "Crescendo, KIP-10, red-block txs."},
+        {"name": "Economics", "url": "https://research.kas.pa/c/economics/6", "chip": "forum", "note": "Issuance, adaptive size, tail emission. Not a KIP."},
+        {"name": "Mining", "url": "https://research.kas.pa/c/mining/7", "chip": "forum", "note": "Not this desk."},
+        {"name": "kaspanet/research", "url": "https://github.com/kaspanet/research", "chip": "papers", "note": "vProgs yellow paper. Not the forum."},
+        {"name": "Kurrent (23 Jun 2026)", "url": "https://research.kas.pa/t/kurrent-an-eltoo-inspired-latest-state-channel-on-kaspa/494", "chip": "research", "note": "a19q3. Eltoo-inspired latest-state channel on KIP-17/20. Not watch-free. Not product."},
+        {"name": "a19q3/Kurrent", "url": "https://github.com/a19q3/Kurrent", "chip": "research", "note": "Repo + thesis PDF. Local-devnet evidence. Unaudited."},
+        {"name": "Dynamic tail emission", "url": "https://research.kas.pa/t/dynamic-tail-emission-that-preserves-the-maximum-supply-to-secure-mining/473", "chip": "wrong", "note": "Apr 2026 proposal. Kaspa still has a max supply. Not a KIP."},
+        {"name": "Adaptive block sizes", "url": "https://research.kas.pa/t/adaptive-block-sizes/464", "chip": "research", "note": "Bit_Cat, Feb 2026. hashdag replied. Not shipped."}
+      ]
+    },
+    {
+      "id": "research-vprogs",
+      "title": "research.kas.pa — vProgs / L1↔L2 (not product)",
+      "rows": [
+        {"name": "Concrete vProgs architecture", "url": "https://research.kas.pa/t/concrete-proposal-for-a-synchronously-composable-verifiable-programs-architecture/387", "chip": "research", "note": "hashdag, Aug 2025. The vProgs pin. No public testnet as product."},
+        {"name": "Zoom-in: vProg computation DAG", "url": "https://research.kas.pa/t/zoom-in-a-formal-backbone-model-for-the-vprog-computation-dag/407", "chip": "research", "note": "michaelsutton, Aug 2025."},
+        {"name": "Transaction scopes / object DAG", "url": "https://research.kas.pa/t/on-transaction-scopes-and-the-visibility-of-the-object-dag/410", "chip": "research", "note": "hashdag, Aug 2025."},
+        {"name": "Pruning safety in vProgs", "url": "https://research.kas.pa/t/pruning-safety-in-the-vprogs-architecture/411", "chip": "research", "note": "FreshAir08."},
+        {"name": "Based ZK rollups over UTXO DAG", "url": "https://research.kas.pa/t/on-the-design-of-based-zk-rollups-over-kaspas-utxo-based-dag-consensus/208", "chip": "research", "note": "michaelsutton, Dec 2024. Out of Gramlane path."},
+        {"name": "Atomic composability (L1/L2)", "url": "https://research.kas.pa/t/atomic-composability-and-other-considerations-for-l1-l2-support/193", "chip": "research", "note": "hashdag, Nov 2024. Highest views on the forum."},
+        {"name": "L1↔L2 canonical bridge", "url": "https://research.kas.pa/t/l1-l2-canonical-bridge-entry-exit-mechanism/258", "chip": "research", "note": "michaelsutton. Not a live bridge."},
+        {"name": "Covenant + async message std", "url": "https://research.kas.pa/t/thoughts-about-covenant-and-async-message-standardization/293", "chip": "research", "note": "michaelsutton, Jan 2025."},
+        {"name": "Subnets sequencing commitments", "url": "https://research.kas.pa/t/subnets-sequencing-commitments/274", "chip": "research", "note": "FreshAir08 / Sutton."},
+        {"name": "Fees and throughput regulation", "url": "https://research.kas.pa/t/fees-and-throughput-regulation-dynamics/247", "chip": "research", "note": "hashdag."},
+        {"name": "L1↔L2 open topics list", "url": "https://research.kas.pa/t/updateable-list-of-l1-l2-topics-to-flesh-out-before-finalizing-design/237", "chip": "research", "note": "hashdag checklist. Still open."},
+        {"name": "Data availability", "url": "https://research.kas.pa/t/data-availability-concerns/375", "chip": "research", "note": "Hans_Moog."},
+        {"name": "Proofs stitching", "url": "https://research.kas.pa/t/a-basic-framework-for-proofs-stitching/323", "chip": "research", "note": "FreshAir08."},
+        {"name": "Multileader vs inclusion-time proving", "url": "https://research.kas.pa/t/on-the-inherent-tension-between-multileader-consensus-and-inclusion-time-proving/347", "chip": "research", "note": "michaelsutton."},
+        {"name": "Elastic throughput", "url": "https://research.kas.pa/t/a-proposal-towards-elastic-throughput/295", "chip": "wrong", "note": "hashdag. Not 100 BPS. Not a spec."}
+      ]
+    },
+    {
+      "id": "research-kips",
+      "title": "research.kas.pa — threads that became KIPs",
+      "rows": [
+        {"name": "Quadratic storage mass", "url": "https://research.kas.pa/t/quadratic-storage-mass-and-kip9/159", "chip": "Active", "note": "Became KIP-9. Law is the KIP, not the thread."},
+        {"name": "Additive addresses", "url": "https://research.kas.pa/t/auto-compounding-additive-addresses-kip10-draft/168", "chip": "Active", "note": "Became KIP-10."},
+        {"name": "Hash / ZK opcodes", "url": "https://research.kas.pa/t/additional-practical-considerations-re-hash-function-and-zk-opcodes/219", "chip": "Active", "note": "Toccata KIP-16 discussion. Most-liked forum thread."},
+        {"name": "Crescendo hardfork", "url": "https://research.kas.pa/t/crescendo-hardfork-discussion-thread/279", "chip": "Active", "note": "KIP-14 era. 10 BPS is live."},
+        {"name": "KIP-15 discussion", "url": "https://research.kas.pa/t/kip-15-discussion-thread/303", "chip": "Active", "note": "someone235. KIP-15 Active."},
+        {"name": "KIP-6 discussion", "url": "https://research.kas.pa/t/kip-6-discussion-thread/189", "chip": "Draft", "note": "KIP-6 still Draft. Not product."}
       ]
     },
     {
@@ -112,7 +162,8 @@
         {"name": "Argent", "url": "https://github.com/argent-lang/argent", "chip": "external", "note": "Not this desk."},
         {"name": "gramlane", "url": "https://github.com/STP-KAS/gramlane", "chip": "this", "note": "skip centralised stablecoins for dapps. Cheap grams. Still delusional."},
         {"name": "KaChat", "url": "https://github.com/vsmirn0v/KaChat", "chip": "other", "note": "Not cloned."},
-        {"name": "coderofstuff dk-wiki", "url": "https://github.com/coderofstuff/dk-wiki", "chip": "wrong", "note": "Unofficial. Not a pin."}
+        {"name": "coderofstuff dk-wiki", "url": "https://github.com/coderofstuff/dk-wiki", "chip": "wrong", "note": "Unofficial. Not a pin."},
+        {"name": "a19q3/Kurrent", "url": "https://github.com/a19q3/Kurrent", "chip": "research", "note": "Latest-state channel. Forum 494. Devnet only. Not Gramlane."}
       ]
     },
     {
@@ -137,7 +188,8 @@
         {"name": "23 Aug KCC-0020 AMM test", "url": "https://kaspa.news/articles", "chip": "draft", "note": "KaspaKaha testnet AMM. Not the standard."},
         {"name": "3 Sep Toccata live post", "url": "https://x.com/KASPAglobal", "chip": "live", "note": "DAA 474165565. Not coming soon."},
         {"name": "4 Sep framing article", "url": "https://kaspa.news/articles/why-reading-a-number-is-not-the-same-as-trusting-it", "chip": "234", "note": "Foreign reads still unsafe. Gramlane only validateOutputState."},
-        {"name": "4 Sep dagknight PRs", "url": "https://github.com/kaspanet/rusty-kaspa/pulls", "chip": "research", "note": "Open/draft. KIP-2 not shipped."}
+        {"name": "4 Sep dagknight PRs", "url": "https://github.com/kaspanet/rusty-kaspa/pulls", "chip": "research", "note": "Open/draft. KIP-2 not shipped."},
+        {"name": "23 Jun Kurrent RFC", "url": "https://research.kas.pa/t/kurrent-an-eltoo-inspired-latest-state-channel-on-kaspa/494", "chip": "research", "note": "a19q3 on research.kas.pa. Eltoo-inspired channel. Not product."}
       ]
     },
     {
@@ -147,7 +199,7 @@
         {"name": "Virtual DAA", "url": "https://api.kaspa.org/info/blockdag", "chip": "530957175", "note": "Recheck before quoting."},
         {"name": "Circulating KAS", "url": "https://api.kaspa.org/info/coinsupply", "chip": "~27.681B", "note": "Of ~28.704B max. Recheck."},
         {"name": "Covenant adoption (24 Aug)", "url": "https://kaspaexplained.com", "chip": "early", "note": "28125 ever, 519 active, ~1.53M KAS. TN10 still dominates."},
-        {"name": "Do not claim", "url": "https://github.com/STP-KAS/kaspa-master-file", "chip": "wrong", "note": "100 BPS, DAGKnight live, KCC-20 adopted, vProgs live, Sil v1 stable, pqv/Portrait mainnet."}
+        {"name": "Do not claim", "url": "https://github.com/STP-KAS/kaspa-master-file", "chip": "wrong", "note": "100 BPS, DAGKnight live, KCC-20 adopted, vProgs live, Kurrent mainnet, Sil v1 stable, pqv/Portrait mainnet."}
       ]
     },
     {
