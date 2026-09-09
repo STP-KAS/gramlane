@@ -42,6 +42,12 @@ Many hosts worldwide = many desks, many jars. That is **not** one global Circle.
 
 How: `/host`. Source: [STP-KAS/gramlane](https://github.com/STP-KAS/gramlane).
 
+## Sequence (the PoC)
+
+Fill once. Then `/seq` runs ordered work: DAG heartbeat, a name, postage. Same prepaid grams. The wallet stays closed. That is the cheap alternative to USDC-for-dApps.
+
+Darwin (honest): PegLab tPEG **will depeg** — classroom. MIX / Parker GitHub **teach**. Gramlane **sequences**. Scorecard: [STP-KAS/gramlanepeglab](https://github.com/STP-KAS/gramlanepeglab). Parker cited as [parker2017code/kaspa-explained](https://github.com/parker2017code/kaspa-explained) only.
+
 ## Use it where the scarce thing is work, not rent
 
 | Work | What grams pay | What grams are not |

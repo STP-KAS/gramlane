@@ -197,6 +197,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/genesis", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]any{"ok": true, "data": genesis.Live(), "seq": seq.Snap(), "payTo": desk.PayTo()})
 	})
+	mux.HandleFunc("/seq", s.seqPage)
+	mux.HandleFunc("/sequence", s.seqPage)
+	mux.HandleFunc("/poc", s.seqPage)
 	mux.HandleFunc("/api/seq", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]any{"ok": true, "data": seq.Snap()})
 	})
@@ -249,33 +252,36 @@ func (s *Server) Handler() http.Handler {
 		writeJSON(w, 200, map[string]any{
 			"ok": true, "dapp": "gramlane", "layer": "kaspa-l1",
 			"unit": "gram", "l2": false, "stablecoin": false,
-			"headline":       ethos.Headline,
-			"vision":         ethos.Vision,
-			"visionLine":     ethos.Line,
-			"jarNakamoto":    ethos.JarIsNakamoto,
-			"securityBudget": ethos.SecurityBudget,
-			"fillAmount":     ethos.FillAmount,
-			"fillIsBusiness": ethos.FillIsBusiness,
-			"fillBurnsKas":   ethos.FillBurnsKAS,
-			"payTo":          desk.PayTo(),
-			"host":           "/host",
-			"products":       []string{"kasdomain", "shop", "spend", "pos", "vault", "postage", "agent", "site", "convert", "jar"},
-			"nameSettle":     "kas",
-			"tillUnit":       "gram",
-			"shelf":          "USD",
-			"kns":            false,
-			"kasdomain":      "live",
-			"toccata":        "live",
-			"kips":           "https://github.com/kaspanet/kips",
-			"kip21":          "https://github.com/kaspanet/kips/blob/master/kip-0021.md",
-			"kccs":           "https://github.com/kaspanet/kccs",
-			"silverscript":   "https://github.com/kaspanet/silverscript/releases",
-			"explained":      "https://kaspaexplained.com/kips",
-			"claims":         "https://kaspaexplained.com/toccata-status",
-			"sources":        "/sources",
-			"sompiPerGram":   quote.SompiPerGram,
-			"grok":           agent.HasKey(),
-			"gramsRemaining": led.Remaining, "credits": led.Credits,
+			"headline":        ethos.Headline,
+			"vision":          ethos.Vision,
+			"visionLine":      ethos.Line,
+			"jarNakamoto":     ethos.JarIsNakamoto,
+			"securityBudget":  ethos.SecurityBudget,
+			"fillAmount":      ethos.FillAmount,
+			"fillIsBusiness":  ethos.FillIsBusiness,
+			"fillBurnsKas":    ethos.FillBurnsKAS,
+			"payTo":           desk.PayTo(),
+			"host":            "/host",
+			"products":        []string{"kasdomain", "shop", "spend", "pos", "vault", "postage", "agent", "site", "convert", "jar", "sequence"},
+			"silverscriptPin": "v1.0.0",
+			"masterfile":      masterfile.Live().Updated,
+			"battletest":      "https://github.com/STP-KAS/gramlanepeglab",
+			"nameSettle":      "kas",
+			"tillUnit":        "gram",
+			"shelf":           "USD",
+			"kns":             false,
+			"kasdomain":       "live",
+			"toccata":         "live",
+			"kips":            "https://github.com/kaspanet/kips",
+			"kip21":           "https://github.com/kaspanet/kips/blob/master/kip-0021.md",
+			"kccs":            "https://github.com/kaspanet/kccs",
+			"silverscript":    "https://github.com/kaspanet/silverscript/releases",
+			"explained":       "https://kaspaexplained.com/kips",
+			"claims":          "https://kaspaexplained.com/toccata-status",
+			"sources":         "/sources",
+			"sompiPerGram":    quote.SompiPerGram,
+			"grok":            agent.HasKey(),
+			"gramsRemaining":  led.Remaining, "credits": led.Credits,
 			"voucherOnChain": led.OnChain, "saleTx": led.SaleTx,
 			"voucherTx": led.VoucherTx, "p2sh": led.P2SH,
 		})
@@ -372,6 +378,11 @@ func (s *Server) hostPage(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) desk(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "desk.html", page{Title: "Apps · Gramlane", Active: "apps", Jobs: jobs.Catalog})
+}
+
+func (s *Server) seqPage(w http.ResponseWriter, r *http.Request) {
+	j, _ := jobs.Get("sequence")
+	s.render(w, "seq.html", page{Title: "Sequence · Gramlane", Active: "seq", Job: &j, Jobs: jobs.Catalog})
 }
 
 func convertFromRequest(r *http.Request) (quote.Convert, error) {

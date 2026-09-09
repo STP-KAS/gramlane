@@ -1,6 +1,9 @@
 package jobs
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestResolveJobIsFloorGrams(t *testing.T) {
 	j, ok := Get("resolve")
@@ -74,5 +77,22 @@ func TestVaultJob(t *testing.T) {
 	}
 	if _, ok := Get("site"); !ok {
 		t.Fatal("site")
+	}
+}
+
+func TestSequenceJob(t *testing.T) {
+	j, ok := Get("sequence")
+	if !ok || j.Grams != Floor || j.Lane != "SEQ1" {
+		t.Fatalf("%+v", j)
+	}
+	rec, err := RunAs(j, "kaspadao.kas", "grams", "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rec.Settlement != "prepaid-grams" {
+		t.Fatalf("settle %s", rec.Settlement)
+	}
+	if !strings.Contains(rec.Output, "1 dag") || !strings.Contains(rec.Output, "3 postage") {
+		t.Fatalf("output %s", rec.Output)
 	}
 }

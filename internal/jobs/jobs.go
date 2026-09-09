@@ -51,6 +51,7 @@ var Catalog = []Job{
 	{ID: "dag", Name: "BlockDAG heartbeat", Blurb: "Read virtual DAA from api.kaspa.org. Cheap inclusion probe.", Grams: Floor, Lane: "SEQ1", Kind: "dag"},
 	{ID: "profile", Name: "Pull KNS profile texts", Blurb: "Avatar, x, website if the public name index has them. Not kasdomain.", Grams: Floor, Lane: "SIGN1", Kind: "profile", Tag: "indexer · not kasdomain"},
 	{ID: "batch", Name: "Batch three KNS resolves", Blurb: "Three inscription lookups. Indexer · not kasdomain.", Grams: Floor, Lane: "SIGN1", Kind: "batch", Tag: "indexer · not kasdomain"},
+	{ID: "sequence", Name: "Sequence three jobs", Blurb: "Ordered: DAG heartbeat, then a name, then postage. One prepaid burn. Wallet stays closed.", Grams: Floor, Lane: "SEQ1", Kind: "sequence"},
 	{ID: "vault", Name: "Vault bump (not the lock)", Blurb: "Grams pay the framing action. The vault still locks KAS. Worked #234: amount 1 can read as 264.", Grams: Floor, Lane: "SEQ1", Kind: "vault"},
 	{ID: "postage", Name: "KaChat postage", Blurb: "Sequenced stamp to a .kas contact. Not E2E — KaChat seals ciph_msg in the wallet.", Grams: Floor, Lane: "MSG1", Kind: "postage"},
 	{ID: "telegram", Name: "Telegram note", Blurb: "AES-GCM in the browser. Text and sender in the box. Grams pay the desk. Not Telegram Inc. Not KaChat.", Grams: Floor, Lane: "MSG1", Kind: "telegram"},
@@ -244,6 +245,25 @@ func RunAs(j Job, q, paid, payer, wallet string) (Receipt, error) {
 				continue
 			}
 			parts = append(parts, n+":\n"+pretty(b))
+		}
+		r.Output = strings.Join(parts, "\n\n")
+	case "sequence":
+		var parts []string
+		if b, err := getJSON("https://api.kaspa.org/info/blockdag"); err != nil {
+			parts = append(parts, "1 dag: "+err.Error())
+		} else {
+			parts = append(parts, "1 dag:\n"+pretty(b))
+		}
+		if b, err := getJSON(ownerURL(q)); err != nil {
+			parts = append(parts, "2 resolve: "+err.Error())
+		} else {
+			parts = append(parts, "2 resolve:\n"+pretty(b))
+		}
+		st := post.StampMsg(r.Payer, q, j.Grams)
+		if b, err := json.MarshalIndent(st, "", "  "); err != nil {
+			parts = append(parts, "3 postage: "+err.Error())
+		} else {
+			parts = append(parts, "3 postage:\n"+string(b))
 		}
 		r.Output = strings.Join(parts, "\n\n")
 	case "vault":
