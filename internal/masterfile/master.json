@@ -1,7 +1,7 @@
 {
   "title": "Kaspa master file",
   "repo": "https://github.com/STP-KAS/kaspa-master-file",
-  "updated": "2026-09-07",
+  "updated": "2026-09-09",
   "disclaimer": "Not Kaspa core. Not official KNS. @StppStp. Merged Active KIP is law. Open PR is not.",
   "sections": [
     {
@@ -14,7 +14,23 @@
         {"name": "FAQ", "url": "https://kaspaexplained.com/faq", "chip": "read", "note": "Is it PoW? What is 10 blocks/s? Is Toccata live? Answers with links so you can check."},
         {"name": "kaspa.org", "url": "https://kaspa.org", "chip": "official", "note": "Official site. Fair launch. No premine."},
         {"name": "Wallets", "url": "https://wiki.kaspa.org/wallet", "chip": "wiki", "note": "How to hold KAS. Nobody from a website should ask for your seed."},
-        {"name": "Video (community)", "url": "https://x.com/kaspaunchained/status/2096211914825285808", "chip": "watch", "note": "@kaspaunchained, 5 Sep 2026. “Only gets better with age.” Older clip (Odie). Not a spec. Not core. Watch, then read the pages above."}
+        {"name": "Video (community)", "url": "https://x.com/kaspaunchained/status/2096211914825285808", "chip": "watch", "note": "@kaspaunchained, 5 Sep 2026. “Only gets better with age.” Older clip (Odie). Not a spec. Not core. Watch, then read the pages above."},
+        {"name": "Grok share (X)", "url": "https://x.com/i/grok/share/c59cba827c574d028607693855b2e5fc", "chip": "share", "note": "Community share. Not a KIP. Recheck before quoting."},
+        {"name": "Faucets and mining", "url": "https://kaspa.aspectron.org/faucets-mining.html", "chip": "ops", "note": "Aspectron. TN faucets, mining entry, public node network. Not kaspanet."},
+        {"name": "Kaspa Q&A", "url": "https://qa.kas.pa/", "chip": "qa", "note": "Community questions. Answers are not KIPs."},
+        {"name": "Kaspa Silver", "url": "https://www.youtube.com/channel/UCv8-2oyrfqDigJAKjZ_RCzQ", "chip": "watch", "note": "Honest protocol explainers. Not core. Not a price channel."},
+        {"name": "Kaspa Graph Inspector", "url": "https://kgi.kaspad.net/", "chip": "live", "note": "Live blockDAG. Default visual on every intel door."},
+        {"name": "kaspa.stream", "url": "https://kaspa.stream/", "chip": "explore", "note": "Explorer for ordinary reading of blocks and transactions."},
+        {"name": "Testnet-10 faucet", "url": "https://faucet-testnet.kaspanet.io", "chip": "tn10", "note": "Toy coins. Never mainnet."},
+        {"name": "kaspa.org/build", "url": "https://kaspa.org/build", "chip": "official", "note": "Official builder door: WASM, node, docs, faucet."},
+        {"name": "Grok share (build notes)", "url": "https://grok.com/share/bGVnYWN5_13075cb2-2ed7-48ac-9e88-861102ca4b4b", "chip": "share", "note": "Community share. Not a KIP."},
+        {"name": "@manyfest_ note", "url": "https://x.com/manyfest_/status/2096312480586748371", "chip": "ss", "note": "SilverScript / builder note. Not law."},
+        {"name": "The Book of Kaspa", "url": "https://www.amazon.com/Book-Kaspa-Realizing-Nakamoto-Dream/dp/B0CCCJ3936", "chip": "book", "note": "Guest book. Not consensus evidence."},
+        {"name": "Kaspa Ghost Knight", "url": "https://www.amazon.com/Kaspa-Ghost-Knight-blockchains-plight-ebook/dp/B0D2VK4PVR", "chip": "book", "note": "Guest book. Not consensus evidence."},
+        {"name": "Kas Smiths", "url": "https://kas-smiths.org", "chip": "workshop", "note": "Builder workshop. kasmith.org is the same desk name; use this URL. Not a KIP."},
+        {"name": "Aviv Zohar", "url": "https://avivz.net", "chip": "research", "note": "@Avivz78. GHOST co-author / research."},
+        {"name": "Discord help room", "url": "https://discord.com/channels/599153230659846165/960905681832140850", "chip": "discord", "note": "Dedicated rooms exist. Browse, then ask. Invite: https://discord.gg/kaspa"},
+        {"name": "Core R&D Telegram", "url": "https://t.me/kasparnd", "chip": "rnd", "note": "Observer-first. Recaps: kaspa.news."}
       ]
     },
     {
@@ -24,7 +40,8 @@
         {"name": "project delusional", "url": "https://github.com/STP-KAS/project-delusional", "chip": "headline", "note": "Kaspa master file, ideas and principles. Still a delusional idea."},
         {"name": "skip centralised stablecoins for dapps", "url": "https://github.com/STP-KAS/gramlane", "chip": "principle", "note": "One principle. Cheap L1 grams vs USDC-for-dApps. Not the headline."},
         {"name": "Fill is not a business", "url": "https://github.com/STP-KAS/gramlane", "chip": "security", "note": "This desk keeps 0. Any Kaspa wallet: QR / kaspa: URI / paste txid. Inject is only Kasware or Kastle."},
-        {"name": "Anyone hosts", "url": "https://github.com/STP-KAS/gramlane", "chip": "host", "note": "Same principle as a node: PC binary, PWA of that host, hardware signs the fill. Many desks ≠ Circle. The jar is not Nakamoto."}
+        {"name": "Anyone hosts", "url": "https://github.com/STP-KAS/gramlane", "chip": "host", "note": "Same principle as a node: PC binary, PWA of that host, hardware signs the fill. Many desks ≠ Circle. The jar is not Nakamoto."},
+        {"name": "Darwin battletest", "url": "https://github.com/STP-KAS/gramlanepeglab", "chip": "poc", "note": "Parker mix Darwin. Grams sequence dapps. PegLab depegs. MIX teaches. Compiler tag is not a dapp."}
       ]
     },
     {
@@ -102,7 +119,7 @@
       "rows": [
         {"name": "rusty-kaspa", "url": "https://github.com/kaspanet/rusty-kaspa", "chip": "node", "note": "v2.0.0 Toccata · v2.0.1 · dagknight branch unmerged."},
         {"name": "kips", "url": "https://github.com/kaspanet/kips", "chip": "law", "note": "Improvement proposals."},
-        {"name": "silverscript", "url": "https://github.com/kaspanet/silverscript/releases", "chip": "v1-rc1", "note": "Only tag 30 Aug 2026. Not master."},
+        {"name": "silverscript", "url": "https://github.com/kaspanet/silverscript/releases/tag/v1.0.0", "chip": "v1.0.0", "note": "Ori / someone235 tagged 9 Sep 2026, commit 3ed9733. SemVer v1. Windows zip SHA256 3e0d660c15a9e7ac90f3960da24d348b076b1891481bfe758db18accc8a102e1. #234 still unmerged."},
         {"name": "kccs", "url": "https://github.com/kaspanet/kccs", "chip": "Draft", "note": "Refuse as a gram token."},
         {"name": "vprogs", "url": "https://github.com/kaspanet/vprogs", "chip": "research", "note": "No product testnet here."},
         {"name": "kaspad (Go)", "url": "https://github.com/kaspanet/kaspad", "chip": "deprecated", "note": "Use rusty-kaspa."}
@@ -131,6 +148,8 @@
         {"name": "@hus_qy", "url": "https://x.com/hus_qy", "chip": "core", "note": "Hans Moog."},
         {"name": "@IzioDev", "url": "https://x.com/IzioDev", "chip": "core", "note": "Romain Billot."},
         {"name": "@biryukovmaxim", "url": "https://x.com/biryukovmaxim", "chip": "core", "note": "KIP-21."},
+        {"name": "@Avivz78", "url": "https://x.com/Avivz78", "chip": "research", "note": "Aviv Zohar. GHOST co-author. avivz.net."},
+        {"name": "@DesheShai", "url": "https://x.com/DesheShai", "chip": "history", "note": "GHOSTDAG co-author. Left core (2025 farewell). Not a current core pin."},
         {"name": "@kaspaunchained", "url": "https://x.com/kaspaunchained", "chip": "community", "note": "Non-representative community X."},
         {"name": "@KASPAglobal", "url": "https://x.com/KASPAglobal", "chip": "community", "note": "3 Sep 2026: Toccata live, not coming soon."},
         {"name": "@Kaspa_Commons", "url": "https://x.com/Kaspa_Commons", "chip": "community", "note": "Relays Discord. Not core."},
@@ -161,6 +180,10 @@
         {"name": "kaspa-pqv", "url": "https://github.com/aglov413/kaspa-pqv", "chip": "TN10", "note": "Posted Core R&D 27 Aug. Hash-based PQ vault. Unaudited."},
         {"name": "Argent", "url": "https://github.com/argent-lang/argent", "chip": "external", "note": "Not this desk."},
         {"name": "gramlane", "url": "https://github.com/STP-KAS/gramlane", "chip": "this", "note": "skip centralised stablecoins for dapps. Cheap grams. Still delusional."},
+        {"name": "kns-spec", "url": "https://github.com/STP-KAS/kns-spec", "chip": "this", "note": "Implementer kit. URL https://stp-kas.github.io/kns-spec/ KasName recompiled with silverc v1.0.0."},
+        {"name": "mixer-concept", "url": "https://github.com/STP-KAS/mixer-concept", "chip": "mix", "note": "Parker GitHub models + STP doors + PegLab classroom. Education. Not a token. Not kaspaexplained.com."},
+        {"name": "peglab-stp", "url": "https://github.com/STP-KAS/peglab-stp", "chip": "tn10", "note": "Toy that WILL depeg. Not USD. Not Gramlane grams."},
+        {"name": "gramlanepeglab", "url": "https://github.com/STP-KAS/gramlanepeglab", "chip": "darwin", "note": "Parker mix Darwin battletest. Sequencing PoC vs a depeg lab vs MIX doors."},
         {"name": "KaChat", "url": "https://github.com/vsmirn0v/KaChat", "chip": "other", "note": "Not cloned."},
         {"name": "coderofstuff dk-wiki", "url": "https://github.com/coderofstuff/dk-wiki", "chip": "wrong", "note": "Unofficial. Not a pin."},
         {"name": "a19q3/Kurrent", "url": "https://github.com/a19q3/Kurrent", "chip": "research", "note": "Latest-state channel. Forum 494. Devnet only. Not Gramlane."}
@@ -168,14 +191,15 @@
     },
     {
       "id": "silverscript-people",
-      "title": "SilverScript v1-rc1 contributors",
+      "title": "SilverScript v1 contributors",
       "rows": [
-        {"name": "someone235 / Ori Newman", "url": "https://github.com/someone235", "chip": "lead", "note": "134 commits. Tagged v1-rc1. X @OriNewman. KIP-17. rusty-kaspa."},
+        {"name": "someone235 / Ori Newman", "url": "https://github.com/someone235", "chip": "lead", "note": "Tagged v1.0.0 on 9 Sep 2026 (3ed9733) and v1-rc1 on 30 Aug. X @OriNewman. KIP-17. rusty-kaspa."},
         {"name": "michaelsutton", "url": "https://github.com/michaelsutton", "chip": "review", "note": "20 commits. X @michaelsuttonil. Argent + KCC-0020 + KIP-21."},
         {"name": "IzioDev / Romain Billot", "url": "https://github.com/IzioDev", "chip": "review", "note": "10 commits. X @IzioDev. KEF-funded. KCC-0020 + KIP-25 draft. izio.fr."},
         {"name": "Manyfestation / Sivan Helfer", "url": "https://github.com/Manyfestation", "chip": "compiler", "note": "9 commits. X @manyfest_. Debugger, KCC-0020, Kas-Smiths."},
         {"name": "elldeeone / Luke Dunshea", "url": "https://github.com/elldeeone", "chip": "zk", "note": "2 commits. X @elldeeone. g16.verify PR 138. dunshea.au. x402."},
-        {"name": "v1-rc1 release", "url": "https://github.com/kaspanet/silverscript/releases/tag/v1-rc1", "chip": "pin", "note": "The credit list. Copilot bot omitted. mw-pearson only reacted."},
+        {"name": "v1.0.0 release", "url": "https://github.com/kaspanet/silverscript/releases/tag/v1.0.0", "chip": "pin", "note": "Official SemVer v1. 9 Sep 2026. Credits: elldeeone, IzioDev, Manyfestation, michaelsutton."},
+        {"name": "v1-rc1 (history)", "url": "https://github.com/kaspanet/silverscript/releases/tag/v1-rc1", "chip": "history", "note": "30 Aug 2026, c7d17a1. Replaced by v1.0.0."},
         {"name": "CashScript (inspiration)", "url": "https://cashscript.org/", "chip": "credit", "note": "Rosco Kalis MIT. Grammar ancestor. Not Kaspa core."}
       ]
     },
@@ -189,6 +213,7 @@
         {"name": "3 Sep Toccata live post", "url": "https://x.com/KASPAglobal", "chip": "live", "note": "DAA 474165565. Not coming soon."},
         {"name": "4 Sep framing article", "url": "https://kaspa.news/articles/why-reading-a-number-is-not-the-same-as-trusting-it", "chip": "234", "note": "Foreign reads still unsafe. Gramlane only validateOutputState."},
         {"name": "4 Sep dagknight PRs", "url": "https://github.com/kaspanet/rusty-kaspa/pulls", "chip": "research", "note": "Open/draft. KIP-2 not shipped."},
+        {"name": "9 Sep SilverScript v1.0.0", "url": "https://github.com/kaspanet/silverscript/releases/tag/v1.0.0", "chip": "pin", "note": "Ori / someone235. Commit 3ed9733. SemVer v1. #234 still unmerged. #243 still open."},
         {"name": "23 Jun Kurrent RFC", "url": "https://research.kas.pa/t/kurrent-an-eltoo-inspired-latest-state-channel-on-kaspa/494", "chip": "research", "note": "a19q3 on research.kas.pa. Eltoo-inspired channel. Not product."}
       ]
     },

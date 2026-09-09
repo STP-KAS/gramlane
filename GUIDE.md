@@ -6,7 +6,7 @@ Human steps for **grams** live on the dApp: http://127.0.0.1:8081/guide
 
 - App source: `C:\Users\Remco\kns`
 - This map: `C:\Users\Remco\Documents\kaspa\superapp`
-- Compiler: `C:\Users\Remco\tools\silverc\silverc.exe` (official [v1-rc1](https://github.com/kaspanet/silverscript/releases/tag/v1-rc1) zip). List: https://github.com/kaspanet/silverscript/releases — only that tag as of 5 Sep 2026. Not master.
+- Compiler pin: official [v1.0.0](https://github.com/kaspanet/silverscript/releases/tag/v1.0.0) (9 Sep 2026, 3ed9733). v1-rc1 is history. This desk’s checked-in ABI is still the portable #232 JSON. Do not recompile onto git master. #234 still unmerged.
 - Language clone: `C:\Users\Remco\silverscript` @ `c7d17a1`
 - Live names: KNS indexer, not this disk
 
@@ -118,7 +118,7 @@ Artifact URLs:
 - “This app is KaChat / Kassword” — pointers only.
 - “WorkCredit is a stablecoin” — it is a gram voucher.
 - “Covenants back a dollar” — they back a ledger of work.
-- “Silverscript v1 is tagged mainnet” — you have **v1-rc1**.
+- “Silverscript v1 is a dapp” — **v1.0.0** is a compiler tag (9 Sep 2026). A compiler tag is not a dapp. #234 still unmerged.
 - “vProgs / DAGKnight / 100 BPS are live” — they are not.
 
 ## 8. Files to touch

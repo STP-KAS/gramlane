@@ -1,0 +1,64 @@
+{{template "header" .}}
+<main>
+  <p class="kicker">proof of concept · not a dollar</p>
+  <h1>Sequence the work.</h1>
+  <p class="lede">Fill once. Jobs run in order. The wallet stays closed. That is the cheap meter Circle does not give you on L1.</p>
+  {{if .Seq}}<p class="tiny">Jar {{.Seq.Remaining}} / {{.Seq.Credits}} g · burns {{len .Seq.Burns}}</p>{{end}}
+
+  <ol class="steps">
+    <li><strong>1 · DAG</strong>Heartbeat from api.kaspa.org. Inclusion probe.</li>
+    <li><strong>2 · Name</strong>Resolve a .kas on the public index. Not kasdomain.</li>
+    <li><strong>3 · Postage</strong>Stamp the contact. Same prepaid burn.</li>
+  </ol>
+
+  {{if .Job}}
+  <form class="row" action="/run" method="post">
+    <input type="hidden" name="job" value="{{.Job.ID}}" />
+    <input type="hidden" name="payment" value="grams" />
+    <div>
+      <label>name</label>
+      <input name="q" value="kaspadao.kas" autocomplete="off" spellcheck="false" />
+    </div>
+    <button class="btn mint" type="submit">Run sequence — burn {{.Job.Grams}} g</button>
+  </form>
+  {{end}}
+  <p class="tiny">HTTP receipt only. This desk does not verify a WorkCredit spend on L1 until consume(). Floor is 1,000 grams. <a href="/job/sequence">Job page</a> · <a href="/jar">Jar</a></p>
+
+  <h2>Beyond the DAG</h2>
+  <p class="lede">The chain is the court. The product is the bill that does not reopen a wallet.</p>
+  <div class="grid">
+    <article class="card">
+      <h3>Household</h3>
+      <p>Keep a jar for work. KAS is the rest. Same habit as a kitchen tin, not a bank.</p>
+    </article>
+    <article class="card">
+      <h3>Plant / control room</h3>
+      <p>A line, a poll, a command already has a unit: the event. Opex should not include an FX cell.</p>
+    </article>
+    <article class="card">
+      <h3>Agent till</h3>
+      <p>HTTP 402. A machine pays grams to call. Human optional. <a href="/agent">Agent</a></p>
+    </article>
+    <article class="card">
+      <h3>Counter</h3>
+      <p>Phone facing the buyer. Same URL as the email invoice. <a href="/pay">Pay</a></p>
+    </article>
+  </div>
+
+  <h2>Darwin (honest)</h2>
+  <table>
+    <tr><th>Species</th><th>Unit</th><th>Survives as dapp meter?</th></tr>
+    <tr><td><a href="https://github.com/STP-KAS/gramlane">Gramlane</a></td><td>prepaid grams (KIP-21 mass)</td><td>Yes as this PoC. Fill once, sequence jobs. Not USD.</td></tr>
+    <tr><td><a href="https://github.com/parker2017code/kaspa-explained">Parker GitHub</a></td><td>1 receipt = 1 locked sompi</td><td>Yes as a <em>receipt</em>. MIX doors teach it. Not this sequencer.</td></tr>
+    <tr><td><a href="https://github.com/STP-KAS/peglab-stp">PegLab</a></td><td>tPEG on TN10</td><td>No as money. WILL DEPEG. Classroom only.</td></tr>
+    <tr><td><a href="https://github.com/STP-KAS/mixer-concept">MIX</a></td><td>education</td><td>Not money. Doors first. Compiler tag is not a dapp.</td></tr>
+  </table>
+  <p class="tiny">Full scorecard: <a href="https://github.com/STP-KAS/gramlanepeglab">STP-KAS/gramlanepeglab</a> · Parker cited as GitHub only.</p>
+  <p class="actions">
+    <a class="btn mint" href="/spend">Fill the jar</a>
+    <a class="btn ghost" href="/why">Why</a>
+    <a class="btn ghost" href="/honest">Honest</a>
+    <a class="btn ghost" href="/masterfile">Master file</a>
+  </p>
+</main>
+{{template "footer" .}}

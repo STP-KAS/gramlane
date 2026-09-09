@@ -6,6 +6,8 @@
 
 A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not a dollar. Does not replace USDT. **No L2 in this path.** Fill is **not a business**: this desk keeps 0. Pay from **any Kaspa wallet** (QR / `kaspa:` URI / paste txid). In-page one-click is only Kasware or Kastle. Amount goes to Kaspa growth. Anyone can run this binary worldwide (`/host`). The jar is not Nakamoto. Vaults still lock KAS; grams pay the action.
 
+Proof of concept: **sequence dapp work** (`/seq`). Fill once, run ordered jobs, wallet stays closed. Darwin battletest vs PegLab (WILL DEPEG) and MIX doors: [STP-KAS/gramlanepeglab](https://github.com/STP-KAS/gramlanepeglab).
+
 Sister dApp (when the invoice really is money):  
 `C:\Users\Remco\Documents\kaspa\superappstablesalternative` — Kaspa Till on `:8082`.
 
@@ -56,6 +58,8 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 | `/vision` | Skip centralised stablecoins for dapps |
 | `/host` | Anyone runs this binary. Fill is not this desk’s money. |
 | `/desk` | Job catalog in GRAM |
+| `/seq` | Sequencer PoC: ordered jobs, one prepaid burn. `/sequence` `/poc` |
+| `/job/sequence` | DAG → name → postage. Floor 1,000 g |
 | `/job/resolve` | Quote + burn prepaid grams |
 | `/api/run?job=dag` | Burns prepaid grams; 402 only after inventory is spent |
 | `/api/seq` | Remaining grams, voucher outpoint |

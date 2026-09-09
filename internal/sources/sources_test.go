@@ -13,4 +13,11 @@ func TestKIP21IsOnTheDeskURL(t *testing.T) {
 	if len(Used) < 10 {
 		t.Fatalf("used %d", len(Used))
 	}
+	v1, ok := ByLocal("/v1.0.0")
+	if !ok || v1.Chip != "pin" {
+		t.Fatalf("v1.0.0 pin %+v", v1)
+	}
+	if _, ok := ByLocal("/darwin"); !ok {
+		t.Fatal("darwin")
+	}
 }

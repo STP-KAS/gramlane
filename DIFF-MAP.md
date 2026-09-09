@@ -128,9 +128,9 @@ L2 (Igra, bridges, wrapped USDC) is out of scope for both.
 
 ---
 
-## Covenants — Silverscript v1-rc1
+## Covenants — Silverscript v1.0.0
 
-Official compiler: kaspanet `v1-rc1` (30 Aug 2026, @OriNewman) from [silverscript releases](https://github.com/kaspanet/silverscript/releases). Only tag as of 5 Sep 2026. RC ≠ tagged `v1`. Windows `silverc.exe` SHA256 `fbf75851e8d1c97e1982e72cb26e8b8f6417fa5a6ed99d58693d6314890619c3` (`silverc-windows-x86_64.zip`). Clone: `C:\Users\Remco\silverscript` @ `c7d17a1`.
+Official compiler: kaspanet **v1.0.0** (9 Sep 2026, Ori / someone235, commit `3ed9733`) from [silverscript releases](https://github.com/kaspanet/silverscript/releases/tag/v1.0.0). A compiler tag is not a dapp. v1-rc1 (30 Aug, `c7d17a1`) is history. This desk’s checked-in ABI JSON is still the portable #232 artifact. Do not recompile onto git master.
 
 Portable ABI JSON: [silverscript#232](https://github.com/kaspanet/silverscript/pull/232) merged. `WorkCredit-live.json` is `schema_version: 1`; loader accepts map or array `contracts`. Do not recompile onto silverc master. Foreign `readInputState` framing: [silverscript#234](https://github.com/kaspanet/silverscript/pull/234) **closed unmerged**. Compute budget is not in the artifact ([#243](https://github.com/kaspanet/silverscript/issues/243)).
 
@@ -139,7 +139,7 @@ Portable ABI JSON: [silverscript#232](https://github.com/kaspanet/silverscript/p
 | `contracts/v1/KasName.sil` | Owner + labelHash + kasPkh + vaultCommit | **compiled** template_hash `e7f981d9…32b79f` |
 | `contracts/v1/KaChatPayTimeout.sil` | Recipient now / sender after timeout | **compiled** |
 | `contracts/v1/WorkCredit.sil` | Prepaid grams: mint / consume / transfer | **compiled** template_hash `c61458da…11521e` |
-| `KasRegistrar.sil` `CovenantDomain.sil` `NameSet.sil` `NameVault.sil` | Old sugar (`#[covenant.singleton]`) | **sketch** — does not compile on v1-rc1 |
+| `KasRegistrar.sil` `CovenantDomain.sil` `NameSet.sil` `NameVault.sil` | Old sugar (`#[covenant.singleton]`) | **sketch** — does not compile on v1.0.0 |
 
 `/silverc` and `GET /api/v1/artifact/{KasName,KaChatPayTimeout,WorkCredit}`.
 

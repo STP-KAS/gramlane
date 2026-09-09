@@ -20,8 +20,9 @@ var Used = []Pin{
 	{ID: "kip-21", Title: "KIP-21 sequencing / grams", URL: "https://github.com/kaspanet/kips/blob/master/kip-0021.md", Local: "/kip-21", Chip: "Active", Use: "Mass in grams. 50 lanes/block, 1e9 gas/lane on L1. Desk MSG1 is not a subnetwork_id."},
 	{ID: "kccs", Title: "kaspanet/kccs", URL: "https://github.com/kaspanet/kccs", Local: "/kccs", Chip: "Draft", Use: "Read so we can refuse a token. WorkCredit is the voucher."},
 	{ID: "kccs-20", Title: "kccs#20 vectors", URL: "https://github.com/kaspanet/kccs/pull/20", Local: "/kccs-20", Chip: "open", Use: "KCC-0020 still Draft. Not GRAM."},
-	{ID: "silverscript", Title: "silverscript releases", URL: "https://github.com/kaspanet/silverscript/releases", Local: "/silverscript", Chip: "v1-rc1", Use: "Official compiler list. Only v1-rc1 as of 5 Sep 2026."},
-	{ID: "v1-rc1", Title: "silverc v1-rc1", URL: "https://github.com/kaspanet/silverscript/releases/tag/v1-rc1", Local: "/v1-rc1", Chip: "pin", Use: "KasName.sil and WorkCredit.sil. Not master."},
+	{ID: "silverscript", Title: "silverscript releases", URL: "https://github.com/kaspanet/silverscript/releases", Local: "/silverscript", Chip: "v1.0.0", Use: "Official compiler list. v1.0.0 tagged 9 Sep 2026. A compiler tag is not a dapp."},
+	{ID: "v1.0.0", Title: "silverc v1.0.0", URL: "https://github.com/kaspanet/silverscript/releases/tag/v1.0.0", Local: "/v1.0.0", Chip: "pin", Use: "Ori / someone235, 9 Sep 2026, 3ed9733. SemVer v1. #234 still unmerged."},
+	{ID: "v1-rc1", Title: "silverc v1-rc1", URL: "https://github.com/kaspanet/silverscript/releases/tag/v1-rc1", Local: "/v1-rc1", Chip: "history", Use: "30 Aug 2026. Replaced by v1.0.0. This desk's checked-in ABI is still the portable #232 JSON."},
 	{ID: "ss-232", Title: "silverscript#232 ABI", URL: "https://github.com/kaspanet/silverscript/pull/232", Local: "/ss-232", Chip: "merged", Use: "Portable ABI JSON this desk reads."},
 	{ID: "ss-234", Title: "silverscript#234 framing", URL: "https://github.com/kaspanet/silverscript/pull/234", Local: "/ss-234", Chip: "closed", Use: "Foreign readInputState. Closed unmerged. Live /234."},
 	{ID: "ss-243", Title: "silverscript#243 budget", URL: "https://github.com/kaspanet/silverscript/issues/243", Local: "/ss-243", Chip: "open", Use: "consume() has no compute budget in the artifact."},
@@ -35,6 +36,9 @@ var Used = []Pin{
 	{ID: "gramlane", Title: "STP-KAS/gramlane", URL: "https://github.com/STP-KAS/gramlane", Local: "/repo", Chip: "this", Use: "This dApp."},
 	{ID: "delusional", Title: "project delusional", URL: "https://github.com/STP-KAS/project-delusional", Local: "/delusional", Chip: "index", Use: "Stack index."},
 	{ID: "masterfile", Title: "kaspa-master-file", URL: "https://github.com/STP-KAS/kaspa-master-file", Local: "/masterfile-repo", Chip: "this", Use: "Public Kaspa map. Tab /masterfile."},
+	{ID: "mixer", Title: "mixer-concept", URL: "https://github.com/STP-KAS/mixer-concept", Local: "/mixer", Chip: "mix", Use: "Parker GitHub models + STP doors. Education. Not this desk's money."},
+	{ID: "peglab", Title: "peglab-stp", URL: "https://github.com/STP-KAS/peglab-stp", Local: "/peglab", Chip: "tn10", Use: "Toy that WILL depeg. Not grams. Not USD."},
+	{ID: "darwin", Title: "gramlanepeglab", URL: "https://github.com/STP-KAS/gramlanepeglab", Local: "/darwin", Chip: "poc", Use: "Parker mix Darwin battletest. Sequencing PoC."},
 }
 
 var Refuse = []Pin{
