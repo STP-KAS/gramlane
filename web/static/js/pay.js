@@ -2,30 +2,10 @@
   function $(sel) {
     return document.querySelector(sel);
   }
-
   function say(t) {
     const el = $("[data-pay-status]");
     if (el) el.textContent = t;
   }
-
-  function loginAddr() {
-    var el = document.querySelector("[data-wallet-addr]");
-    if (!el) return "";
-    return String(el.value || el.textContent || "").trim();
-  }
-
-  function parseTxid(raw) {
-    if (!raw) return "";
-    if (typeof raw === "object") return raw.id || raw.transactionId || raw.txid || "";
-    var s = String(raw).trim();
-    try {
-      var j = JSON.parse(s);
-      return j.id || j.transactionId || j.txid || s;
-    } catch (_) {
-      return s;
-    }
-  }
-
   function copy(text) {
     text = String(text || "").trim();
     if (!text) return;
@@ -41,259 +21,22 @@
         document.execCommand("copy");
       } catch (_) {}
       document.body.removeChild(ta);
-      say("Copied " + text);
+      say("Copied");
     }
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text).then(function () {
-        say("Copied " + text);
+        say("Copied");
       }, fallback);
     } else fallback();
   }
-
-  async function accounts() {
-    var w = window.kasware;
-    if (!w) throw new Error("Kasware is not in this tab. Log in on http://127.0.0.1:8081 first.");
-    if (typeof w.getAccounts === "function") {
-      try {
-        var have = await w.getAccounts();
-        if (have && have[0]) return have;
-      } catch (_) {}
-    }
-    return w.requestAccounts();
-  }
-
-  function injectedSender() {
-    if (window.kasware && typeof window.kasware.sendKaspa === "function") return window.kasware;
-    if (window.kastle && typeof window.kastle.sendKaspa === "function") return window.kastle;
-    return null;
-  }
-
-  async function sendKaspaAny(to, sompi, opts) {
-    opts = opts || { priorityFee: 10000 };
-    var last = null;
-    var order = [];
-    if (window.kasware && typeof window.kasware.sendKaspa === "function") order.push(window.kasware);
-    if (window.kastle && typeof window.kastle.sendKaspa === "function") order.push(window.kastle);
-    for (var i = 0; i < order.length; i++) {
-      try {
-        return await order[i].sendKaspa(to, sompi, opts);
-      } catch (e) {
-        last = e;
-      }
-    }
-    throw last || new Error("No in-page wallet. Open the kaspa: link, scan the QR, or paste a txid from any Kaspa wallet (Kaspium, Tangem, Kaspa NG, …).");
-  }
-
-  async function sendKaspaMaybePair(nameTo, nameSompi, vaultTo, vaultSompi) {
-    var w = injectedSender();
-    if (!w) throw new Error("No in-page wallet. Pay the name lock and growth vault from any Kaspa wallet, then paste the txid.");
-    try {
-      return await w.sendKaspa(
-        [
-          { address: nameTo, amount: nameSompi },
-          { address: vaultTo, amount: vaultSompi },
-        ],
-        { priorityFee: 10000 }
-      );
-    } catch (_) {}
-    try {
-      return await w.sendKaspa(nameTo, nameSompi, {
-        priorityFee: 10000,
-        outputs: [{ address: vaultTo, amount: vaultSompi }],
-      });
-    } catch (_) {}
-    say("Name first (100 KAS). Then confirm the Kaspa growth share.");
-    var nameTx = await w.sendKaspa(nameTo, nameSompi, { priorityFee: 10000 });
-    say("Name on L1. Confirm 100 KAS to the growth vault.");
-    try {
-      await w.sendKaspa(vaultTo, vaultSompi, { priorityFee: 10000 });
-    } catch (e) {
-      say("Name is funded. Growth share failed — send 100 KAS to the vault when you can. " + (e && e.message ? e.message : ""));
-    }
-    return nameTx;
-  }
-
-  function toHex(s) {
-    var out = "";
-    var u = new TextEncoder().encode(String(s || ""));
-    for (var i = 0; i < u.length; i++) out += u[i].toString(16).padStart(2, "0");
-    return out;
-  }
-
-  async function sendWithPayload(to, sompi, payload) {
-    var w = injectedSender();
-    if (!w) throw new Error("No in-page wallet. Open the kaspa: link, scan the QR, or paste a txid.");
-    var attempts = [
-      { priorityFee: 10000, payload: payload },
-      { priorityFee: 10000, payload: toHex(payload) },
-    ];
-    var last = null;
-    for (var i = 0; i < attempts.length; i++) {
-      try {
-        return await w.sendKaspa(to, sompi, attempts[i]);
-      } catch (e) {
-        last = e;
-      }
-    }
-    try {
-      return await w.sendKaspa(to, sompi, { priorityFee: 10000 });
-    } catch (e) {
-      throw last || e;
-    }
-  }
-
-  async function kachatSend(ev) {
-    ev.preventDefault();
-    var btn = ev.currentTarget;
-    if (btn.dataset.busy === "1") return;
-    var form = btn.closest("form");
-    var textEl = form && form.querySelector('input[name="text"], textarea[name="text"]');
-    var text = (textEl && textEl.value ? textEl.value : "").trim();
-    if (!text) {
-      say("Type a message first.");
-      return;
-    }
-    var to = (btn.getAttribute("data-to") || "").trim();
-    var sompi = Number(btn.getAttribute("data-sompi") || "50000000");
-    var kind = btn.getAttribute("data-kind") || "pay";
-    if (!to || to.indexOf("kaspa:") !== 0) {
-      say("No Kaspa address to send to.");
-      return;
-    }
-    var me = loginAddr();
-    if (me && to === me) {
-      say("Kasware blocks send-to-self. Open a contact, not your own login.");
-      return;
-    }
-    var payload = kind === "bcast" ? "kchat:1:bcast:gramlane:" + text : "kchat:1:pay:" + btoa(unescape(encodeURIComponent(text)));
-    btn.dataset.busy = "1";
-    btn.disabled = true;
-    say("Kasware confirm on this page. 0.5 KAS + payload. Not KaChat E2E.");
-    try {
-      await accounts();
-      var raw = await sendWithPayload(to, sompi, payload);
-      var txid = parseTxid(raw);
-      if (!txid) throw new Error("Kasware returned no txid.");
-      var tx = form && form.querySelector('input[name="tx"]');
-      if (tx) tx.value = txid;
-      say("On L1. " + txid);
-      if (form) form.submit();
-    } catch (e) {
-      say((e && e.message ? e.message : String(e)) + " Stay on this URL. Do not open the KaChat app for this send.");
-    } finally {
-      btn.dataset.busy = "0";
-      btn.disabled = false;
-    }
-  }
-
-  async function payL1(ev) {
+  function withdrawn(ev) {
     ev.preventDefault();
     ev.stopPropagation();
-    var btn = ev.currentTarget;
-    if (btn.dataset.busy === "1") return;
-    var to = (btn.getAttribute("data-to") || "").trim() || (($("#pay-to") && $("#pay-to").value.trim()) || "");
-    var sompi = Number(btn.getAttribute("data-sompi") || "0");
-    var me = loginAddr();
-    if (!to || to.indexOf("kaspa:") !== 0) {
-      say("Need a kaspa: output address (Kaspa growth vault for fill — not your login).");
-      return;
-    }
-    if (me && to === me) {
-      say("Output address is your login. Kasware will block it.");
-      return;
-    }
-    if (!sompi) {
-      say("Missing amount.");
-      return;
-    }
-    var modal = document.getElementById("walletModal");
-    if (modal) modal.hidden = true;
-    btn.dataset.busy = "1";
-    btn.disabled = true;
-    say("Kasware confirm should appear over this page — stay here, do not open the extension Send tab.");
-    try {
-      var acc = await accounts();
-      if (!acc || !acc[0]) throw new Error("Log in first.");
-      var payer = $('input[name="payer"]');
-      var wallet = $('input[name="wallet"]');
-      if (payer) payer.value = acc[0];
-      if (wallet) wallet.value = window.kastle && !window.kasware ? "kastle" : (window.kasware ? "kasware" : "uri");
-      var vault = (btn.getAttribute("data-vault") || "").trim();
-      var vaultSompi = Number(btn.getAttribute("data-vault-sompi") || "0");
-      var raw;
-      if (vault && vault.indexOf("kaspa:") === 0 && vaultSompi > 0) {
-        if (me && vault === me) {
-          say("Growth vault is your login. Kasware will block it.");
-          return;
-        }
-        raw = await sendKaspaMaybePair(to, sompi, vault, vaultSompi);
-      } else {
-        say("Confirm in Kasware or Kastle if this tab has one. Otherwise use the kaspa: link / QR.");
-        raw = await sendKaspaAny(to, sompi, { priorityFee: 10000 });
-      }
-      var txid = parseTxid(raw);
-      if (!txid) throw new Error("Kasware returned no txid.");
-      var pay = $('input[name="payment"]');
-      if (pay) pay.value = txid;
-      var link = $("[data-explorer]");
-      if (link) {
-        link.href = "https://explorer.kaspa.org/txs/" + txid;
-        link.hidden = false;
-        link.textContent = "explorer.kaspa.org";
-      }
-      say("On L1. Txid " + txid);
-      var buyId = btn.getAttribute("data-buy-id");
-      if (buyId && acc[0]) {
-        var buyBody = "act=buy&id=" + encodeURIComponent(buyId) + "&buyer=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
-        fetch("/market", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: buyBody })
-          .finally(function () {
-            location.href = "/mine?address=" + encodeURIComponent(acc[0]);
-          });
-        return;
-      }
-      var reserve = btn.getAttribute("data-reserve-buy");
-      if (reserve && acc[0]) {
-        var rb = "act=buy-reserve&name=" + encodeURIComponent(reserve) + "&address=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
-        fetch("/kasdomain", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: rb })
-          .finally(function () {
-            location.href = "/mine?address=" + encodeURIComponent(acc[0]);
-          });
-        return;
-      }
-      var nm = btn.getAttribute("data-name");
-      if (nm && acc[0]) {
-        var body = "act=held&name=" + encodeURIComponent(nm) + "&address=" + encodeURIComponent(acc[0]) + "&tx=" + encodeURIComponent(txid);
-        fetch("/kasdomain", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body })
-          .finally(function () {
-            location.href = "/kasdomain?q=" + encodeURIComponent(nm) + "&address=" + encodeURIComponent(acc[0]);
-          });
-        return;
-      }
-      var after = btn.getAttribute("data-after");
-      if (after === "run") {
-        say("On L1. Txid " + txid + " — running job.");
-        var form = document.querySelector("form[action='/run']");
-        if (form) form.submit();
-      } else if (after) {
-        var form = document.querySelector("form[action='" + after + "']") || document.querySelector(after);
-        if (form) form.submit();
-      }
-    } catch (e) {
-      say((e && e.message ? e.message : String(e)) + " — if Kasware is a black window, close it, Log in, click Pay once.");
-    } finally {
-      btn.dataset.busy = "0";
-      btn.disabled = false;
-    }
+    say("Wallet inject withdrawn 17 Sep 2026. Copy the kaspa: URI, scan the QR, or paste a txid. This desk does not ship wallet integrations.");
   }
-
   function bind() {
-    var host = $("[data-origin-note]");
-    if (host) host.textContent = "Stay on " + location.origin + ".";
-    document.querySelectorAll("[data-pay-l1]").forEach(function (payBtn) {
-      payBtn.addEventListener("click", payL1);
-    });
-    document.querySelectorAll("[data-kachat-send]").forEach(function (btn) {
-      btn.addEventListener("click", kachatSend);
+    document.querySelectorAll("[data-pay-l1], [data-kachat-send]").forEach(function (btn) {
+      btn.addEventListener("click", withdrawn);
     });
     document.querySelectorAll("[data-copy], [data-copy-text]").forEach(function (btn) {
       btn.addEventListener("click", function (ev) {
@@ -305,7 +48,6 @@
       });
     });
   }
-
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
   else bind();
 })();
