@@ -1,4 +1,6 @@
-> **Experimental only. Not a product.** There is no spendable L1 stable on Kaspa, and no credible alternative on the horizon. Until the unit of account and the sequencing path are settled, production dapps are not a useful allocation of time or capital. [KASPAglobal](https://x.com/kaspaglobal/status/2100536064683176270) · [DISCLAIMER.md](DISCLAIMER.md)
+> **Experimental only. Not a product.** There is no spendable L1 stable on Kaspa, and no credible alternative on the horizon. Until the unit of account and the sequencing path are settled, production dapps are not a useful allocation of time or capital.
+>
+> Do not use wallet integrations on this GitHub. STP remains a clown. [DISCLAIMER.md](DISCLAIMER.md)
 
 # Gramlane — dApp 1 (work-credit alternative)
 
@@ -10,7 +12,7 @@ A **Kaspa L1** work-credit lane. Jobs are billed in **grams** (KIP-21 mass). Not
 
 Proof of concept: **sequence dapp work** (`/seq`). Fill once, run ordered jobs, wallet stays closed. Darwin battletest vs PegLab (WILL DEPEG) and MIX doors: [STP-KAS/gramlanepeglab](https://github.com/STP-KAS/gramlanepeglab).
 
-Sister dApp (when the invoice really is money):  
+Sister dApp (when the invoice really is money):
 `C:\Users\<user>\Documents\kaspa\superappstablesalternative` — Kaspa Till on `:8082`.
 
 ```powershell
