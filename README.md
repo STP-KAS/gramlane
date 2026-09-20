@@ -86,3 +86,12 @@ Index of the stack: [STP-KAS/project-delusional](https://github.com/STP-KAS/proj
 ## Honesty
 
 Covenants lock work. They do not mint USD. This dApp never routes through an L2. USDT can sit off to the side; it is not the meter. A Kaspa L1 dollar is **not live**; that slot is the other dApp.
+
+---
+
+> **Standard disclaimer.** This GitHub, not the topic above.
+>
+> Intentions are good; thought process is questionable. STP remains delusional. Si vis pacem, para bellum.
+>
+> Intern at https://sixpack.wtf/  
+> X: https://x.com/StppStp · GitHub: https://github.com/STP-KAS
