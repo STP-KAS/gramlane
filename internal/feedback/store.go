@@ -13,7 +13,15 @@ import (
 	"unicode"
 )
 
-const DefaultDir = `C:\Users\<user>\Documents\kaspa\feedback`
+// DefaultDir is %USERPROFILE%\Documents\kaspa\feedback on the Windows desk.
+var DefaultDir = filepath.Join(userHome(), "Documents", "kaspa", "feedback")
+
+func userHome() string {
+	if h, err := os.UserHomeDir(); err == nil {
+		return h
+	}
+	return "."
+}
 
 var wordRe = regexp.MustCompile(`[a-z]+`)
 
